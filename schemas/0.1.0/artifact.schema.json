@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/artifact.schema.json",
+  "title": "Artifact reference",
+  "description": "A bounded reference to scientific content that remains outside model context.",
+  "type": "object",
+  "required": ["artifact_ref", "uri", "media_type", "size_bytes", "sha256", "role", "access_scope", "provenance_ref"],
+  "properties": {
+    "artifact_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#absoluteReference"
+    },
+    "uri": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#absoluteReference"
+    },
+    "media_type": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#mediaType"
+    },
+    "size_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sha256": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#sha256"
+    },
+    "role": {
+      "enum": ["source-record", "input", "output", "structure", "trajectory", "mesh", "log", "diagnostic", "report", "other"]
+    },
+    "access_scope": {
+      "enum": ["public", "workspace", "authenticated", "restricted"]
+    },
+    "provenance_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#absoluteReference"
+    },
+    "extensions": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/extension.schema.json"
+    }
+  },
+  "unevaluatedProperties": false
+}

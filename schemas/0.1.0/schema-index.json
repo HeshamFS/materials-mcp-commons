@@ -1,0 +1,104 @@
+{
+  "contract": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/schema-index.schema.json",
+  "profile_version": "0.1.0",
+  "canonical_base": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/",
+  "generated_at": "2026-09-04T23:08:35+02:00",
+  "resources": [
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/artifact.schema.json",
+      "path": "artifact.schema.json",
+      "sha256": "2875b078f014741ded9f4481e9d1d6f6cc3c41ec6d0be2551cd16c49451dedbb",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/citation.schema.json",
+      "path": "citation.schema.json",
+      "sha256": "259f1f36b234ad3ade4d0af136dbb4db3ce5e4b5160ce546471bbe51f43a1038",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json",
+      "path": "common.schema.json",
+      "sha256": "3a263ac898ba89dcd9b07dc1fe62c81f32f6e0f9d9fd000e18ccce1ff3c46efd",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/effect.schema.json",
+      "path": "effect.schema.json",
+      "sha256": "4f14a464eff60e628cc42c02b27e2b437871ac361d87d60ad8171b6e64289a33",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/entity.schema.json",
+      "path": "entity.schema.json",
+      "sha256": "6e1192714acf068882bdc1774aca3403ef5bfa684a8fd031cbd8f25da81dd576",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/extension.schema.json",
+      "path": "extension.schema.json",
+      "sha256": "522f9a5416cf8fe4e776853fa8a2c357ed031a6f2bbec823c2cec4b5137c13a1",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/operation-plan.schema.json",
+      "path": "operation-plan.schema.json",
+      "sha256": "e71f5dc3508d550765b0082227d32cd55b99351359bd555dca3c73aa80f44b9e",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/plugin-manifest.schema.json",
+      "path": "plugin-manifest.schema.json",
+      "sha256": "4c2a663d5ff90f1ab0dd09b084fd6b3383aedd2dff869847bb501af223c9c086",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/provenance.schema.json",
+      "path": "provenance.schema.json",
+      "sha256": "fd5b7c3be03efa90abddb8ad1d4dc645b2650a47897f60b7b369624e86c0592d",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/quality-assessment.schema.json",
+      "path": "quality-assessment.schema.json",
+      "sha256": "e3f8d4e83a91a96c5156ff2e0bdd1d5d0c216e350072df45d513a4c7b2b7be22",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/result-bundle.schema.json",
+      "path": "result-bundle.schema.json",
+      "sha256": "66a0c2997dc8f25be73d3d0e9648bed81ae8300cd404bad6121dd8fb5a666f83",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/run-record.schema.json",
+      "path": "run-record.schema.json",
+      "sha256": "fc4e64ae147f8053ca7ef919c419448eed9fa46405a04ee7885c70a814c0de2c",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/schema-index.schema.json",
+      "path": "schema-index.schema.json",
+      "sha256": "7ebbfee99e958be3c4853baea1ef886ca6be1e23b9807ea793c44be11200b669",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/scientific-property.schema.json",
+      "path": "scientific-property.schema.json",
+      "sha256": "b88140db3eefa527f48306039c3308d1a67a7fa5c19603f9342964cc1407387f",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/scientific-value.schema.json",
+      "path": "scientific-value.schema.json",
+      "sha256": "b20c890278f1cb51a061fa301bbfaf950ed3f28d2fea45ad5fb65e485e5b3b5d",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/structured-error.schema.json",
+      "path": "structured-error.schema.json",
+      "sha256": "da3d3f3e36510fbaf308459f99ccd8bbbd7f674066ede58764e2130448bc4d48",
+      "media_type": "application/schema+json"
+    }
+  ]
+}

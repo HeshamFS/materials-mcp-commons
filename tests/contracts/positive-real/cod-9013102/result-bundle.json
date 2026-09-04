@@ -1,0 +1,259 @@
+{
+  "contract": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/result-bundle.schema.json",
+  "profile_version": "0.1.0",
+  "result_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:result",
+  "produced_at": "2026-09-04T22:45:08+02:00",
+  "status": "complete",
+  "entities": [
+    {
+      "entity_ref": "https://www.crystallography.net/cod/9013102.html",
+      "entity_type": "structure",
+      "label": "Silicon crystal structure at 298.15 K",
+      "identifiers": [
+        {
+          "scheme": "cod",
+          "value": "9013102",
+          "uri": "https://www.crystallography.net/cod/9013102.html"
+        },
+        {"scheme": "chemical-formula", "value": "Si"},
+        {"scheme": "sample-origin", "value": "Synthetic"},
+        {"scheme": "space-group-it-number", "value": "227"},
+        {"scheme": "hermann-mauguin", "value": "F d -3 m :1"},
+        {"scheme": "hall", "value": "F 4d 2 3 -1d"}
+      ]
+    }
+  ],
+  "properties": [
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:property:cell-length-a",
+      "property_id": "https://dictionary.iucr.org/Cell_length_a",
+      "label": "Unit-cell length a",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 5.4304,
+        "unit": {"system": "UCUM", "identifier": "Ao", "symbol": "Å"}
+      },
+      "condition_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature"],
+      "uncertainty": {
+        "status": "not-reported",
+        "reason": "The selected source value has no reported standard uncertainty."
+      },
+      "evidence_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"]
+    },
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:property:cell-length-b",
+      "property_id": "https://dictionary.iucr.org/Cell_length_b",
+      "label": "Unit-cell length b",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 5.4304,
+        "unit": {"system": "UCUM", "identifier": "Ao", "symbol": "Å"}
+      },
+      "condition_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature"],
+      "uncertainty": {
+        "status": "not-reported",
+        "reason": "The selected source value has no reported standard uncertainty."
+      },
+      "evidence_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"]
+    },
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:property:cell-length-c",
+      "property_id": "https://dictionary.iucr.org/Cell_length_c",
+      "label": "Unit-cell length c",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 5.4304,
+        "unit": {"system": "UCUM", "identifier": "Ao", "symbol": "Å"}
+      },
+      "condition_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature"],
+      "uncertainty": {
+        "status": "not-reported",
+        "reason": "The selected source value has no reported standard uncertainty."
+      },
+      "evidence_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"]
+    },
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:property:cell-angle-alpha",
+      "property_id": "https://dictionary.iucr.org/Cell_angle_alpha",
+      "label": "Unit-cell angle alpha",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 90,
+        "unit": {"system": "UCUM", "identifier": "deg", "symbol": "°"}
+      },
+      "condition_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature"],
+      "uncertainty": {
+        "status": "not-reported",
+        "reason": "The selected source value has no reported standard uncertainty."
+      },
+      "evidence_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"]
+    },
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:property:cell-angle-beta",
+      "property_id": "https://dictionary.iucr.org/Cell_angle_beta",
+      "label": "Unit-cell angle beta",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 90,
+        "unit": {"system": "UCUM", "identifier": "deg", "symbol": "°"}
+      },
+      "condition_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature"],
+      "uncertainty": {
+        "status": "not-reported",
+        "reason": "The selected source value has no reported standard uncertainty."
+      },
+      "evidence_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"]
+    },
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:property:cell-angle-gamma",
+      "property_id": "https://dictionary.iucr.org/Cell_angle_gamma",
+      "label": "Unit-cell angle gamma",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 90,
+        "unit": {"system": "UCUM", "identifier": "deg", "symbol": "°"}
+      },
+      "condition_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature"],
+      "uncertainty": {
+        "status": "not-reported",
+        "reason": "The selected source value has no reported standard uncertainty."
+      },
+      "evidence_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"]
+    },
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:property:cell-volume",
+      "property_id": "https://dictionary.iucr.org/Cell_volume",
+      "label": "Unit-cell volume",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 160.138,
+        "unit": {"system": "UCUM", "identifier": "Ao3", "symbol": "Å³"}
+      },
+      "condition_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature"],
+      "uncertainty": {
+        "status": "not-reported",
+        "reason": "The selected source value has no reported standard uncertainty."
+      },
+      "evidence_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"]
+    }
+  ],
+  "conditions": [
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature",
+      "property_id": "https://dictionary.iucr.org/Diffrn_ambient_temperature",
+      "label": "Diffraction ambient temperature",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 298.15,
+        "unit": {"system": "UCUM", "identifier": "K", "symbol": "K"}
+      },
+      "condition_refs": [],
+      "uncertainty": {
+        "status": "not-reported",
+        "reason": "The selected source value has no reported standard uncertainty."
+      },
+      "evidence_refs": ["urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"]
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif",
+      "uri": "https://www.crystallography.net/cod/9013102.cif@291877",
+      "media_type": "chemical/x-cif",
+      "size_bytes": 5190,
+      "sha256": "4ccd895a831a4d4539a687f23c03b8708a97fbb14fadbf9e43a22bb338b92176",
+      "role": "source-record",
+      "access_scope": "public",
+      "provenance_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:provenance"
+    }
+  ],
+  "quality": {
+    "status": "not-assessed",
+    "reason": "This fixture tests contract and provenance handling; it is not a scientific validation claim.",
+    "criteria": [],
+    "limitations": [
+      "The selected scalar values contain no reported standard uncertainties.",
+      "The source record does not include reflection observations.",
+      "No numerical backend execution or independent scientific validation is claimed."
+    ]
+  },
+  "provenance": {
+    "provenance_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:provenance",
+    "activity_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:activity:source-projection",
+    "activity_type": "source-projection",
+    "started_at": "2026-09-04T22:45:07+02:00",
+    "ended_at": "2026-09-04T22:45:08+02:00",
+    "producer": {
+      "producer_ref": "urn:materials-mcp:commons:profile-fixture-curation",
+      "name": "Materials MCP Commons profile fixture curation",
+      "version": "0.1.0"
+    },
+    "inputs": ["https://www.crystallography.net/cod/9013102.cif@291877"],
+    "parameters": [],
+    "environment": {
+      "status": "not-applicable",
+      "reason": "No computational backend or numerical scientific execution was used."
+    },
+    "sources": [
+      {
+        "source_ref": "https://www.crystallography.net/cod/9013102.cif@291877",
+        "source_type": "database-record",
+        "title": "Crystallography Open Database entry 9013102, revision 291877",
+        "uri": "https://www.crystallography.net/cod/9013102.cif@291877",
+        "version": "291877",
+        "retrieved_at": "2026-09-04T22:45:08+02:00",
+        "rights": {
+          "basis": "public-domain",
+          "identifier": "CC0-1.0",
+          "uri": "https://creativecommons.org/publicdomain/zero/1.0/",
+          "redistribution": "permitted",
+          "attribution": "Acknowledge B. N. Dutta and the original structural-data sources as requested by the Crystallography Open Database."
+        },
+        "size_bytes": 5190,
+        "sha256": "4ccd895a831a4d4539a687f23c03b8708a97fbb14fadbf9e43a22bb338b92176",
+        "transformations": [
+          {"operation": "copy", "source_locator": "_chemical_formula_sum", "target_pointer": "/entities/0/identifiers/1/value"},
+          {"operation": "copy", "source_locator": "_chemical_compound_source", "target_pointer": "/entities/0/identifiers/2/value"},
+          {"operation": "copy", "source_locator": "_space_group_IT_number", "target_pointer": "/entities/0/identifiers/3/value"},
+          {"operation": "copy", "source_locator": "_symmetry_space_group_name_H-M", "target_pointer": "/entities/0/identifiers/4/value"},
+          {"operation": "copy", "source_locator": "_symmetry_space_group_name_Hall", "target_pointer": "/entities/0/identifiers/5/value"},
+          {"operation": "copy", "source_locator": "_cell_length_a", "target_pointer": "/properties/0/value/value"},
+          {"operation": "copy", "source_locator": "_cell_length_b", "target_pointer": "/properties/1/value/value"},
+          {"operation": "copy", "source_locator": "_cell_length_c", "target_pointer": "/properties/2/value/value"},
+          {"operation": "copy", "source_locator": "_cell_angle_alpha", "target_pointer": "/properties/3/value/value"},
+          {"operation": "copy", "source_locator": "_cell_angle_beta", "target_pointer": "/properties/4/value/value"},
+          {"operation": "copy", "source_locator": "_cell_angle_gamma", "target_pointer": "/properties/5/value/value"},
+          {"operation": "copy", "source_locator": "_cell_volume", "target_pointer": "/properties/6/value/value"},
+          {"operation": "copy", "source_locator": "_diffrn_ambient_temperature", "target_pointer": "/conditions/0/value/value"},
+          {
+            "operation": "unit-annotation",
+            "source_locator": "IUCr CIF Core dictionary units for the selected tags",
+            "target_pointer": "",
+            "note": "Numeric values were not converted. UCUM identifiers annotate the source units."
+          }
+        ],
+        "citation_refs": ["https://doi.org/10.1002/pssb.19620020803"]
+      }
+    ]
+  },
+  "citations": [
+    {
+      "citation_ref": "https://doi.org/10.1002/pssb.19620020803",
+      "title": "Lattice constants and thermal expansion of silicon up to 900 C by X-ray method",
+      "authors": ["B. N. Dutta"],
+      "year": 1962,
+      "identifier": {"scheme": "doi", "value": "10.1002/pssb.19620020803"},
+      "uri": "https://doi.org/10.1002/pssb.19620020803",
+      "container_title": "Physica Status Solidi"
+    }
+  ],
+  "warnings": []
+}

@@ -32,7 +32,15 @@ The engine is implemented and gated before concrete plugins are selected or name
 
 Public documentation begins in [`docs/`](docs/README.md).
 
-The current engine foundation is an installable, typed Python alpha package with independently versioned contract sources. It intentionally has no runtime dependency, normative schema, concrete integration, or scientific fixture yet; those enter only through their gated work items.
+The repository now contains:
+
+- an installable, typed Python alpha package with no engine runtime dependencies;
+- the 0.1.0 normative JSON Schema contract line and checksum-pinned resource index;
+- an offline, fail-closed conformance harness;
+- one registered real positive scientific record and an isolated generated-negative rejection corpus; and
+- an independently deployable Cloudflare Worker boundary for the canonical schema hostname.
+
+Start with the [0.1.0 contract guide](docs/contracts.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Runtime dispatch, context projection, and concrete integrations are not implemented yet.
 
 ## Author and maintainer
 

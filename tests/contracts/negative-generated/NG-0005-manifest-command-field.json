@@ -1,0 +1,16 @@
+{
+  "case_id": "NG-0005",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject an undeclared command field in the declarative manifest boundary.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/plugin-manifest.schema.json",
+  "instance": {
+    "command": "generated-invalid-command"
+  },
+  "expected": {
+    "phase": "schema",
+    "validator": "unevaluatedProperties",
+    "instance_path": [],
+    "schema_path": ["unevaluatedProperties"]
+  }
+}

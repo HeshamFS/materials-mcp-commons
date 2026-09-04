@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/scientific-property.schema.json",
+  "title": "Scientific property",
+  "description": "A typed property value linked to its subject, conditions, uncertainty, and evidence.",
+  "type": "object",
+  "required": ["property_ref", "property_id", "label", "subject_ref", "value", "condition_refs", "uncertainty", "evidence_refs"],
+  "properties": {
+    "property_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#absoluteReference"
+    },
+    "property_id": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#absoluteReference"
+    },
+    "label": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#nonEmptyString"
+    },
+    "subject_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#absoluteReference"
+    },
+    "value": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/scientific-value.schema.json"
+    },
+    "condition_refs": {
+      "type": "array",
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#absoluteReference"
+      }
+    },
+    "uncertainty": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["status", "reason"],
+          "properties": {
+            "status": {"const": "not-reported"},
+            "reason": {
+              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#nonEmptyString"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["status", "kind", "value"],
+          "properties": {
+            "status": {"const": "reported"},
+            "kind": {
+              "enum": ["standard", "expanded", "confidence-interval", "range", "other"]
+            },
+            "value": {
+              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/scientific-value.schema.json"
+            },
+            "confidence_level": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#absoluteReference"
+      }
+    },
+    "extensions": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/extension.schema.json"
+    }
+  },
+  "unevaluatedProperties": false
+}

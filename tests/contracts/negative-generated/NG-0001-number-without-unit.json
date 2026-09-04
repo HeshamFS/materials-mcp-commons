@@ -1,0 +1,17 @@
+{
+  "case_id": "NG-0001",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject a numeric scientific value whose unit is omitted.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/scientific-value.schema.json",
+  "instance": {
+    "value_type": "number",
+    "value": 1.0
+  },
+  "expected": {
+    "phase": "schema",
+    "validator": "required",
+    "instance_path": [],
+    "schema_path": ["oneOf", 0, "required"]
+  }
+}

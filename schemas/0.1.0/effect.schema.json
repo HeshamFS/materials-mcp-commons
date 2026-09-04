@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/effect.schema.json",
+  "title": "Operation effect",
+  "description": "The R0-R4 effect tier and its mandatory planning and approval posture.",
+  "type": "object",
+  "required": ["tier", "category", "description", "plan_required", "approval_required", "strong_confirmation_required"],
+  "properties": {
+    "tier": {"enum": ["R0", "R1", "R2", "R3", "R4"]},
+    "category": {"enum": ["read-only", "bounded-local", "compute-or-cost", "external-write", "destructive"]},
+    "description": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/common.schema.json#nonEmptyString"
+    },
+    "plan_required": {"type": "boolean"},
+    "approval_required": {"type": "boolean"},
+    "strong_confirmation_required": {"type": "boolean"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"tier": {"const": "R0"}}, "required": ["tier"]},
+      "then": {
+        "properties": {
+          "category": {"const": "read-only"},
+          "plan_required": {"const": false},
+          "approval_required": {"const": false},
+          "strong_confirmation_required": {"const": false}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"tier": {"const": "R1"}}, "required": ["tier"]},
+      "then": {
+        "properties": {
+          "category": {"const": "bounded-local"},
+          "plan_required": {"const": false},
+          "approval_required": {"const": false},
+          "strong_confirmation_required": {"const": false}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"tier": {"const": "R2"}}, "required": ["tier"]},
+      "then": {
+        "properties": {
+          "category": {"const": "compute-or-cost"},
+          "plan_required": {"const": true},
+          "approval_required": {"const": true},
+          "strong_confirmation_required": {"const": false}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"tier": {"const": "R3"}}, "required": ["tier"]},
+      "then": {
+        "properties": {
+          "category": {"const": "external-write"},
+          "plan_required": {"const": true},
+          "approval_required": {"const": true},
+          "strong_confirmation_required": {"const": false}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"tier": {"const": "R4"}}, "required": ["tier"]},
+      "then": {
+        "properties": {
+          "category": {"const": "destructive"},
+          "plan_required": {"const": true},
+          "approval_required": {"const": true},
+          "strong_confirmation_required": {"const": true}
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

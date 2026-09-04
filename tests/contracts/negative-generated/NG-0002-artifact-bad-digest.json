@@ -1,0 +1,23 @@
+{
+  "case_id": "NG-0002",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject an artifact reference whose SHA-256 digest is malformed.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/artifact.schema.json",
+  "instance": {
+    "artifact_ref": "urn:generated-negative:artifact",
+    "uri": "urn:generated-negative:content",
+    "media_type": "application/octet-stream",
+    "size_bytes": 1,
+    "sha256": "not-a-sha256",
+    "role": "input",
+    "access_scope": "workspace",
+    "provenance_ref": "urn:generated-negative:provenance"
+  },
+  "expected": {
+    "phase": "schema",
+    "validator": "pattern",
+    "instance_path": ["sha256"],
+    "schema_path": ["properties", "sha256", "pattern"]
+  }
+}

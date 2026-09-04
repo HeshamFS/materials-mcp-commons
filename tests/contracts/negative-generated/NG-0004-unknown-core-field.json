@@ -1,0 +1,19 @@
+{
+  "case_id": "NG-0004",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject an unknown top-level field instead of silently accepting core-schema drift.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/result-bundle.schema.json",
+  "base_instance": "positive-real/cod-9013102/result-bundle.json",
+  "mutation": {
+    "operation": "add",
+    "path": "/provider_hint",
+    "value": "generated-invalid-field"
+  },
+  "expected": {
+    "phase": "schema",
+    "validator": "unevaluatedProperties",
+    "instance_path": [],
+    "schema_path": ["unevaluatedProperties"]
+  }
+}

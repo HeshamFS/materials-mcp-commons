@@ -53,29 +53,19 @@ def test_initial_source_package_contains_only_the_version_surface() -> None:
     assert package_files == ["__init__.py", "py.typed"]
 
 
-def test_contract_layout_is_exact_and_contains_no_scientific_fixture() -> None:
+def test_contract_layout_has_one_exact_version_and_no_mutable_alias() -> None:
     schema_root = PUBLIC_ROOT / "schemas"
     contract_directories = sorted(path.name for path in schema_root.iterdir() if path.is_dir())
-    contract_files = sorted(
-        path.relative_to(schema_root).as_posix()
-        for path in schema_root.rglob("*")
-        if path.is_file()
-    )
 
     assert contract_directories == ["0.1.0"]
-    assert contract_files == ["0.1.0/README.md", "README.md"]
+    assert not (schema_root / "latest").exists()
+    assert (schema_root / "0.1.0" / "schema-index.json").is_file()
 
 
-def test_contract_corpora_contain_policy_markers_only() -> None:
+def test_contract_corpora_remain_physically_separated() -> None:
     corpus_root = PUBLIC_ROOT / "tests" / "contracts"
-    corpus_files = sorted(
-        path.relative_to(corpus_root).as_posix()
-        for path in corpus_root.rglob("*")
-        if path.is_file()
+    assert (corpus_root / "positive-real").is_dir()
+    assert (corpus_root / "negative-generated").is_dir()
+    assert not any(
+        path.name.startswith("NG-") for path in (corpus_root / "positive-real").rglob("*")
     )
-
-    assert corpus_files == [
-        "README.md",
-        "negative-generated/README.md",
-        "positive-real/README.md",
-    ]

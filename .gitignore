@@ -16,6 +16,9 @@ htmlcov/
 # Environments and builds
 .venv/
 venv/
+node_modules/
+.wrangler/
+.worker-dist/
 build/
 dist/
 *.egg-info/

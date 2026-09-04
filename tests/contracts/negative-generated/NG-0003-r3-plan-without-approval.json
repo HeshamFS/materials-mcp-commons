@@ -1,0 +1,50 @@
+{
+  "case_id": "NG-0003",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject an R3 external-write plan that claims approval is not required.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/operation-plan.schema.json",
+  "instance": {
+    "contract": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/operation-plan.schema.json",
+    "profile_version": "0.1.0",
+    "plan_ref": "urn:generated-negative:plan",
+    "capability_id": "https://invalid.example/generated-negative/capability",
+    "effect": {
+      "tier": "R3",
+      "category": "external-write",
+      "description": "Generated rejection input for external-write approval policy.",
+      "plan_required": true,
+      "approval_required": true,
+      "strong_confirmation_required": false
+    },
+    "created_at": "2026-09-04T00:00:00Z",
+    "input_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "steps": [
+      {
+        "step_id": "write",
+        "action": "write",
+        "description": "Generated external write that must be rejected without approval.",
+        "targets": ["https://invalid.example/generated-negative/target"]
+      }
+    ],
+    "permissions": [
+      {"permission": "external-write", "scope": "generated-negative-target"}
+    ],
+    "approval": {
+      "status": "not-required",
+      "confirmation_kind": "none",
+      "prompt": "Generated invalid approval posture."
+    },
+    "expected_outputs": [
+      {"role": "record", "media_type": "application/json"}
+    ],
+    "estimates": [],
+    "risks": ["Generated negative case only."]
+  },
+  "expected": {
+    "phase": "schema",
+    "validator": "enum",
+    "instance_path": ["approval", "status"],
+    "schema_path": ["allOf", 1, "then", "properties", "approval", "properties", "status", "enum"]
+  }
+}
