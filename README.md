@@ -32,6 +32,8 @@ The engine is implemented and gated before concrete plugins are selected or name
 
 Public documentation begins in [`docs/`](docs/README.md).
 
+The current engine foundation is an installable, typed Python alpha package with independently versioned contract sources. It intentionally has no runtime dependency, normative schema, concrete integration, or scientific fixture yet; those enter only through their gated work items.
+
 ## Author and maintainer
 
 Hesham Salama

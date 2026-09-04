@@ -1,0 +1,74 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "materials-mcp-commons"
+version = "0.1.0a0"
+description = "Plugin-agnostic contracts and engine infrastructure for interoperable materials-science capabilities."
+readme = "README.md"
+requires-python = ">=3.11,<3.15"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [
+  { name = "Hesham Salama" },
+]
+keywords = ["materials-science", "mcp", "scientific-computing"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "pyright>=1.1.404,<2",
+  "pytest>=8.4,<10",
+  "pytest-cov>=6.2,<8",
+  "ruff>=0.12,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/materials_mcp_commons"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/src",
+  "/tests/unit",
+  "/LICENSE",
+  "/NOTICE",
+  "/README.md",
+  "/pyproject.toml",
+]
+
+[tool.pytest.ini_options]
+addopts = [
+  "--strict-config",
+  "--strict-markers",
+  "--cov=materials_mcp_commons",
+  "--cov-branch",
+  "--cov-report=term-missing",
+]
+testpaths = ["tests/unit"]
+
+[tool.pyright]
+include = ["src", "tests/unit"]
+pythonVersion = "3.11"
+typeCheckingMode = "strict"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "RUF", "SIM", "UP"]
+
+[tool.uv]
+required-version = ">=0.9.18"
