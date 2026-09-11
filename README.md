@@ -50,7 +50,7 @@ The repository now contains:
 - one registered real positive scientific record, its lossless successor migration and bounded compact projection, and an isolated generated-negative rejection corpus; and
 - an independently deployable Cloudflare Worker boundary for the canonical schema hostname.
 
-Start with the [runtime guide](docs/runtime.md), [production-alpha API compatibility guide](docs/api-compatibility.md), [MCP host guide](docs/mcp-host.md), [operations runbook](docs/operations-runbook.md), [state recovery guide](docs/state-recovery.md), [threat model](docs/threat-model.md), [Scientist Kit authoring guide](docs/authoring.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Effectful dispatch is available only through the exact policy boundary; remote scheduling, network-host authentication, and concrete integrations are not implemented yet.
+Start with the [runtime guide](docs/runtime.md), [production-alpha API compatibility guide](docs/api-compatibility.md), [support boundary](docs/support.md), [MCP host guide](docs/mcp-host.md), [operations runbook](docs/operations-runbook.md), [state recovery guide](docs/state-recovery.md), [threat model](docs/threat-model.md), [Scientist Kit authoring guide](docs/authoring.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Effectful dispatch is available only through the exact policy boundary; remote scheduling, network-host authentication, and concrete integrations are not implemented yet.
 
 ## Author and maintainer
 

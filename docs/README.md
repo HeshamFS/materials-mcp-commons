@@ -15,6 +15,7 @@ This directory contains public, product-facing documentation for Materials MCP C
 - [Scientific evidence policy](scientific-evidence.md)
 - [Versioning and compatibility](versioning.md)
 - [Production-alpha API compatibility](api-compatibility.md)
+- [Production-alpha support boundary](support.md)
 - [External production-alpha review protocol](external-review.md)
 - [Licensing and third-party material](licensing.md)
 
