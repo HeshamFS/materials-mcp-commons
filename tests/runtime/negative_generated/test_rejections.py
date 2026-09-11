@@ -185,7 +185,7 @@ def test_generated_registration_conflicts_fail_closed(
 ) -> None:
     registry = LifecycleRegistry()
     registry.register(loaded_manifest)
-    changed = replace(loaded_manifest, plugin_version="0.1.0-alpha.3")
+    changed = replace(loaded_manifest, plugin_version="0.1.0-alpha.4")
     with pytest.raises(LifecycleError) as failure:
         registry.register(changed)
     assert failure.value.code == "plugin-already-registered"

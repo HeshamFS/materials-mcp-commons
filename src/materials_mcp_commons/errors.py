@@ -21,3 +21,7 @@ class LifecycleError(CommonsError):
 
 class DispatchError(CommonsError):
     """A dispatch request or handler binding was invalid before execution."""
+
+
+class RunStoreError(CommonsError):
+    """Durable run, provenance, or artifact state failed closed."""

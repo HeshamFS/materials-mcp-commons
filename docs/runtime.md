@@ -1,6 +1,6 @@
 # Engine runtime
 
-Engine distribution `0.1.0a2` implements the plugin-agnostic runtime boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner R0 dispatch, deactivation, and unregistration.
+Engine distribution `0.1.0a3` implements the plugin-agnostic runtime boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner R0 dispatch, durable local run/artifact state, deactivation, and unregistration.
 
 Registering metadata or binding a handler never creates network, filesystem, compute, cost, or external-write authority. This release executes only R0 capabilities; R1-R4 fail closed until the later planning, permission, approval, quota, and audit boundary exists.
 
@@ -82,6 +82,12 @@ outcome = dispatcher.dispatch(
 ```
 
 The handler sees an immutable detached request containing only identity and validated JSON data. Failures contain bounded cause, stage, evidence, retryability, corrective action, and the caller-supplied occurrence time; raw handler exceptions are withheld. Synchronous and asynchronous declarations are enforced at the dispatch entry points.
+
+## Durable runs and artifacts
+
+`RunStore` persists exact owner-scoped run snapshots and their complete sequence history in a fixed SQLite database beneath an explicit state root. Creation is deterministic and idempotent for one request identity. Updates require the expected sequence and non-decreasing explicit timestamps; terminal states are immutable. `deltas` supports bounded reconnect reads, `recover_incomplete` reconstructs nonterminal work after restart, and `cancel` records an explicit cancellation state without claiming remote-job termination.
+
+Artifact registration uses a contained relative path beneath a separate explicit artifact root. The store validates provenance and artifact documents, computes size and SHA-256 from actual bytes, attaches the reference transactionally, and rechecks path containment and bytes on every retrieval. It never copies, deletes, executes, or retrieves artifact content over a network. Run creation remains limited to R0/R1 until the effect-policy runtime is implemented.
 
 ## Evidence boundary
 

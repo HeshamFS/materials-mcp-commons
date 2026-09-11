@@ -79,6 +79,7 @@
       "pathlib",
       "re",
       "referencing",
+      "sqlite3",
       "threading",
       "types",
       "typing"
