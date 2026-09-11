@@ -24,6 +24,7 @@ from tests.contracts.support import (
     validation_errors,
     validator_for,
 )
+from tools.run_conformance import compact_budget_failures, context_budget_failures
 
 PROFILE_VERSION = "0.2.0"
 PREDECESSOR_VERSION = "0.1.0"
@@ -76,42 +77,6 @@ def _normalize_schema_version(value: object) -> object:
         object_value = cast(dict[str, object], value)
         return {key: _normalize_schema_version(item) for key, item in object_value.items()}
     return value
-
-
-def compact_budget_failures(instance: SchemaDocument) -> list[str]:
-    projection = cast(dict[str, Any], instance["projection"])
-    budget = cast(dict[str, Any], projection["budget"])
-    measurement = cast(dict[str, Any], budget["measurement"])
-    failures: list[str] = []
-    if budget["observed"] > budget["limit"]:
-        failures.append("observed-exceeds-limit")
-    if budget["unit"] == "tokens" and measurement["method"] != "host-tokenizer":
-        failures.append("token-measurement-method-mismatch")
-    if budget["unit"] == "utf8-bytes" and measurement["method"] != "utf8-bytes":
-        failures.append("byte-measurement-method-mismatch")
-    return failures
-
-
-def context_budget_failures(instance: SchemaDocument) -> list[str]:
-    budgets = cast(dict[str, Any], instance["budgets"])
-    activation = cast(dict[str, Any], budgets["activation"])
-    inline_result = cast(dict[str, Any], budgets["inline_result"])
-    total_mcp = cast(dict[str, Any], budgets["total_mcp"])
-    lease_policy = cast(dict[str, Any], instance["lease_policy"])
-    failures: list[str] = []
-    if activation["target_schemas"] > activation["max_schemas"]:
-        failures.append("activation-target-exceeds-maximum")
-    if inline_result["target_tokens"] > inline_result["max_tokens"]:
-        failures.append("inline-target-exceeds-maximum")
-    if lease_policy["default_turns"] > lease_policy["max_turns"]:
-        failures.append("lease-default-exceeds-maximum")
-    if not (
-        total_mcp["target_fraction"]
-        <= total_mcp["warning_fraction"]
-        <= total_mcp["intervention_fraction"]
-    ):
-        failures.append("context-fractions-out-of-order")
-    return failures
 
 
 def test_schema_set_is_exact_meta_valid_and_path_identified(

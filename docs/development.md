@@ -22,6 +22,14 @@ The complete test run includes both exact profile lines, the frozen-0.1.0 public
 uv run pytest tests/contracts
 ```
 
+The deterministic M1 conformance runner evaluates the declared multi-version corpus and structural coupling boundary in one command:
+
+```console
+uv run python -m tools.run_conformance
+```
+
+Its machine-readable suite and committed reproducible report are documented in [`conformance/`](../conformance/README.md). The runner is public development tooling; it is intentionally outside the installed engine distribution.
+
 The committed `uv.lock` controls development and verification dependencies. uv is not a runtime requirement of the installed engine package.
 
 ## Schema-host checks
@@ -39,4 +47,4 @@ These commands install the pinned deployment toolchain, regenerate binding types
 
 ## Build boundaries
 
-Build configuration uses explicit public paths. Normative schemas, public documentation, contract corpora, and deployment sources are not bundled into the engine wheel or source distribution. Public release artifacts must be created from clean, tracked repository content rather than a parent-directory build context.
+Build configuration uses explicit public paths. Normative schemas, public documentation, conformance tooling, contract corpora, and deployment sources are not bundled into the engine wheel or source distribution. Public release artifacts must be created from clean, tracked repository content rather than a parent-directory build context.

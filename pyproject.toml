@@ -61,7 +61,7 @@ addopts = [
 testpaths = ["tests"]
 
 [tool.pyright]
-include = ["src", "tests"]
+include = ["src", "tests", "tools"]
 pythonVersion = "3.11"
 typeCheckingMode = "strict"
 

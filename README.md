@@ -37,6 +37,7 @@ The repository now contains:
 - an installable, typed Python alpha package with no engine runtime dependencies;
 - the immutable 0.1.0 contract line and additive 0.2.0 successor, each with a checksum-pinned resource index;
 - an offline, fail-closed conformance harness;
+- a deterministic multi-version conformance report and structural zero-coupling audit;
 - one registered real positive scientific record, its lossless successor migration and bounded compact projection, and an isolated generated-negative rejection corpus; and
 - an independently deployable Cloudflare Worker boundary for the canonical schema hostname.
 

@@ -77,10 +77,16 @@ uv sync --locked --all-groups
 uv run pytest tests/contracts
 ```
 
+The higher-level [M1 conformance suite](../conformance/README.md) runs both profile lines, every declared positive and negative case, semantic budget checks, schema-index integrity, and the structural zero-coupling audit:
+
+```console
+uv run python -m tools.run_conformance
+```
+
 ## Evidence boundary
 
 The [positive corpus](../tests/contracts/positive-real/README.md) contains only registered, provenance-traceable real records. The [generated-negative corpus](../tests/contracts/negative-generated/README.md) exists only to prove rejection or safe failure. A fixture that passes these contracts is Conformant evidence for the tested boundary; it is not, by itself, runtime verification or independent scientific validation.
 
 ## Deliberately outside this implementation slice
 
-This contract set does not yet implement runtime loading or dispatch, context-policy enforcement, host compatibility, or any concrete integration. Those layers must build on these contracts without introducing backend-specific fields into the core.
+This contract set does not yet implement runtime loading or dispatch, runtime context-policy enforcement, host compatibility, or any concrete integration. Those layers must build on these contracts without introducing implementation-specific fields into the core.

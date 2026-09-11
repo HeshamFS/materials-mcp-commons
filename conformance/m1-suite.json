@@ -1,0 +1,95 @@
+{
+  "suite_version": 1,
+  "profiles": [
+    {
+      "profile_version": "0.1.0",
+      "schema_index": "schemas/0.1.0/schema-index.json",
+      "schema_index_sha256": "617d982d3a8132f9a5a4123f312b4d8ed70b7cae62b3ba190901b0ad27b5f459",
+      "schema_count": 16
+    },
+    {
+      "profile_version": "0.2.0",
+      "schema_index": "schemas/0.2.0/schema-index.json",
+      "schema_index_sha256": "baaa83d626a644c7058529cc154a069cafb23268d5a0157b3a6d7513cd73f076",
+      "schema_count": 19
+    }
+  ],
+  "positive_instances": [
+    {
+      "profile_version": "0.1.0",
+      "path": "tests/contracts/positive-real/cod-9013102/result-bundle.json"
+    },
+    {
+      "profile_version": "0.2.0",
+      "path": "tests/contracts/positive-real/cod-9013102/result-bundle-0.2.0.json"
+    },
+    {
+      "profile_version": "0.2.0",
+      "path": "tests/contracts/positive-real/cod-9013102/compact-result-0.2.0.json"
+    },
+    {
+      "profile_version": "0.2.0",
+      "path": "tests/contracts/profile-0.2.0/context-manifest.json"
+    },
+    {
+      "profile_version": "0.2.0",
+      "path": "tests/contracts/profile-0.2.0/profile-compatibility.json"
+    }
+  ],
+  "negative_cases": [
+    {
+      "path": "tests/contracts/negative-generated/NG-0001-number-without-unit.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0002-artifact-bad-digest.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0003-r3-plan-without-approval.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0004-unknown-core-field.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0005-manifest-command-field.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0006-unregistered-extension.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0007-duplicate-key.json.txt",
+      "strict_json_code": "duplicate-key"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0008-non-finite-number.json.txt",
+      "strict_json_code": "non-finite-number"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0009-context-too-many-active-schemas.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0010-context-inline-token-ceiling.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0011-compact-observed-over-limit.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0012-context-target-over-maximum.json"
+    },
+    {
+      "path": "tests/contracts/negative-generated/NG-0013-context-fraction-order.json"
+    }
+  ],
+  "coupling_boundary": {
+    "source_roots": [
+      "src/materials_mcp_commons"
+    ],
+    "allowed_import_roots": [
+      "importlib"
+    ],
+    "expected_runtime_dependencies": [],
+    "expected_profile_versions": [
+      "0.1.0",
+      "0.2.0"
+    ]
+  }
+}
