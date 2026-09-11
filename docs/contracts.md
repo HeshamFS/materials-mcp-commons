@@ -89,4 +89,4 @@ The [positive corpus](../tests/contracts/positive-real/README.md) contains only 
 
 ## Deliberately outside this implementation slice
 
-The engine implements exact contract loading, dispatch, and effect-policy enforcement. Runtime context projection, host compatibility, and concrete integrations remain separate layers that must build on these contracts without introducing implementation-specific fields into the core.
+The engine implements exact contract loading, dispatch, effect-policy enforcement, context measurement, and loss-declaring compact projection. Host compatibility and concrete integrations remain separate layers that must build on these contracts without introducing implementation-specific fields into the core.

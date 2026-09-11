@@ -2,6 +2,21 @@
 
 from importlib.metadata import version
 
+from .context import (
+    CompactProjection,
+    ContextGateway,
+    ContextMeasurement,
+    ContextPolicy,
+    ContextReport,
+    ContextViolation,
+    LifecycleWorkloadReport,
+    RetrievalCase,
+    RetrievalReport,
+    canonical_json,
+    card_document,
+    evaluate_retrieval,
+    run_lifecycle_workload,
+)
 from .contracts import ContractRegistry
 from .control import DISCOVER_CAPABILITY_ID, INSPECT_CAPABILITY_ID, EngineControlHandlers
 from .dispatch import (
@@ -15,6 +30,7 @@ from .dispatch import (
 )
 from .errors import (
     CommonsError,
+    ContextError,
     ContractError,
     DispatchError,
     LifecycleError,
@@ -64,6 +80,13 @@ __all__ = (
     "CapabilityDetail",
     "CapabilityTarget",
     "CommonsError",
+    "CompactProjection",
+    "ContextError",
+    "ContextGateway",
+    "ContextMeasurement",
+    "ContextPolicy",
+    "ContextReport",
+    "ContextViolation",
     "ContractError",
     "ContractRegistry",
     "DispatchError",
@@ -79,6 +102,7 @@ __all__ = (
     "LifecycleError",
     "LifecyclePolicy",
     "LifecycleRegistry",
+    "LifecycleWorkloadReport",
     "LoadedManifest",
     "ManifestLoader",
     "OperationPlan",
@@ -89,10 +113,16 @@ __all__ = (
     "QuotaCharge",
     "QuotaLimit",
     "Registration",
+    "RetrievalCase",
+    "RetrievalReport",
     "RunOwner",
     "RunSnapshot",
     "RunStore",
     "RunStoreError",
     "SchemaResource",
     "__version__",
+    "canonical_json",
+    "card_document",
+    "evaluate_retrieval",
+    "run_lifecycle_workload",
 )

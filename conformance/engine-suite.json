@@ -73,6 +73,7 @@
       "hashlib",
       "importlib",
       "inspect",
+      "itertools",
       "json",
       "jsonschema",
       "math",

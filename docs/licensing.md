@@ -25,6 +25,7 @@ The current directly declared Python build and verification tools are:
 | pytest | `9.1.1` | Test runner | MIT |
 | pytest-cov | `7.1.0` | Coverage integration | MIT |
 | Ruff | `0.16.6` | Linting and formatting | MIT |
+| tiktoken | `0.14.0` | Identified host-tokenizer verification in tests only | MIT |
 | uv | `>=0.9.18` | Resolver, environment runner, and build frontend | Apache-2.0 OR MIT |
 
 The exact Python runtime and verification graph, including transitive versions, is recorded in [`uv.lock`](../uv.lock). Build and verification tools are not installed engine requirements; the two separately listed validation libraries are.

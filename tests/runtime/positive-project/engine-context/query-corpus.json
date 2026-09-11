@@ -1,0 +1,30 @@
+{
+  "corpus_ref": "urn:materials-mcp:engine-context:query-corpus:0.1.0",
+  "scope": "Actual engine-owned discovery and inspection control capabilities",
+  "cases": [
+    {
+      "case_id": "discover-capabilities",
+      "query": "discover registered capabilities",
+      "expected_capability_ids": [
+        "https://schemas.autonomouslab.io/materials-mcp/engine/discover"
+      ]
+    },
+    {
+      "case_id": "inspect-schema",
+      "query": "inspect schema metadata",
+      "expected_capability_ids": [
+        "https://schemas.autonomouslab.io/materials-mcp/engine/inspect"
+      ]
+    },
+    {
+      "case_id": "no-tool-weather",
+      "query": "weather forecast tomorrow",
+      "expected_capability_ids": []
+    },
+    {
+      "case_id": "negative-delete",
+      "query": "delete remote account records",
+      "expected_capability_ids": []
+    }
+  ]
+}

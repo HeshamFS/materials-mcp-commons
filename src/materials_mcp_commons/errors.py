@@ -29,3 +29,7 @@ class RunStoreError(CommonsError):
 
 class PolicyError(CommonsError):
     """Planning, approval, permission, quota, or audit policy failed closed."""
+
+
+class ContextError(CommonsError):
+    """Context measurement, projection, or certification failed closed."""

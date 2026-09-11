@@ -1,6 +1,6 @@
 # Engine runtime
 
-Engine distribution `0.1.0a4` implements the plugin-agnostic runtime boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner dispatch, deterministic effect planning and authorization, durable local run/artifact state, deactivation, and unregistration.
+Engine distribution `0.1.0a5` implements the plugin-agnostic runtime boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner dispatch, deterministic effect planning and authorization, canonical context measurement and projection, durable local run/artifact state, deactivation, and unregistration.
 
 Registering metadata or binding a handler never creates network, filesystem, compute, cost, or external-write authority. R1-R4 dispatch requires a consumed grant whose receipt binds the exact owner, request, registered capability, input digest, effect tier, plan, and immutable policy snapshot. Handlers receive none of the policy state, approvals, or credentials.
 
@@ -93,6 +93,16 @@ Permissions reject wildcard names and scopes. R1 requires exact permissions and 
 The dispatcher accepts effectful work only when its `PolicyEngine` verifies that exact durable receipt immediately before handler invocation. R2-R4 run creation applies the same durable receipt check. No quota is silently refunded when an authorized operation is abandoned or fails.
 
 Audit records contain hashes and references rather than request payloads, credentials, or secrets. Each owner has a monotonic sequence and SHA-256 link to the previous event. The complete chain is verified whenever the store opens and before audit records are returned; corruption prevents further use.
+
+## Measure and bound context
+
+`ContextPolicy.from_manifest` validates and snapshots the exact profile 0.2.0 context declaration. `ContextGateway` serializes measured values as strict canonical JSON and reports exact UTF-8 bytes. Token measurements require both a caller-supplied host tokenizer callback and an absolute tokenizer reference; the engine never estimates tokens from characters or bytes and has no tokenizer runtime dependency.
+
+The linter measures control tools, discovery cards, active schemas, an optional inline result, historical MCP tokens, and the total footprint against an explicit model-window size. Hard count, byte, token, fraction, intervention, and reasoning-reserve violations remain separately identifiable.
+
+Rich-to-compact projection validates the authoritative ResultBundle first, copies only source values and references in source order, records every omission, and measures the complete contract-valid projection. If the candidate exceeds its byte or identified-token budget, whole optional entries are removed from the end; serialized JSON and scientific scalars are never byte-truncated. An irreducible envelope that cannot fit fails explicitly.
+
+The runtime also provides deterministic retrieval and 100-turn lifecycle evaluators. The checked-in positive corpus covers only actual engine-owned discovery and inspection behavior, including no-tool cases. It does not claim scientific-domain retrieval breadth; that evidence belongs to later real plugins.
 
 ## Durable runs and artifacts
 

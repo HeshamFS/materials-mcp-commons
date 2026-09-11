@@ -41,6 +41,7 @@ The repository now contains:
 - strict offline profile/package validation and deterministic registration, discovery, inspection, and activation leases;
 - exact-owner dispatch with immutable typed requests, two-sided schema validation, and contract-valid structured failures;
 - deterministic operation plans, exact scoped permissions, expiring single-use approvals, atomic quotas, and tamper-evident policy audit;
+- canonical context measurement with identified host tokenizers, bounded linting, real-source compact projection, retrieval evaluation, and long-session lease checks;
 - durable owner-isolated run events, reconnect/cancellation, and hash-verified artifact/provenance records;
 - one registered real positive scientific record, its lossless successor migration and bounded compact projection, and an isolated generated-negative rejection corpus; and
 - an independently deployable Cloudflare Worker boundary for the canonical schema hostname.

@@ -19,14 +19,14 @@ def test_distribution_metadata() -> None:
     project = cast(dict[str, Any], load_pyproject()["project"])
 
     assert project["name"] == "materials-mcp-commons"
-    assert project["version"] == "0.1.0a4"
+    assert project["version"] == "0.1.0a5"
     assert project["requires-python"] == ">=3.11,<3.15"
     assert project["license"] == "Apache-2.0"
     assert project["authors"] == [{"name": "Hesham Salama"}]
 
 
 def test_runtime_version_matches_distribution_metadata() -> None:
-    assert materials_mcp_commons.__version__ == "0.1.0a4"
+    assert materials_mcp_commons.__version__ == "0.1.0a5"
     assert materials_mcp_commons.__version__ == version("materials-mcp-commons")
 
 
@@ -55,6 +55,7 @@ def test_source_package_contains_only_the_declared_engine_modules() -> None:
 
     assert package_files == [
         "__init__.py",
+        "context.py",
         "contracts.py",
         "control.py",
         "dispatch.py",
