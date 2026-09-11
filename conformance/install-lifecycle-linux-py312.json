@@ -1,8 +1,8 @@
 {
   "current": {
-    "sdist_sha256": "04b25fb9779fa5538c5743db0d20c310349f86b8321cdd339e5d75a8eec1b98e",
-    "version": "0.1.0a10",
-    "wheel_sha256": "c8bb584abcbfda936db2202a86fa638fc73e760e0d60e069986849edfe61838f"
+    "sdist_sha256": "b901061c4929f8d2d09886e7a2546b9172961a54a002f3c764d30c7cb1bede03",
+    "version": "0.1.0a11",
+    "wheel_sha256": "9fbc6e586821764281c097d365bbc4bcd52f1e3614c8d146b4fea866f1ec8b42"
   },
   "platform": "linux",
   "previous": {
