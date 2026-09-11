@@ -87,12 +87,25 @@ class CapabilityDetail:
 
 
 @dataclass(frozen=True)
+class CapabilityTarget:
+    detail: CapabilityDetail
+    manifest: LoadedManifest
+
+
+@dataclass(frozen=True)
 class Activation:
     activation_ref: str
     capability_id: str
     registration_ref: str
     activated_at_turn: int
     expires_at_turn: int
+
+
+@dataclass(frozen=True)
+class ActiveCapabilityTarget:
+    detail: CapabilityDetail
+    manifest: LoadedManifest
+    activation: Activation
 
 
 class LifecycleRegistry:
@@ -229,6 +242,49 @@ class LifecycleRegistry:
                 plugin_id=manifest.plugin_id,
                 plugin_version=manifest.plugin_version,
                 capability=capability,
+            )
+
+    def resolve(self, capability_id: str, registration_ref: str) -> CapabilityTarget:
+        """Resolve one capability only when exact registration ownership matches."""
+        with self._lock:
+            found = self._capabilities.get(capability_id)
+            if found is None:
+                raise LifecycleError("capability-not-found", "Capability is not registered")
+            registration, manifest, capability = found
+            if registration.registration_ref != registration_ref:
+                raise LifecycleError(
+                    "registration-mismatch", "Capability is owned by a different registration"
+                )
+            return CapabilityTarget(
+                detail=CapabilityDetail(
+                    registration_ref=registration.registration_ref,
+                    plugin_id=manifest.plugin_id,
+                    plugin_version=manifest.plugin_version,
+                    capability=capability,
+                ),
+                manifest=manifest,
+            )
+
+    def resolve_active(
+        self,
+        capability_id: str,
+        registration_ref: str,
+        *,
+        current_turn: int,
+    ) -> ActiveCapabilityTarget:
+        """Resolve exact ownership and a live activation in one locked transition."""
+        if type(current_turn) is not int or current_turn < 0:
+            raise LifecycleError("invalid-turn", "Logical turn must be non-negative")
+        with self._lock:
+            self._advance(current_turn)
+            target = self.resolve(capability_id, registration_ref)
+            activation = self._active.get(capability_id)
+            if activation is None or activation.registration_ref != registration_ref:
+                raise LifecycleError("capability-not-active", "Capability is not active")
+            return ActiveCapabilityTarget(
+                detail=target.detail,
+                manifest=target.manifest,
+                activation=activation,
             )
 
     def _advance(self, current_turn: int) -> None:

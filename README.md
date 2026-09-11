@@ -39,10 +39,11 @@ The repository now contains:
 - an offline, fail-closed conformance harness;
 - a deterministic multi-version conformance report and structural zero-coupling audit;
 - strict offline profile/package validation and deterministic registration, discovery, inspection, and activation leases;
+- exact-owner R0 dispatch with immutable typed requests, two-sided schema validation, and contract-valid structured failures;
 - one registered real positive scientific record, its lossless successor migration and bounded compact projection, and an isolated generated-negative rejection corpus; and
 - an independently deployable Cloudflare Worker boundary for the canonical schema hostname.
 
-Start with the [runtime guide](docs/runtime.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Runtime dispatch, effectful execution, durable runs/artifacts, and concrete integrations are not implemented yet.
+Start with the [runtime guide](docs/runtime.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Effectful execution, durable runs/artifacts, and concrete integrations are not implemented yet.
 
 ## Author and maintainer
 

@@ -17,3 +17,7 @@ class ContractError(CommonsError):
 
 class LifecycleError(CommonsError):
     """A catalog registration or activation transition was rejected."""
+
+
+class DispatchError(CommonsError):
+    """A dispatch request or handler binding was invalid before execution."""

@@ -3,11 +3,23 @@
 from importlib.metadata import version
 
 from .contracts import ContractRegistry
-from .errors import CommonsError, ContractError, LifecycleError
+from .control import DISCOVER_CAPABILITY_ID, INSPECT_CAPABILITY_ID, EngineControlHandlers
+from .dispatch import (
+    Dispatcher,
+    DispatchFailure,
+    DispatchOutcome,
+    DispatchRequest,
+    DispatchSuccess,
+    HandlerBinding,
+    HandlerRequest,
+)
+from .errors import CommonsError, ContractError, DispatchError, LifecycleError
 from .lifecycle import (
     Activation,
+    ActiveCapabilityTarget,
     CapabilityCard,
     CapabilityDetail,
+    CapabilityTarget,
     LifecyclePolicy,
     LifecycleRegistry,
     Registration,
@@ -17,14 +29,27 @@ from .manifest import Capability, Effect, LoadedManifest, ManifestLoader, Schema
 __version__: str = version("materials-mcp-commons")
 
 __all__ = (
+    "DISCOVER_CAPABILITY_ID",
+    "INSPECT_CAPABILITY_ID",
     "Activation",
+    "ActiveCapabilityTarget",
     "Capability",
     "CapabilityCard",
     "CapabilityDetail",
+    "CapabilityTarget",
     "CommonsError",
     "ContractError",
     "ContractRegistry",
+    "DispatchError",
+    "DispatchFailure",
+    "DispatchOutcome",
+    "DispatchRequest",
+    "DispatchSuccess",
+    "Dispatcher",
     "Effect",
+    "EngineControlHandlers",
+    "HandlerBinding",
+    "HandlerRequest",
     "LifecycleError",
     "LifecyclePolicy",
     "LifecycleRegistry",

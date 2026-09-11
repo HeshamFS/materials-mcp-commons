@@ -236,7 +236,7 @@ class ContractRegistry:
         if index.get("profile_version") != profile_version or index.get("canonical_base") != base:
             _fail("index-profile-mismatch", "Schema index does not identify the requested profile")
         index_contract = _string(index, "contract", "schema-index")
-        cls._validate_instance(index_contract, index, schemas, registry)
+        cls.validate_instance(index_contract, index, schemas, registry)
         resources_value = index.get("resources")
         if not isinstance(resources_value, list):
             _fail("invalid-index", "Schema index resources must be an array")
@@ -262,7 +262,7 @@ class ContractRegistry:
         return cls(profile_version, base, frozenset(snapshots), snapshots, snapshot_registry)
 
     @staticmethod
-    def _validate_instance(
+    def validate_instance(
         schema_id: str,
         instance: object,
         schemas: Mapping[str, SchemaDocument],
@@ -283,7 +283,7 @@ class ContractRegistry:
             _fail("schema-validation", f"Instance failed {schema_id} at {location}")
 
     def validate(self, schema_id: str, instance: object) -> None:
-        self._validate_instance(schema_id, instance, self._schemas, self._registry)
+        self.validate_instance(schema_id, instance, self._schemas, self._registry)
 
     def combined_registry(
         self, additional: Mapping[str, SchemaDocument]

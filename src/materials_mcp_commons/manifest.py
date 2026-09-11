@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass
+from dataclasses import field as dataclass_field
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, cast
 
 from jsonschema import Draft202012Validator, FormatChecker
@@ -12,6 +15,8 @@ from .contracts import (
     DIALECT,
     ContractRegistry,
     SchemaDocument,
+    SchemaRegistry,
+    build_registry,
     iter_references,
     iter_schema_nodes,
     load_json_object,
@@ -63,6 +68,12 @@ class LoadedManifest:
     manifest_sha256: str
     capabilities: tuple[Capability, ...]
     schema_resources: tuple[SchemaResource, ...]
+    _schemas: Mapping[str, SchemaDocument] = dataclass_field(repr=False, compare=False)
+    _registry: SchemaRegistry = dataclass_field(repr=False, compare=False)
+
+    def validate(self, schema_id: str, instance: object) -> None:
+        """Validate against the exact immutable profile-plus-package snapshot."""
+        ContractRegistry.validate_instance(schema_id, instance, self._schemas, self._registry)
 
 
 def _string(document: Mapping[str, object], key: str) -> str:
@@ -252,6 +263,8 @@ class ManifestLoader:
         publisher = cast(dict[str, object], manifest["publisher"])
         license_record = cast(dict[str, object], manifest["license"])
         digest = hashlib.sha256(manifest_file.read_bytes()).hexdigest()
+        schema_snapshots = MappingProxyType(copy.deepcopy(dict(combined)))
+        snapshot_registry = build_registry(schema_snapshots)
         return LoadedManifest(
             plugin_id=_string(manifest, "plugin_id"),
             plugin_version=_string(manifest, "plugin_version"),
@@ -263,4 +276,6 @@ class ManifestLoader:
             manifest_sha256=digest,
             capabilities=tuple(capabilities),
             schema_resources=tuple(resource_models),
+            _schemas=schema_snapshots,
+            _registry=snapshot_registry,
         )
