@@ -84,12 +84,12 @@
         "plugin": {
           "description": "Self-description of the engine-owned bounded discovery and inspection behaviors implemented by this source tree.",
           "license_expression": "Apache-2.0",
-          "manifest_sha256": "69090e787ec1131e30ca8420f601773d66a8bf0ce8854e2dfcf7f085c85aed7c",
+          "manifest_sha256": "6ce82a7952351c286261032a473348117b94995c7f2d2a09d33f945b77e61649",
           "name": "Materials MCP Commons engine lifecycle",
           "plugin_id": "https://schemas.autonomouslab.io/materials-mcp/engine",
-          "plugin_version": "0.1.0-alpha.7",
+          "plugin_version": "0.1.0-alpha.8",
           "publisher_name": "Hesham Salama",
-          "registration_ref": "urn:materials-mcp:registration:aa06ebdbb4f2f2075a1ca8d855810bd832ead2483fd0f86402450fdc3a137eb3"
+          "registration_ref": "urn:materials-mcp:registration:575d1858939cbb5d795e30c984750dffce01bc8159f1f5cfb3ed4fcd02f59f6a"
         },
         "profile_version": "0.1.0",
         "report_version": 1,
@@ -178,12 +178,12 @@
         "plugin": {
           "description": "Self-description of the engine-owned bounded discovery and inspection behaviors implemented by this source tree.",
           "license_expression": "Apache-2.0",
-          "manifest_sha256": "9d409a18c65775b9171545960a3564d19c037dda92a25ee1a64808b1fba3bdd8",
+          "manifest_sha256": "9237684312fd4815f563591fbb172e32b49685cb67e793514c521f7522006bf4",
           "name": "Materials MCP Commons engine lifecycle",
           "plugin_id": "https://schemas.autonomouslab.io/materials-mcp/engine",
-          "plugin_version": "0.1.0-alpha.7",
+          "plugin_version": "0.1.0-alpha.8",
           "publisher_name": "Hesham Salama",
-          "registration_ref": "urn:materials-mcp:registration:adc55a90f303759b108d290d70e9b2167530428345c144976d0de7801116819b"
+          "registration_ref": "urn:materials-mcp:registration:3043fae8a8acc1eb1cd8d291263f0d20d5942290d973cd23f15b2f76412932f4"
         },
         "profile_version": "0.2.0",
         "report_version": 1,

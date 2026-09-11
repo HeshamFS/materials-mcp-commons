@@ -9,12 +9,13 @@ These licenses apply only to material for which Hesham Salama owns or controls t
 
 ## Current dependency inventory
 
-The engine package declares two generic runtime dependencies and does not vendor or redistribute their source in its wheel:
+The engine package declares two generic base runtime dependencies and one optional official MCP host dependency. It does not vendor or redistribute their source in its wheel:
 
 | Package | Constraint | Runtime role | Reported license |
 |---|---|---|---|
 | jsonschema | `>=4.26,<5` | JSON Schema Draft 2020-12 validation | MIT |
 | referencing | `>=0.37,<0.38` | Explicit offline schema registry | MIT |
+| mcp | `>=2.2,<2.3` (optional `mcp-host` extra) | Official MCP v2 protocol server/client composition | MIT |
 
 The current directly declared Python build and verification tools are:
 
@@ -28,7 +29,7 @@ The current directly declared Python build and verification tools are:
 | tiktoken | `0.14.0` | Identified host-tokenizer verification in tests only | MIT |
 | uv | `>=0.9.18` | Resolver, environment runner, and build frontend | Apache-2.0 OR MIT |
 
-The exact Python runtime and verification graph, including transitive versions, is recorded in [`uv.lock`](../uv.lock). Build and verification tools are not installed engine requirements; the two separately listed validation libraries are.
+The exact Python runtime and verification graph, including the optional host's transitive versions, is recorded in [`uv.lock`](../uv.lock). Build and verification tools are not installed engine requirements. The two validation libraries are base requirements; the MCP dependency and its transport stack are installed only when the `mcp-host` extra is selected.
 
 The Cloudflare schema-host deployment has no application runtime dependency. Its directly pinned development/deployment tools are:
 
@@ -40,7 +41,7 @@ The Cloudflare schema-host deployment has no application runtime dependency. Its
 
 The exact Node.js dependency graph is recorded in [`deployment/cloudflare-schema-host/package-lock.json`](../deployment/cloudflare-schema-host/package-lock.json). Wrangler, TypeScript, and type declarations are not imported by the deployed Worker.
 
-Python license expressions were reviewed from package metadata on 2026-09-04. The Cloudflare toolchain expressions and zero-vulnerability npm audit were refreshed on 2026-09-11 after updating Wrangler and its compatible Worker types. Lockfiles preserve the reviewed version graphs; a release still requires a refreshed transitive-license, vulnerability, and artifact inventory.
+Base Python license expressions were reviewed from package metadata on 2026-09-04. The optional `mcp` 2.2.0 package reports MIT in its installed metadata; its locked direct transport dependencies were inspected on 2026-09-11 and report MIT, BSD-3-Clause, or Apache-2.0/BSD-3-Clause expressions. The Cloudflare toolchain expressions and zero-vulnerability npm audit were refreshed on 2026-09-11 after updating Wrangler and its compatible Worker types. Lockfiles preserve the reviewed version graphs; a release still requires a refreshed complete transitive-license, vulnerability, and artifact inventory.
 
 ## Included data and test-vector rights
 

@@ -45,10 +45,12 @@ The repository now contains:
 - deterministic empty-workspace scaffolding and exact-profile declarative package building without generated capabilities, handlers, or scientific results;
 - deterministic plugin-package and versioned compatibility reports, explicit migration assessment, and manifest-derived capability references without plugin-code execution;
 - durable owner-isolated run events, reconnect/cancellation, and hash-verified artifact/provenance records;
+- an optional official-SDK MCP adapter with four bounded tools, trusted host-side identity/authorization injection, and real in-process/stdio protocol tests;
+- metadata-only operational events, bounded health metrics, and integrity-checked non-overwriting SQLite state snapshots/restores;
 - one registered real positive scientific record, its lossless successor migration and bounded compact projection, and an isolated generated-negative rejection corpus; and
 - an independently deployable Cloudflare Worker boundary for the canonical schema hostname.
 
-Start with the [runtime guide](docs/runtime.md), [Scientist Kit authoring guide](docs/authoring.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Effectful dispatch is available only through the exact policy boundary; remote scheduling and concrete integrations are not implemented yet.
+Start with the [runtime guide](docs/runtime.md), [MCP host guide](docs/mcp-host.md), [operations runbook](docs/operations-runbook.md), [state recovery guide](docs/state-recovery.md), [threat model](docs/threat-model.md), [Scientist Kit authoring guide](docs/authoring.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Effectful dispatch is available only through the exact policy boundary; remote scheduling, network-host authentication, and concrete integrations are not implemented yet.
 
 ## Author and maintainer
 

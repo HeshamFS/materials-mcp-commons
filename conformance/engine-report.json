@@ -22,6 +22,10 @@
     "external_import_roots": [],
     "external_schema_reference_count": 0,
     "generic_extension_boundaries": 24,
+    "optional_dependency_count": 1,
+    "optional_dependency_groups": [
+      "mcp-host"
+    ],
     "result": "pass",
     "runtime_dependency_count": 2,
     "source_root_count": 1
@@ -42,5 +46,5 @@
   ],
   "report_version": 1,
   "result": "pass",
-  "suite_sha256": "53c74aac0ce2191a99a7a184af5da1b61230c7407fa49dca609d91b7ef8392e6"
+  "suite_sha256": "5b891dab41616acd0c56fafb83e1734030c784593025efd4261f9865f35d0b1c"
 }

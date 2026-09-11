@@ -66,6 +66,7 @@
     "allowed_import_roots": [
       "__future__",
       "argparse",
+      "asyncio",
       "collections",
       "copy",
       "dataclasses",
@@ -79,22 +80,29 @@
       "json",
       "jsonschema",
       "math",
+      "mcp",
       "os",
       "pathlib",
       "re",
       "referencing",
       "shutil",
       "sqlite3",
+      "stat",
       "sys",
       "tempfile",
       "threading",
+      "time",
       "types",
-      "typing"
+      "typing",
+      "uuid"
     ],
     "expected_runtime_dependencies": [
       "jsonschema>=4.26,<5",
       "referencing>=0.37,<0.38"
     ],
+    "expected_optional_dependencies": {
+      "mcp-host": ["mcp>=2.2,<2.3"]
+    },
     "expected_profile_versions": ["0.1.0", "0.2.0"]
   }
 }

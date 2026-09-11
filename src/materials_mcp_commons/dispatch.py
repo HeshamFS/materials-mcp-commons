@@ -225,6 +225,10 @@ class Dispatcher:
                 for key in sorted(self._bindings, key=lambda item: (item[1], item[0]))
             )
 
+    @property
+    def profile_version(self) -> str:
+        return self._contracts.profile_version
+
     @staticmethod
     def _occurred_at(request: DispatchRequest) -> str:
         return request.occurred_at.isoformat(timespec="microseconds").replace("+00:00", "Z")

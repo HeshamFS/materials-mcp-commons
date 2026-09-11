@@ -36,13 +36,13 @@ def _source_record() -> tuple[Path, dict[str, object], str]:
         "producer": {
             "producer_ref": "urn:materials-mcp:producer:commons-conformance",
             "name": "Materials MCP Commons conformance runner",
-            "version": "0.1.0a7",
+            "version": "0.1.0a8",
         },
         "inputs": [source_ref],
         "parameters": [],
         "environment": {
             "status": "reported",
-            "software": [{"name": "materials-mcp-commons", "version": "0.1.0a7"}],
+            "software": [{"name": "materials-mcp-commons", "version": "0.1.0a8"}],
             "platform": "Declared local Python environment",
         },
         "sources": [

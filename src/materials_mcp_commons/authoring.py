@@ -17,7 +17,7 @@ from .contracts import ContractRegistry, resolve_contained_file
 from .errors import AuthoringError, ContractError
 from .manifest import LoadedManifest, ManifestLoader
 
-ENGINE_REQUIREMENT = "materials-mcp-commons==0.1.0a7"
+ENGINE_REQUIREMENT = "materials-mcp-commons==0.1.0a8"
 DIST_NAME_PATTERN = re.compile(r"^[a-z0-9]+(?:[-.][a-z0-9]+)*$")
 IMPORT_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 PACKAGE_PATH_PATTERN = re.compile(r"^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$")

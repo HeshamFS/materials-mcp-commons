@@ -47,10 +47,12 @@ from .errors import (
     ContextError,
     ContractError,
     DispatchError,
+    HostError,
     LifecycleError,
     PluginConformanceError,
     PolicyError,
     RunStoreError,
+    StateRecoveryError,
 )
 from .lifecycle import (
     Activation,
@@ -63,6 +65,14 @@ from .lifecycle import (
     Registration,
 )
 from .manifest import Capability, Effect, LoadedManifest, ManifestLoader, SchemaResource
+from .mcp_host import AuthorizationResolver, EngineMCPHost, HostHealth, create_mcp_server
+from .operations import (
+    EventSink,
+    OperationEvent,
+    OperationMetric,
+    OperationMetricsSnapshot,
+    OperationObserver,
+)
 from .plugin_conformance import (
     MigrationAssessment,
     PackageCase,
@@ -89,6 +99,7 @@ from .policy import (
     QuotaLimit,
 )
 from .runs import ArtifactAttachment, ArtifactSnapshot, RunOwner, RunSnapshot, RunStore
+from .state_recovery import DatabaseSnapshot, RecoveryLimits, StateRecovery, StateSnapshot
 
 __version__: str = version("materials-mcp-commons")
 
@@ -105,6 +116,7 @@ __all__ = (
     "AuthoringError",
     "AuthorizationGrant",
     "AuthorizationReceipt",
+    "AuthorizationResolver",
     "Capability",
     "CapabilityCard",
     "CapabilityDetail",
@@ -120,6 +132,7 @@ __all__ = (
     "ContextViolation",
     "ContractError",
     "ContractRegistry",
+    "DatabaseSnapshot",
     "DispatchError",
     "DispatchFailure",
     "DispatchOutcome",
@@ -129,9 +142,13 @@ __all__ = (
     "Effect",
     "EffectSpec",
     "EngineControlHandlers",
+    "EngineMCPHost",
+    "EventSink",
     "ExtensionSpec",
     "HandlerBinding",
     "HandlerRequest",
+    "HostError",
+    "HostHealth",
     "LifecycleError",
     "LifecyclePolicy",
     "LifecycleRegistry",
@@ -139,6 +156,10 @@ __all__ = (
     "LoadedManifest",
     "ManifestLoader",
     "MigrationAssessment",
+    "OperationEvent",
+    "OperationMetric",
+    "OperationMetricsSnapshot",
+    "OperationObserver",
     "OperationPlan",
     "PackageCase",
     "PackageReceipt",
@@ -154,6 +175,7 @@ __all__ = (
     "ProfileCase",
     "QuotaCharge",
     "QuotaLimit",
+    "RecoveryLimits",
     "Registration",
     "RetrievalCase",
     "RetrievalReport",
@@ -164,6 +186,9 @@ __all__ = (
     "ScaffoldReceipt",
     "SchemaResource",
     "SchemaSpec",
+    "StateRecovery",
+    "StateRecoveryError",
+    "StateSnapshot",
     "VersionedConformanceMatrix",
     "WorkspaceSpec",
     "__version__",
@@ -172,6 +197,7 @@ __all__ = (
     "canonical_json",
     "capability_reference_sha256",
     "card_document",
+    "create_mcp_server",
     "evaluate_retrieval",
     "render_capability_reference",
     "run_lifecycle_workload",

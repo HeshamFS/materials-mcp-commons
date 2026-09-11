@@ -19,7 +19,7 @@ def test_distribution_metadata() -> None:
     project = cast(dict[str, Any], load_pyproject()["project"])
 
     assert project["name"] == "materials-mcp-commons"
-    assert project["version"] == "0.1.0a7"
+    assert project["version"] == "0.1.0a8"
     assert project["requires-python"] == ">=3.11,<3.15"
     assert project["license"] == "Apache-2.0"
     assert project["authors"] == [{"name": "Hesham Salama"}]
@@ -29,11 +29,11 @@ def test_distribution_metadata() -> None:
 
 
 def test_runtime_version_matches_distribution_metadata() -> None:
-    assert materials_mcp_commons.__version__ == "0.1.0a7"
+    assert materials_mcp_commons.__version__ == "0.1.0a8"
     assert materials_mcp_commons.__version__ == version("materials-mcp-commons")
 
 
-def test_runtime_dependencies_are_only_generic_contract_validation() -> None:
+def test_base_runtime_and_optional_host_dependencies_are_separated() -> None:
     pyproject = load_pyproject()
     project = cast(dict[str, Any], pyproject["project"])
     build_system = cast(dict[str, Any], pyproject["build-system"])
@@ -42,6 +42,7 @@ def test_runtime_dependencies_are_only_generic_contract_validation() -> None:
         "jsonschema>=4.26,<5",
         "referencing>=0.37,<0.38",
     ]
+    assert project["optional-dependencies"] == {"mcp-host": ["mcp>=2.2,<2.3"]}
     assert build_system == {
         "requires": ["hatchling>=1.27,<2"],
         "build-backend": "hatchling.build",
@@ -66,10 +67,13 @@ def test_source_package_contains_only_the_declared_engine_modules() -> None:
         "errors.py",
         "lifecycle.py",
         "manifest.py",
+        "mcp_host.py",
+        "operations.py",
         "plugin_conformance.py",
         "policy.py",
         "py.typed",
         "runs.py",
+        "state_recovery.py",
     ]
 
 

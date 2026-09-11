@@ -360,6 +360,15 @@ def _validate_coupling(
     expected_dependencies = _strings(
         boundary.get("expected_runtime_dependencies"), "expected_runtime_dependencies"
     )
+    expected_optional_value = boundary.get("expected_optional_dependencies")
+    if not isinstance(expected_optional_value, dict):
+        _fail("expected_optional_dependencies must be an object")
+    expected_optional_mapping = cast(dict[object, object], expected_optional_value)
+    if any(not isinstance(key, str) for key in expected_optional_mapping):
+        _fail("expected_optional_dependencies keys must be strings")
+    expected_optional: dict[str, list[str]] = {}
+    for key, value in expected_optional_mapping.items():
+        expected_optional[cast(str, key)] = _strings(value, f"optional dependency {key}")
     expected_versions = _strings(
         boundary.get("expected_profile_versions"), "expected_profile_versions"
     )
@@ -381,6 +390,17 @@ def _validate_coupling(
     actual_dependencies = cast(list[str], dependency_items)
     if actual_dependencies != expected_dependencies:
         _fail("Engine runtime dependencies differ from the zero-coupling declaration")
+    optional_value = project.get("optional-dependencies")
+    if not isinstance(optional_value, dict):
+        _fail("project.optional-dependencies must be an object")
+    optional_mapping = cast(dict[object, object], optional_value)
+    if any(not isinstance(key, str) for key in optional_mapping):
+        _fail("project.optional-dependencies keys must be strings")
+    actual_optional: dict[str, list[str]] = {}
+    for key, value in optional_mapping.items():
+        actual_optional[cast(str, key)] = _strings(value, f"optional dependency {key}")
+    if actual_optional != expected_optional:
+        _fail("Engine optional dependencies differ from the coupling declaration")
 
     declared_roots = {resolve_public_path(path) for path in source_roots}
     actual_roots = {
@@ -402,6 +422,8 @@ def _validate_coupling(
     return {
         "result": "pass",
         "runtime_dependency_count": len(actual_dependencies),
+        "optional_dependency_count": sum(len(items) for items in actual_optional.values()),
+        "optional_dependency_groups": sorted(actual_optional),
         "source_root_count": len(actual_roots),
         "external_import_roots": external_imports,
         "external_schema_reference_count": 0,

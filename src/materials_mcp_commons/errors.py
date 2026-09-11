@@ -41,3 +41,11 @@ class AuthoringError(CommonsError):
 
 class PluginConformanceError(CommonsError):
     """Plugin conformance, compatibility, or reference generation failed closed."""
+
+
+class HostError(CommonsError):
+    """Protocol-host composition or operational telemetry failed closed."""
+
+
+class StateRecoveryError(CommonsError):
+    """Durable engine state inspection, snapshot, or restoration failed closed."""

@@ -1,6 +1,6 @@
 # Development foundation
 
-The engine uses a minimal Python package foundation. Its only current runtime dependencies are `jsonschema` and `referencing`, used for Draft 2020-12 validation and an explicit offline registry. Python 3.11 is the syntax and static-analysis floor; the supported initial line is Python 3.11 through 3.14.
+The engine uses a minimal Python package foundation. Its base runtime dependencies are `jsonschema` and `referencing`, used for Draft 2020-12 validation and an explicit offline registry. The separately selected `mcp-host` extra provides the official protocol adapter. Python 3.11 is the syntax and static-analysis floor; the supported initial line is Python 3.11 through 3.14.
 
 ## Python and contract checks
 
@@ -31,6 +31,17 @@ uv run python -m tools.run_conformance
 Its current and frozen milestone suites and committed reproducible reports are documented in [`conformance/`](../conformance/README.md). The runner is public development tooling; it is intentionally outside the installed engine distribution.
 
 The committed `uv.lock` controls development and verification dependencies. uv is not a runtime requirement of the installed engine package.
+
+The host and recovery boundary has focused checks in addition to the complete suite:
+
+```console
+uv run pytest tests/runtime/test_mcp_host.py tests/runtime/test_state_recovery.py
+uv run pytest tests/runtime/negative_generated/test_mcp_host_rejections.py tests/runtime/negative_generated/test_state_recovery_rejections.py
+```
+
+The positive host tests compose the actual engine-control package and use the official SDK client in process and over a real stdio subprocess. The same stdio fixture has also passed the official independent MCP Inspector CLI 2.6.0: strict tool listing returned the exact four schemas and a real discovery call returned the actual engine-control cards. Recovery creates actual run and policy/audit records, snapshots them through SQLite, restores them into a fresh root, and reopens both stores. Generated failure inputs remain isolated in the negative directory.
+
+The checked-in GitHub Actions workflow declares Windows and Ubuntu jobs across Python 3.11 through 3.14, plus a separate Windows packaging/static/coverage job. Action revisions and uv are pinned. A workflow file is not evidence that hosted CI ran: record the actual run URL and conclusion only after a public remote exists and the workflow has executed. Local Windows 3.11-3.14 and Ubuntu WSL2 Python 3.12 results are maintained separately as dated milestone evidence.
 
 ## Authoring checks
 

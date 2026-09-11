@@ -1,0 +1,55 @@
+name: Engine checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python-matrix:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - name: Check out public repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.9.18"
+          enable-cache: true
+      - name: Sync locked environment
+        run: uv sync --locked --all-groups --python ${{ matrix.python }}
+      - name: Run complete engine suite
+        run: uv run --locked --python ${{ matrix.python }} pytest --no-cov
+
+  package-and-static:
+    name: Package and static checks
+    runs-on: windows-latest
+    steps:
+      - name: Check out public repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install pinned uv and Python
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.9.18"
+          python-version: "3.12"
+          enable-cache: true
+      - name: Sync locked environment
+        run: uv sync --locked --all-groups
+      - name: Check formatting
+        run: uv run ruff format --check .
+      - name: Lint
+        run: uv run ruff check .
+      - name: Type check
+        run: uv run pyright
+      - name: Run tests with branch coverage
+        run: uv run pytest
+      - name: Build wheel and source distribution
+        run: uv build --clear --no-sources

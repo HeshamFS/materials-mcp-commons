@@ -3,11 +3,11 @@
 This generated reference reports exact declarative structure only. It does not load or execute plugin code and does not establish backend interoperability, security, or scientific validity.
 
 - Plugin ID: `https://schemas.autonomouslab.io/materials-mcp/engine`
-- Plugin version: `0.1.0-alpha.7`
+- Plugin version: `0.1.0-alpha.8`
 - Profile version: `0.2.0`
 - Publisher: Hesham Salama
 - License expression: `Apache-2.0`
-- Manifest SHA-256: `9d409a18c65775b9171545960a3564d19c037dda92a25ee1a64808b1fba3bdd8`
+- Manifest SHA-256: `9237684312fd4815f563591fbb172e32b49685cb67e793514c521f7522006bf4`
 
 ## Discover registered capabilities
 
