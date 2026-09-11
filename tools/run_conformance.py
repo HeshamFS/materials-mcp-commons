@@ -410,7 +410,7 @@ def _validate_coupling(
 
 
 def build_report(suite_path: Path | None = None) -> SchemaDocument:
-    selected_suite = (suite_path or PUBLIC_ROOT / "conformance" / "m1-suite.json").resolve(
+    selected_suite = (suite_path or PUBLIC_ROOT / "conformance" / "engine-suite.json").resolve(
         strict=True
     )
     suite = load_json(selected_suite)
@@ -460,12 +460,12 @@ def serialize_report(report: SchemaDocument) -> str:
 
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run the deterministic M1 contract and structural coupling suite."
+        description="Run the deterministic current contract and structural coupling suite."
     )
     parser.add_argument(
         "--suite",
         type=Path,
-        default=PUBLIC_ROOT / "conformance" / "m1-suite.json",
+        default=PUBLIC_ROOT / "conformance" / "engine-suite.json",
         help="Suite manifest path.",
     )
     parser.add_argument("--output", type=Path, help="Write the report to this path.")

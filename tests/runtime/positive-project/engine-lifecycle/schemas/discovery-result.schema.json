@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/discovery-result.schema.json",
+  "title": "Engine capability discovery result",
+  "description": "Bounded capability cards returned by the engine-owned discovery behavior.",
+  "type": "object",
+  "required": ["cards"],
+  "properties": {
+    "cards": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["capability_id", "title", "description", "effect_tier", "supports_async"],
+        "properties": {
+          "capability_id": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://[^\\s?#]+(?:/[^\\s?#]*)?$",
+            "maxLength": 2048
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16384
+          },
+          "effect_tier": {
+            "enum": ["R0", "R1", "R2", "R3", "R4"]
+          },
+          "supports_async": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

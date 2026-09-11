@@ -10,12 +10,25 @@ import pytest
 from tests.contracts.support import PUBLIC_ROOT, load_json
 from tools.run_conformance import ConformanceFailure, build_report, main, serialize_report
 
-SUITE_PATH = PUBLIC_ROOT / "conformance" / "m1-suite.json"
-REPORT_PATH = PUBLIC_ROOT / "conformance" / "m1-report.json"
+SUITE_PATH = PUBLIC_ROOT / "conformance" / "engine-suite.json"
+REPORT_PATH = PUBLIC_ROOT / "conformance" / "engine-report.json"
+M1_SUITE_PATH = PUBLIC_ROOT / "conformance" / "m1-suite.json"
+M1_REPORT_PATH = PUBLIC_ROOT / "conformance" / "m1-report.json"
 
 
 def test_committed_report_exactly_matches_a_fresh_run() -> None:
     assert build_report(SUITE_PATH) == load_json(REPORT_PATH)
+
+
+def test_m1_evidence_snapshot_remains_byte_frozen() -> None:
+    import hashlib
+
+    assert hashlib.sha256(M1_SUITE_PATH.read_bytes()).hexdigest() == (
+        "039b52bf114ad68a9ba9885f042b4dff5f664be26175c1937ca106ad03996911"
+    )
+    assert hashlib.sha256(M1_REPORT_PATH.read_bytes()).hexdigest() == (
+        "7a6a8b4eb75ce603f8068628c4ada97d242e02607c6221ba965f53f7fcf938f8"
+    )
 
 
 def test_report_serialization_is_byte_deterministic() -> None:

@@ -3,6 +3,7 @@
 This directory contains public, product-facing documentation for Materials MCP Commons.
 
 - [Architecture](architecture.md)
+- [Engine runtime](runtime.md)
 - [Materials MCP Profile contracts](contracts.md)
 - [Canonical schema hosting](schema-hosting.md)
 - [Development foundation](development.md)

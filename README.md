@@ -34,14 +34,15 @@ Public documentation begins in [`docs/`](docs/README.md).
 
 The repository now contains:
 
-- an installable, typed Python alpha package with no engine runtime dependencies;
+- an installable, typed Python alpha package with audited generic JSON Schema runtime dependencies;
 - the immutable 0.1.0 contract line and additive 0.2.0 successor, each with a checksum-pinned resource index;
 - an offline, fail-closed conformance harness;
 - a deterministic multi-version conformance report and structural zero-coupling audit;
+- strict offline profile/package validation and deterministic registration, discovery, inspection, and activation leases;
 - one registered real positive scientific record, its lossless successor migration and bounded compact projection, and an isolated generated-negative rejection corpus; and
 - an independently deployable Cloudflare Worker boundary for the canonical schema hostname.
 
-Start with the [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Runtime dispatch, context-policy enforcement, and concrete integrations are not implemented yet.
+Start with the [runtime guide](docs/runtime.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Runtime dispatch, effectful execution, durable runs/artifacts, and concrete integrations are not implemented yet.
 
 ## Author and maintainer
 

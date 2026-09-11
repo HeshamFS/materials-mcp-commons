@@ -1,6 +1,6 @@
 # Development foundation
 
-The engine uses a minimal Python package foundation with no runtime dependencies. Python 3.11 is the syntax and static-analysis floor; the supported initial line is Python 3.11 through 3.14.
+The engine uses a minimal Python package foundation. Its only current runtime dependencies are `jsonschema` and `referencing`, used for Draft 2020-12 validation and an explicit offline registry. Python 3.11 is the syntax and static-analysis floor; the supported initial line is Python 3.11 through 3.14.
 
 ## Python and contract checks
 
@@ -22,13 +22,13 @@ The complete test run includes both exact profile lines, the frozen-0.1.0 public
 uv run pytest tests/contracts
 ```
 
-The deterministic M1 conformance runner evaluates the declared multi-version corpus and structural coupling boundary in one command:
+The deterministic current-engine conformance runner evaluates the declared multi-version corpus and structural coupling boundary in one command:
 
 ```console
 uv run python -m tools.run_conformance
 ```
 
-Its machine-readable suite and committed reproducible report are documented in [`conformance/`](../conformance/README.md). The runner is public development tooling; it is intentionally outside the installed engine distribution.
+Its current and frozen milestone suites and committed reproducible reports are documented in [`conformance/`](../conformance/README.md). The runner is public development tooling; it is intentionally outside the installed engine distribution.
 
 The committed `uv.lock` controls development and verification dependencies. uv is not a runtime requirement of the installed engine package.
 

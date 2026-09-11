@@ -19,30 +19,33 @@ def test_distribution_metadata() -> None:
     project = cast(dict[str, Any], load_pyproject()["project"])
 
     assert project["name"] == "materials-mcp-commons"
-    assert project["version"] == "0.1.0a0"
+    assert project["version"] == "0.1.0a1"
     assert project["requires-python"] == ">=3.11,<3.15"
     assert project["license"] == "Apache-2.0"
     assert project["authors"] == [{"name": "Hesham Salama"}]
 
 
 def test_runtime_version_matches_distribution_metadata() -> None:
-    assert materials_mcp_commons.__version__ == "0.1.0a0"
+    assert materials_mcp_commons.__version__ == "0.1.0a1"
     assert materials_mcp_commons.__version__ == version("materials-mcp-commons")
 
 
-def test_initial_package_has_no_runtime_dependencies() -> None:
+def test_runtime_dependencies_are_only_generic_contract_validation() -> None:
     pyproject = load_pyproject()
     project = cast(dict[str, Any], pyproject["project"])
     build_system = cast(dict[str, Any], pyproject["build-system"])
 
-    assert project["dependencies"] == []
+    assert project["dependencies"] == [
+        "jsonschema>=4.26,<5",
+        "referencing>=0.37,<0.38",
+    ]
     assert build_system == {
         "requires": ["hatchling>=1.27,<2"],
         "build-backend": "hatchling.build",
     }
 
 
-def test_initial_source_package_contains_only_the_version_surface() -> None:
+def test_source_package_contains_only_the_declared_engine_modules() -> None:
     package_root = PUBLIC_ROOT / "src" / "materials_mcp_commons"
     package_files = sorted(
         path.relative_to(package_root).as_posix()
@@ -50,7 +53,14 @@ def test_initial_source_package_contains_only_the_version_surface() -> None:
         if path.is_file() and "__pycache__" not in path.parts
     )
 
-    assert package_files == ["__init__.py", "py.typed"]
+    assert package_files == [
+        "__init__.py",
+        "contracts.py",
+        "errors.py",
+        "lifecycle.py",
+        "manifest.py",
+        "py.typed",
+    ]
 
 
 def test_contract_layout_has_exact_versions_and_no_mutable_alias() -> None:

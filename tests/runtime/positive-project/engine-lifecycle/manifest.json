@@ -1,0 +1,83 @@
+{
+  "contract": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/plugin-manifest.schema.json",
+  "profile_version": "0.2.0",
+  "plugin_id": "https://schemas.autonomouslab.io/materials-mcp/engine",
+  "plugin_version": "0.1.0-alpha.1",
+  "name": "Materials MCP Commons engine lifecycle",
+  "description": "Self-description of the engine-owned bounded discovery behavior implemented by this source tree.",
+  "publisher": {
+    "name": "Hesham Salama",
+    "uri": "https://autonomouslab.io/"
+  },
+  "license": {
+    "expression": "Apache-2.0",
+    "rights_uri": "https://www.apache.org/licenses/LICENSE-2.0"
+  },
+  "capabilities": [
+    {
+      "capability_id": "https://schemas.autonomouslab.io/materials-mcp/engine/discover",
+      "title": "Discover registered capabilities",
+      "description": "Return a deterministic bounded set of compact cards from manifests already validated and registered in the local engine.",
+      "effect": {
+        "tier": "R0",
+        "category": "read-only",
+        "description": "Reads immutable in-process registration metadata without network, filesystem, compute, or external effects.",
+        "plan_required": false,
+        "approval_required": false,
+        "strong_confirmation_required": false
+      },
+      "input_schema": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/discovery-input.schema.json",
+      "result_schema": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/discovery-result.schema.json",
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "supports_async": false
+    },
+    {
+      "capability_id": "https://schemas.autonomouslab.io/materials-mcp/engine/inspect",
+      "title": "Inspect a registered capability",
+      "description": "Return immutable identity, effect, and exact schema metadata for one capability already registered in the local engine.",
+      "effect": {
+        "tier": "R0",
+        "category": "read-only",
+        "description": "Reads one immutable in-process capability snapshot without network, filesystem, compute, or external effects.",
+        "plan_required": false,
+        "approval_required": false,
+        "strong_confirmation_required": false
+      },
+      "input_schema": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/inspection-input.schema.json",
+      "result_schema": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/inspection-result.schema.json",
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "supports_async": false
+    }
+  ],
+  "schema_resources": [
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/discovery-input.schema.json",
+      "path": "schemas/discovery-input.schema.json",
+      "sha256": "b17f23efcee5009ad47290e5611a0bb4882de8b5703a62f870e82acafbe98e73",
+      "media_type": "application/schema+json",
+      "role": "input"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/discovery-result.schema.json",
+      "path": "schemas/discovery-result.schema.json",
+      "sha256": "20bfac418a0d5c7a68205e2e3bd38b09f3c717cac753f10229892df8fd41e9e8",
+      "media_type": "application/schema+json",
+      "role": "result"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/inspection-input.schema.json",
+      "path": "schemas/inspection-input.schema.json",
+      "sha256": "5e4118a6b81f37f7616b54ddac33724b6df7ef6851dd41bed434419aa18be6e1",
+      "media_type": "application/schema+json",
+      "role": "input"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/inspection-result.schema.json",
+      "path": "schemas/inspection-result.schema.json",
+      "sha256": "8c58e501cc324a01e9d07b8803a6497741417c63aeac3cbb81884dd97555d451",
+      "media_type": "application/schema+json",
+      "role": "result"
+    }
+  ],
+  "extension_declarations": []
+}

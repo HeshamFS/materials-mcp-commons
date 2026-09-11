@@ -1,8 +1,8 @@
 # M1 conformance suite
 
-`m1-suite.json` is the machine-readable M1 acceptance boundary. It pins both exact profile indexes, enumerates every accepted positive instance and generated-negative rejection case, and declares the permitted engine dependency and import surface.
+`m1-suite.json` and `m1-report.json` are the immutable machine-readable M1 acceptance snapshot from public commit `6a8e9b59222195321bdc0b5578a73229837438a7`. They pin both exact profile indexes, enumerate the then-accepted corpus, and record the engine dependency and import surface at the M1 gate.
 
-`m1-report.json` is the deterministic report produced from that suite. It contains no timestamp, machine path, network result, or environment-specific value, so the same committed inputs produce identical bytes.
+`engine-suite.json` and `engine-report.json` are the current evolving engine boundary. They retain the profile and corpus checks while adding each accepted runtime surface. Reports contain no timestamp, machine path, network result, or environment-specific value, so the same committed inputs produce identical bytes.
 
 Run the suite from the repository root:
 
@@ -11,12 +11,14 @@ uv sync --locked --all-groups
 uv run python -m tools.run_conformance
 ```
 
-Regenerate the committed report only when an intentional, reviewed suite input changes:
+Regenerate only the current engine report when an intentional, reviewed suite input changes:
 
 ```console
-uv run python -m tools.run_conformance --output conformance/m1-report.json
+uv run python -m tools.run_conformance --output conformance/engine-report.json
 uv run pytest tests/conformance
 ```
+
+Do not rewrite the M1 snapshot. Reproduce it by checking out its recorded commit.
 
 ## What the coupling result means
 

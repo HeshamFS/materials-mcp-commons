@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/discovery-input.schema.json",
+  "title": "Engine capability discovery input",
+  "description": "Bounded input accepted by the engine-owned capability discovery behavior.",
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    }
+  },
+  "additionalProperties": false
+}

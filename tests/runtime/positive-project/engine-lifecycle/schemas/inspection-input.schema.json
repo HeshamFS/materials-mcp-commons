@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/inspection-input.schema.json",
+  "title": "Engine capability inspection input",
+  "description": "Exact capability identifier accepted by the engine-owned inspection behavior.",
+  "type": "object",
+  "required": ["capability_id"],
+  "properties": {
+    "capability_id": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^\\s?#]+(?:/[^\\s?#]*)?$",
+      "maxLength": 2048
+    }
+  },
+  "additionalProperties": false
+}

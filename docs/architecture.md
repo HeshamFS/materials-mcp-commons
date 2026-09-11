@@ -28,3 +28,5 @@ The intended control flow is:
 `discover -> inspect -> validate -> plan -> execute/query -> observe -> retrieve -> provenance`
 
 Each stage has explicit inputs, bounded outputs, structured failures, and permission semantics.
+
+The implemented first runtime slice covers the left edge of that flow: exact profile validation, contained manifest-package loading, registration, bounded discovery, inspection, activation renewal/expiry/eviction, deactivation, and safe unregistration. Logical turns are supplied by the caller so lease behavior is deterministic and replayable without wall-clock assumptions. Dispatch and execution begin only after this lifecycle boundary is gated.

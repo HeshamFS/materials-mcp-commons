@@ -9,22 +9,25 @@ These licenses apply only to material for which Hesham Salama owns or controls t
 
 ## Current dependency inventory
 
-The engine package has no runtime dependencies. Its wheel therefore does not redistribute any third-party Python runtime package.
+The engine package declares two generic runtime dependencies and does not vendor or redistribute their source in its wheel:
+
+| Package | Constraint | Runtime role | Reported license |
+|---|---|---|---|
+| jsonschema | `>=4.26,<5` | JSON Schema Draft 2020-12 validation | MIT |
+| referencing | `>=0.37,<0.38` | Explicit offline schema registry | MIT |
 
 The current directly declared Python build and verification tools are:
 
 | Package | Current resolution or constraint | Role | Reported license |
 |---|---|---|---|
 | Hatchling | `>=1.27,<2` | Isolated build backend | MIT |
-| jsonschema | `4.26.0` | Draft 2020-12 instance and meta-schema validation | MIT |
-| referencing | `0.37.0` | Explicit offline schema registry | MIT |
 | Pyright | `1.1.411` | Static type analysis | MIT |
 | pytest | `9.1.1` | Test runner | MIT |
 | pytest-cov | `7.1.0` | Coverage integration | MIT |
 | Ruff | `0.16.6` | Linting and formatting | MIT |
 | uv | `>=0.9.18` | Resolver, environment runner, and build frontend | Apache-2.0 OR MIT |
 
-The exact Python verification graph, including transitive versions, is recorded in [`uv.lock`](../uv.lock). These tools are development/build inputs, not installed engine requirements.
+The exact Python runtime and verification graph, including transitive versions, is recorded in [`uv.lock`](../uv.lock). Build and verification tools are not installed engine requirements; the two separately listed validation libraries are.
 
 The Cloudflare schema-host deployment has no application runtime dependency. Its directly pinned development/deployment tools are:
 
@@ -45,6 +48,8 @@ Python license expressions were reviewed from package metadata on 2026-09-04. Th
 | [`tests/contracts/positive-real/cod-9013102/source.cif`](../tests/contracts/positive-real/cod-9013102/source.cif) | Crystallography Open Database record 9013102, revision 291877 | CC0-1.0; redistribution permitted; acknowledge B. N. Dutta and the original structural-data sources as requested by COD |
 | [`tests/contracts/positive-real/cod-9013102/`](../tests/contracts/positive-real/cod-9013102/README.md) registration and result records | Project-authored source registration, direct contract projection, lossless successor migration, and compact projection | CC BY 4.0; embedded source facts retain their source provenance |
 | [`tests/contracts/negative-generated/`](../tests/contracts/negative-generated/README.md) | Project-authored invalid contract inputs used only for rejection testing | CC BY 4.0; no scientific-validity claim |
+| [`tests/runtime/positive-project/`](../tests/runtime/positive-project/README.md) | Project-authored records of actual engine control-plane behavior; no scientific or integration claim | CC BY 4.0 |
+| `tests/runtime/negative_generated/` | Generated invalid, boundary, and security inputs used only for fail-closed runtime testing | Apache-2.0 test code; no scientific-validity claim |
 | [`conformance/`](../conformance/README.md) | Project-authored conformance-suite declaration and deterministic result vector | CC BY 4.0 |
 | [`schemas/`](../schemas/README.md) and [`docs/`](README.md) | Project-authored schema specifications and documentation | CC BY 4.0 |
 | `src/`, `tools/`, executable tests, and `deployment/` code | Project-authored software | Apache-2.0 |
