@@ -42,7 +42,7 @@ The Cloudflare schema-host deployment has no application runtime dependency. Its
 
 The exact Node.js dependency graph is recorded in [`deployment/cloudflare-schema-host/package-lock.json`](../deployment/cloudflare-schema-host/package-lock.json). Wrangler, TypeScript, and type declarations are not imported by the deployed Worker.
 
-The checked-in Python inventories were regenerated from clean locked environments on Windows and Ubuntu-compatible Linux. The optional `mcp` 2.2.0 graph reports permissive or weak-copyleft expressions recorded package by package; `pywin32` is the only platform-specific host dependency in the current graphs. The Cloudflare toolchain expressions and zero-vulnerability npm audit were refreshed on 2026-09-11 after updating Wrangler and its compatible Worker types. CI regenerates the platform inventory and runs vulnerability scans; a release record must retain those results and the built artifact hashes.
+The checked-in Python inventories were regenerated from clean locked environments on Windows and Ubuntu-compatible Linux. The optional `mcp` 2.2.0 graph reports permissive or weak-copyleft expressions recorded package by package; `pywin32` is the only platform-specific host dependency in the current graphs. The matching [`install lifecycle reports`](../conformance/README.md) retain the built wheel and source-distribution hashes. The Cloudflare toolchain expressions and zero-vulnerability npm audit were refreshed on 2026-09-11 after updating Wrangler and its compatible Worker types. CI regenerates the platform inventory and runs vulnerability scans; a release record must retain those results and the built artifact hashes.
 
 ## Included data and test-vector rights
 

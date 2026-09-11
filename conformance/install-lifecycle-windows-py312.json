@@ -1,0 +1,25 @@
+{
+  "current": {
+    "sdist_sha256": "04b25fb9779fa5538c5743db0d20c310349f86b8321cdd339e5d75a8eec1b98e",
+    "version": "0.1.0a10",
+    "wheel_sha256": "7e5c5f3f45e882253fbf124034a09c4206a633aa796b25af7fe4b13dc9c6b578"
+  },
+  "platform": "win32",
+  "previous": {
+    "git_ref": "828f8f3c45ce57cc2fceb5c645472632d44fce73",
+    "version": "0.1.0a8"
+  },
+  "python": "3.12",
+  "report_version": 1,
+  "result": "pass",
+  "steps": [
+    "install-previous-wheel",
+    "upgrade-to-current-wheel",
+    "dependency-check",
+    "uninstall-and-import-absence",
+    "install-current-mcp-host-extra",
+    "host-import-and-dependency-check",
+    "uninstall-and-import-absence"
+  ],
+  "uv": "0.9.18"
+}
