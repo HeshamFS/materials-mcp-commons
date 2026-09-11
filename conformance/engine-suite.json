@@ -65,6 +65,7 @@
     "source_roots": ["src/materials_mcp_commons"],
     "allowed_import_roots": [
       "__future__",
+      "argparse",
       "collections",
       "copy",
       "dataclasses",
@@ -77,10 +78,14 @@
       "json",
       "jsonschema",
       "math",
+      "os",
       "pathlib",
       "re",
       "referencing",
+      "shutil",
       "sqlite3",
+      "sys",
+      "tempfile",
       "threading",
       "types",
       "typing"

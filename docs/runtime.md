@@ -1,6 +1,6 @@
 # Engine runtime
 
-Engine distribution `0.1.0a5` implements the plugin-agnostic runtime boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner dispatch, deterministic effect planning and authorization, canonical context measurement and projection, durable local run/artifact state, deactivation, and unregistration.
+Engine distribution `0.1.0a6` implements the plugin-agnostic runtime boundary and its first authoring SDK: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner dispatch, deterministic effect planning and authorization, canonical context measurement and projection, durable local run/artifact state, deterministic empty-workspace scaffolding, and validated declarative package construction.
 
 Registering metadata or binding a handler never creates network, filesystem, compute, cost, or external-write authority. R1-R4 dispatch requires a consumed grant whose receipt binds the exact owner, request, registered capability, input digest, effect tier, plan, and immutable policy snapshot. Handlers receive none of the policy state, approvals, or credentials.
 
@@ -103,6 +103,12 @@ The linter measures control tools, discovery cards, active schemas, an optional 
 Rich-to-compact projection validates the authoritative ResultBundle first, copies only source values and references in source order, records every omission, and measures the complete contract-valid projection. If the candidate exceeds its byte or identified-token budget, whole optional entries are removed from the end; serialized JSON and scientific scalars are never byte-truncated. An irreducible envelope that cannot fit fails explicitly.
 
 The runtime also provides deterministic retrieval and 100-turn lifecycle evaluators. The checked-in positive corpus covers only actual engine-owned discovery and inspection behavior, including no-tool cases. It does not claim scientific-domain retrieval breadth; that evidence belongs to later real plugins.
+
+## Author without inventing a plugin
+
+The authoring SDK creates an empty installable scientist workspace and builds a declarative plugin package only from complete caller-authored capability, effect, rights, extension, and schema specifications. Schema bytes are preserved, resource hashes are computed, manifest output is deterministic, and the staged package must pass the same exact-profile loader used at runtime before it is published to a fresh destination.
+
+The SDK does not generate a sample capability, handler, backend, scientific result, or trust claim and does not execute plugin code. See the [Scientist Kit guide](authoring.md).
 
 ## Durable runs and artifacts
 

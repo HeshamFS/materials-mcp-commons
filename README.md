@@ -42,11 +42,12 @@ The repository now contains:
 - exact-owner dispatch with immutable typed requests, two-sided schema validation, and contract-valid structured failures;
 - deterministic operation plans, exact scoped permissions, expiring single-use approvals, atomic quotas, and tamper-evident policy audit;
 - canonical context measurement with identified host tokenizers, bounded linting, real-source compact projection, retrieval evaluation, and long-session lease checks;
+- deterministic empty-workspace scaffolding and exact-profile declarative package building without generated capabilities, handlers, or scientific results;
 - durable owner-isolated run events, reconnect/cancellation, and hash-verified artifact/provenance records;
 - one registered real positive scientific record, its lossless successor migration and bounded compact projection, and an isolated generated-negative rejection corpus; and
 - an independently deployable Cloudflare Worker boundary for the canonical schema hostname.
 
-Start with the [runtime guide](docs/runtime.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Effectful dispatch is available only through the exact policy boundary; remote scheduling and concrete integrations are not implemented yet.
+Start with the [runtime guide](docs/runtime.md), [Scientist Kit authoring guide](docs/authoring.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Effectful dispatch is available only through the exact policy boundary; remote scheduling and concrete integrations are not implemented yet.
 
 ## Author and maintainer
 

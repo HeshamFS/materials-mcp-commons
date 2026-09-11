@@ -2,6 +2,19 @@
 
 from importlib.metadata import version
 
+from .authoring import (
+    ENGINE_REQUIREMENT,
+    CapabilitySpec,
+    EffectSpec,
+    ExtensionSpec,
+    PackageReceipt,
+    PluginPackageBuilder,
+    PluginPackageSpec,
+    ScaffoldReceipt,
+    SchemaSpec,
+    WorkspaceSpec,
+    scaffold_workspace,
+)
 from .context import (
     CompactProjection,
     ContextGateway,
@@ -29,6 +42,7 @@ from .dispatch import (
     HandlerRequest,
 )
 from .errors import (
+    AuthoringError,
     CommonsError,
     ContextError,
     ContractError,
@@ -66,6 +80,7 @@ __version__: str = version("materials-mcp-commons")
 
 __all__ = (
     "DISCOVER_CAPABILITY_ID",
+    "ENGINE_REQUIREMENT",
     "INSPECT_CAPABILITY_ID",
     "Activation",
     "ActiveCapabilityTarget",
@@ -73,11 +88,13 @@ __all__ = (
     "ArtifactAttachment",
     "ArtifactSnapshot",
     "AuditEvent",
+    "AuthoringError",
     "AuthorizationGrant",
     "AuthorizationReceipt",
     "Capability",
     "CapabilityCard",
     "CapabilityDetail",
+    "CapabilitySpec",
     "CapabilityTarget",
     "CommonsError",
     "CompactProjection",
@@ -96,7 +113,9 @@ __all__ = (
     "DispatchSuccess",
     "Dispatcher",
     "Effect",
+    "EffectSpec",
     "EngineControlHandlers",
+    "ExtensionSpec",
     "HandlerBinding",
     "HandlerRequest",
     "LifecycleError",
@@ -106,7 +125,10 @@ __all__ = (
     "LoadedManifest",
     "ManifestLoader",
     "OperationPlan",
+    "PackageReceipt",
     "Permission",
+    "PluginPackageBuilder",
+    "PluginPackageSpec",
     "PolicyEngine",
     "PolicyError",
     "PolicySnapshot",
@@ -119,10 +141,14 @@ __all__ = (
     "RunSnapshot",
     "RunStore",
     "RunStoreError",
+    "ScaffoldReceipt",
     "SchemaResource",
+    "SchemaSpec",
+    "WorkspaceSpec",
     "__version__",
     "canonical_json",
     "card_document",
     "evaluate_retrieval",
     "run_lifecycle_workload",
+    "scaffold_workspace",
 )

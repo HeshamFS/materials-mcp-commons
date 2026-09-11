@@ -33,3 +33,7 @@ class PolicyError(CommonsError):
 
 class ContextError(CommonsError):
     """Context measurement, projection, or certification failed closed."""
+
+
+class AuthoringError(CommonsError):
+    """Workspace scaffolding or declarative package authoring failed closed."""

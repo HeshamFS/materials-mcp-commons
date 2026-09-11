@@ -4,6 +4,7 @@ This directory contains public, product-facing documentation for Materials MCP C
 
 - [Architecture](architecture.md)
 - [Engine runtime](runtime.md)
+- [Scientist Kit authoring](authoring.md)
 - [Materials MCP Profile contracts](contracts.md)
 - [Canonical schema hosting](schema-hosting.md)
 - [Development foundation](development.md)

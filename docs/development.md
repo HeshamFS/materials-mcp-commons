@@ -32,6 +32,12 @@ Its current and frozen milestone suites and committed reproducible reports are d
 
 The committed `uv.lock` controls development and verification dependencies. uv is not a runtime requirement of the installed engine package.
 
+## Authoring checks
+
+The installed `materials-mcp-scaffold` command creates a fresh empty scientist workspace from explicit metadata. The typed `PluginPackageBuilder` then constructs a checksum-bound declarative package from complete authored schemas and validates it with the runtime loader. See the [Scientist Kit guide](authoring.md).
+
+The test suite reconstructs the actual engine-control package twice and compares every output byte. Generated malformed authoring inputs are isolated under `tests/runtime/negative_generated/`; they are boundary/security evidence, not scientific examples.
+
 ## Schema-host checks
 
 The canonical-host deployment has an independent Node.js toolchain. From `deployment/cloudflare-schema-host/`:
