@@ -5,6 +5,7 @@ import inspect
 import json
 import math
 import re
+import sqlite3
 from collections.abc import Awaitable, Callable, Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -434,7 +435,7 @@ class Dispatcher:
             assert policy is not None
             assert authorization is not None
             try:
-                self._policy_engine.verify_receipt(authorization, request, target.detail, policy)
+                self._policy_engine.redeem_receipt(authorization, request, target.detail, policy)
             except PolicyError:
                 return self._failure(
                     request,
@@ -451,6 +452,39 @@ class Dispatcher:
                     ),
                     retryable=False,
                     next_action="Create and consume a new exact authorization grant.",
+                )
+            except sqlite3.OperationalError as error:
+                error_code = getattr(error, "sqlite_errorcode", None)
+                base_code = error_code & 0xFF if isinstance(error_code, int) else None
+                retryable = base_code in {sqlite3.SQLITE_BUSY, sqlite3.SQLITE_LOCKED}
+                return self._failure(
+                    request,
+                    code="AUTHORIZATION_DENIED",
+                    stage="authorization",
+                    cause="The authorization store was temporarily unavailable."
+                    if retryable
+                    else "The authorization store rejected the receipt.",
+                    message="Effectful dispatch stopped before invoking a handler.",
+                    evidence_kind="policy",
+                    evidence_summary="Receipt redemption did not commit.",
+                    retryable=retryable,
+                    next_action="Retry after the authorization store lock clears."
+                    if retryable
+                    else "Inspect and repair the policy store before retrying.",
+                )
+            except Exception:
+                return self._failure(
+                    request,
+                    code="AUTHORIZATION_DENIED",
+                    stage="authorization",
+                    cause="The authorization boundary rejected an invalid receipt or store state.",
+                    message="Effectful dispatch stopped before invoking a handler.",
+                    evidence_kind="policy",
+                    evidence_summary="Receipt redemption failed closed.",
+                    retryable=False,
+                    next_action=(
+                        "Inspect the policy store and create a new exact authorization grant."
+                    ),
                 )
         handler_request = HandlerRequest(
             request_ref=request.request_ref,

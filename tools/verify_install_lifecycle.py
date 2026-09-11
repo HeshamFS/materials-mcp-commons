@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import cast
 
 PUBLIC_ROOT = Path(__file__).parents[1]
-PREVIOUS_ENGINE_REF = "828f8f3c45ce57cc2fceb5c645472632d44fce73"
+PREVIOUS_ENGINE_REF = "5fb892d6597841542ddd5d721099c5f562a99472"
 UV_VERSION = "0.9.18"
 
 

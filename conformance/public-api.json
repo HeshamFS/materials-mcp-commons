@@ -5,7 +5,7 @@
   },
   "contract_version": 1,
   "distribution": "materials-mcp-commons",
-  "distribution_version": "0.1.0a11",
+  "distribution_version": "0.1.0a12",
   "profile_versions": [
     "0.1.0",
     "0.2.0"
@@ -946,9 +946,7 @@
                   "type": "boolean"
                 },
                 "result": {
-                  "additionalProperties": true,
-                  "title": "Result",
-                  "type": "object"
+                  "title": "Result"
                 }
               },
               "required": [
@@ -1135,7 +1133,7 @@
       {
         "kind": "constant",
         "name": "ENGINE_REQUIREMENT",
-        "value": "materials-mcp-commons==0.1.0a11"
+        "value": "materials-mcp-commons==0.1.0a12"
       },
       {
         "kind": "constant",
@@ -6522,6 +6520,45 @@
           },
           {
             "kind": "method",
+            "name": "redeem_receipt",
+            "signature": {
+              "callable_mode": "synchronous",
+              "parameters": [
+                {
+                  "kind": "positional_or_keyword",
+                  "name": "self",
+                  "required": true
+                },
+                {
+                  "annotation": "AuthorizationReceipt",
+                  "kind": "positional_or_keyword",
+                  "name": "receipt",
+                  "required": true
+                },
+                {
+                  "annotation": "DispatchRequest",
+                  "kind": "positional_or_keyword",
+                  "name": "request",
+                  "required": true
+                },
+                {
+                  "annotation": "CapabilityDetail",
+                  "kind": "positional_or_keyword",
+                  "name": "target",
+                  "required": true
+                },
+                {
+                  "annotation": "PolicySnapshot",
+                  "kind": "positional_or_keyword",
+                  "name": "policy",
+                  "required": true
+                }
+              ],
+              "return": "None"
+            }
+          },
+          {
+            "kind": "method",
             "name": "verify_run_receipt",
             "signature": {
               "callable_mode": "synchronous",
@@ -6603,6 +6640,12 @@
               "kind": "positional_or_keyword",
               "name": "contracts",
               "required": true
+            },
+            {
+              "annotation": "Callable[[], datetime] | None",
+              "default": null,
+              "kind": "keyword_only",
+              "name": "clock"
             }
           ],
           "return": "None"
@@ -6614,7 +6657,7 @@
           },
           {
             "name": "SCHEMA_VERSION",
-            "value": 1
+            "value": 2
           }
         ]
       },
@@ -8093,7 +8136,7 @@
       {
         "kind": "constant",
         "name": "__version__",
-        "value": "0.1.0a11"
+        "value": "0.1.0a12"
       },
       {
         "kind": "function",

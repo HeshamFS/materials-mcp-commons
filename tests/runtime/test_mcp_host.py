@@ -3,7 +3,10 @@ from __future__ import annotations
 import asyncio
 import json
 import sys
+from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
+from types import MappingProxyType
 from typing import cast
 
 from mcp import StdioServerParameters
@@ -17,6 +20,7 @@ from materials_mcp_commons import (
     Dispatcher,
     EngineControlHandlers,
     EngineMCPHost,
+    HandlerRequest,
     LifecycleRegistry,
     LoadedManifest,
     ManifestLoader,
@@ -24,6 +28,7 @@ from materials_mcp_commons import (
     OperationObserver,
     create_mcp_server,
 )
+from materials_mcp_commons.contracts import DIALECT, build_registry
 
 EXPECTED_TOOLS = [
     "materials_discover",
@@ -54,6 +59,22 @@ def _host(
             observer=observer,
         ),
         registration.registration_ref,
+    )
+
+
+def _with_result_schema(
+    loaded_manifest: LoadedManifest,
+    schema: dict[str, object],
+) -> LoadedManifest:
+    schemas = dict(loaded_manifest._schemas)  # pyright: ignore[reportPrivateUsage]
+    schema_id = cast(str, schema["$id"])
+    schemas[schema_id] = schema
+    capability = replace(loaded_manifest.capabilities[0], result_schema=schema_id)
+    return replace(
+        loaded_manifest,
+        capabilities=(capability, *loaded_manifest.capabilities[1:]),
+        _schemas=MappingProxyType(schemas),
+        _registry=build_registry(schemas),
     )
 
 
@@ -151,6 +172,101 @@ def test_actual_engine_controls_work_through_in_process_mcp(
     assert health["registrations"] == 1
     assert health["bindings"] == 2
     assert "owner" not in json.dumps(health, sort_keys=True)
+
+
+def test_execute_preserves_non_object_json_result_roots_on_the_wire(
+    loaded_manifest: LoadedManifest,
+    contract_registry: ContractRegistry,
+) -> None:
+    schema_id = "urn:materials-mcp:test-schema:json-roots"
+    manifest = _with_result_schema(
+        loaded_manifest,
+        {
+            "$schema": DIALECT,
+            "$id": schema_id,
+            "type": ["array", "string", "null"],
+        },
+    )
+    lifecycle = LifecycleRegistry()
+    registration = lifecycle.register(manifest)
+    dispatcher = Dispatcher(lifecycle, contract_registry)
+    results: list[object] = [[{"value": 1}], "scalar", None]
+
+    def handler(_: HandlerRequest) -> object:
+        return results.pop(0)
+
+    dispatcher.bind(registration.registration_ref, DISCOVER_CAPABILITY_ID, handler)
+    lifecycle.activate(DISCOVER_CAPABILITY_ID, current_turn=0)
+    host = EngineMCPHost(
+        lifecycle,
+        dispatcher,
+        owner_ref="urn:materials-mcp:owner:json-root-test",
+    )
+
+    async def exercise() -> None:
+        async with Client(create_mcp_server(host)) as client:
+            for expected in ([{"value": 1}], "scalar", None):
+                response = await client.call_tool(
+                    "materials_execute",
+                    {
+                        "registration_ref": registration.registration_ref,
+                        "capability_id": DISCOVER_CAPABILITY_ID,
+                        "payload": {},
+                    },
+                )
+                assert response.is_error is False
+                document = cast(dict[str, object], response.structured_content)
+                assert document == {"ok": True, "result": expected}
+
+    asyncio.run(exercise())
+
+
+def test_execute_rejects_decimal_wire_type_drift(
+    loaded_manifest: LoadedManifest,
+    contract_registry: ContractRegistry,
+) -> None:
+    schema_id = "urn:materials-mcp:test-schema:decimal-result"
+    manifest = _with_result_schema(
+        loaded_manifest,
+        {
+            "$schema": DIALECT,
+            "$id": schema_id,
+            "type": "object",
+            "properties": {"value": {"type": "number"}},
+            "required": ["value"],
+            "additionalProperties": False,
+        },
+    )
+    lifecycle = LifecycleRegistry()
+    registration = lifecycle.register(manifest)
+    dispatcher = Dispatcher(lifecycle, contract_registry)
+    dispatcher.bind(
+        registration.registration_ref,
+        DISCOVER_CAPABILITY_ID,
+        lambda _: {"value": Decimal("1.50")},
+    )
+    lifecycle.activate(DISCOVER_CAPABILITY_ID, current_turn=0)
+    host = EngineMCPHost(
+        lifecycle,
+        dispatcher,
+        owner_ref="urn:materials-mcp:owner:decimal-wire-test",
+    )
+
+    async def exercise() -> None:
+        async with Client(create_mcp_server(host)) as client:
+            response = await client.call_tool(
+                "materials_execute",
+                {
+                    "registration_ref": registration.registration_ref,
+                    "capability_id": DISCOVER_CAPABILITY_ID,
+                    "payload": {},
+                },
+            )
+            document = cast(dict[str, object], response.structured_content)
+            error = cast(dict[str, object], document["error"])
+            assert error["code"] == "RESULT_SCHEMA_REJECTED"
+
+    asyncio.run(exercise())
 
 
 def test_advertised_error_contract_tracks_the_exact_host_profile() -> None:

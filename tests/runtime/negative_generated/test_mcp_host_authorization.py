@@ -22,6 +22,7 @@ from materials_mcp_commons import (
     LoadedManifest,
     Permission,
     PolicyEngine,
+    PolicyError,
     PolicySnapshot,
     QuotaCharge,
     QuotaLimit,
@@ -187,3 +188,24 @@ def test_generated_host_authorization_success_replay_and_resolver_failure_are_co
         assert failed_error["code"] == "AUTHORIZATION_RESOLVER_FAILED"
         assert "private-resolver-secret" not in json.dumps(failed, sort_keys=True)
         assert invoked == 1
+
+        def denied_resolver(
+            request: DispatchRequest, target: CapabilityDetail
+        ) -> tuple[PolicySnapshot, AuthorizationReceipt]:
+            del request, target
+            raise PolicyError("quota-denied", "private-policy-reason")
+
+        denied = EngineMCPHost(
+            lifecycle,
+            dispatcher,
+            owner_ref=OWNER_REF,
+            authorization_resolver=denied_resolver,
+            clock=lambda: NOW,
+            request_ref_factory=lambda: "urn:materials-mcp:request:generated-host-denied",
+        )
+        denied_result = asyncio.run(
+            denied.execute(registration.registration_ref, DISCOVER_CAPABILITY_ID, {})
+        )
+        denied_error = cast(dict[str, object], denied_result.get("error"))
+        assert denied_error["code"] == "AUTHORIZATION_DENIED"
+        assert "private-policy-reason" not in json.dumps(denied_result, sort_keys=True)

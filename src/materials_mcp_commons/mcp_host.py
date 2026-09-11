@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import math
 import re
 import uuid
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from decimal import Decimal
 from importlib.metadata import version
 from typing import (
     TYPE_CHECKING,
@@ -23,7 +25,7 @@ from typing import (
 from typing_extensions import TypedDict
 
 from .dispatch import Dispatcher, DispatchFailure, DispatchRequest
-from .errors import CommonsError, HostError
+from .errors import CommonsError, HostError, PolicyError
 from .lifecycle import CapabilityDetail, LifecycleRegistry
 from .operations import OperationName, OperationObserver, OperationOutcome
 from .policy import AuthorizationReceipt, PolicySnapshot
@@ -205,13 +207,33 @@ class _ActivateSuccess(TypedDict, closed=True):
 
 class _ExecuteSuccess(TypedDict, closed=True):
     ok: Literal[True]
-    result: dict[str, object]
+    result: object
 
 
 _DiscoverOutput: TypeAlias = _DiscoverSuccess | _FailureOutput
 _InspectOutput: TypeAlias = _InspectSuccess | _FailureOutput
 _ActivateOutput: TypeAlias = _ActivateSuccess | _FailureOutput
 _ExecuteOutput: TypeAlias = _ExecuteSuccess | _FailureOutput
+
+
+def _wire_json(value: object) -> object:
+    if isinstance(value, Mapping):
+        mapping = cast(Mapping[object, object], value)
+        if any(type(key) is not str for key in mapping):
+            raise HostError("invalid-result", "MCP result object keys must be strings")
+        return {cast(str, key): _wire_json(item) for key, item in mapping.items()}
+    if isinstance(value, (list, tuple)):
+        return [_wire_json(item) for item in cast(list[object] | tuple[object, ...], value)]
+    if value is None or type(value) in {str, bool, int}:
+        return value
+    if type(value) is float and math.isfinite(value):
+        return value
+    if type(value) is Decimal:
+        raise HostError(
+            "invalid-result",
+            "Decimal results require an explicit JSON-safe representation at the MCP boundary",
+        )
+    raise HostError("invalid-result", "MCP result contains a non-JSON wire value")
 
 
 class AuthorizationResolver(Protocol):
@@ -465,7 +487,56 @@ class EngineMCPHost:
                 policy = None
                 authorization = None
                 if effect_tier != "R0" and self._authorization_resolver is not None:
-                    policy, authorization = self._authorization_resolver(request, target)
+                    try:
+                        resolved = cast(object, self._authorization_resolver(request, target))
+                        if not isinstance(resolved, tuple):
+                            raise TypeError("authorization resolver returned invalid types")
+                        resolved_values = cast(tuple[object, ...], resolved)
+                        if len(resolved_values) != 2:
+                            raise TypeError("authorization resolver returned invalid types")
+                        policy_value, authorization_value = resolved_values
+                        if not isinstance(policy_value, PolicySnapshot) or not isinstance(
+                            authorization_value, AuthorizationReceipt
+                        ):
+                            raise TypeError("authorization resolver returned invalid types")
+                        policy, authorization = policy_value, authorization_value
+                    except PolicyError:
+                        self._observe(
+                            started,
+                            operation="execute",
+                            outcome="failure",
+                            capability_id=capability_id,
+                            effect_tier=effect_tier,
+                            error_code="authorization-denied",
+                        )
+                        return {
+                            "ok": False,
+                            "error": self._host_failure(
+                                "AUTHORIZATION_DENIED",
+                                "execute",
+                                "Create and consume a new exact authorization grant.",
+                            ),
+                        }
+                    except Exception:
+                        self._observe(
+                            started,
+                            operation="execute",
+                            outcome="failure",
+                            capability_id=capability_id,
+                            effect_tier=effect_tier,
+                            error_code="authorization-resolver-failed",
+                        )
+                        return {
+                            "ok": False,
+                            "error": self._host_failure(
+                                "AUTHORIZATION_RESOLVER_FAILED",
+                                "execute",
+                                (
+                                    "Inspect private operator diagnostics and repair the trusted "
+                                    "resolver."
+                                ),
+                            ),
+                        }
                 outcome = await self._dispatcher.dispatch_async(
                     request, policy=policy, authorization=authorization
                 )
@@ -481,10 +552,26 @@ class EngineMCPHost:
                     error_code=code,
                 )
                 return {"ok": False, "error": cast(_StructuredError, document)}
-            result: _ExecuteOutput = {
-                "ok": True,
-                "result": cast(dict[str, object], outcome.to_result()),
-            }
+            try:
+                wire_result = _wire_json(outcome.to_result())
+            except HostError:
+                self._observe(
+                    started,
+                    operation="execute",
+                    outcome="failure",
+                    capability_id=capability_id,
+                    effect_tier=effect_tier,
+                    error_code="invalid-result",
+                )
+                return {
+                    "ok": False,
+                    "error": self._host_failure(
+                        "RESULT_SCHEMA_REJECTED",
+                        "execute",
+                        "Return a JSON-wire-safe value matching the declared result schema.",
+                    ),
+                }
+            result: _ExecuteOutput = {"ok": True, "result": wire_result}
         except CommonsError as error:
             self._observe(
                 started,
@@ -509,14 +596,14 @@ class EngineMCPHost:
                 outcome="failure",
                 capability_id=capability_id,
                 effect_tier=effect_tier,
-                error_code="authorization-resolver-failed",
+                error_code="execution-failed",
             )
             return {
                 "ok": False,
                 "error": self._host_failure(
-                    "AUTHORIZATION_RESOLVER_FAILED",
+                    "EXECUTION_FAILED",
                     "execute",
-                    "Inspect private operator diagnostics and repair the trusted resolver.",
+                    "Inspect private operator diagnostics and repair the engine boundary.",
                 ),
             }
         self._observe(

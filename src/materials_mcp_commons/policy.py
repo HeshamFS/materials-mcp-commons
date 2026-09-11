@@ -4,9 +4,10 @@ import hashlib
 import json
 import re
 import sqlite3
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 from threading import RLock
 from types import MappingProxyType
@@ -19,6 +20,7 @@ from .lifecycle import CapabilityDetail
 
 REFERENCE_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:[^\s]+$")
 TOKEN_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$")
+SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 CONFIRMATION_STRENGTH = {"standard": 1, "strong": 2}
 
 
@@ -67,15 +69,29 @@ def _plain(value: object) -> object:
     return value
 
 
+def _render_canonical(value: object) -> str:
+    if isinstance(value, dict):
+        document = cast(dict[str, object], value)
+        return (
+            "{"
+            + ",".join(
+                f"{json.dumps(key, ensure_ascii=False)}:{_render_canonical(document[key])}"
+                for key in sorted(document)
+            )
+            + "}"
+        )
+    if isinstance(value, list):
+        return "[" + ",".join(_render_canonical(item) for item in cast(list[object], value)) + "]"
+    if type(value) is Decimal:
+        if not value.is_finite():
+            raise ValueError("non-finite decimal")
+        return str(value)
+    return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
+
+
 def _canonical(value: object) -> str:
     try:
-        return json.dumps(
-            _plain(value),
-            ensure_ascii=False,
-            allow_nan=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        )
+        return _render_canonical(_plain(value))
     except (TypeError, ValueError) as error:
         raise PolicyError("invalid-json-value", "Policy value is not strict JSON") from error
 
@@ -225,9 +241,15 @@ class PolicyEngine:
     """Durable exact-scope authorization, quota, and hash-chained audit runtime."""
 
     DATABASE_NAME = "materials-mcp-policy.sqlite3"
-    SCHEMA_VERSION = 1
+    SCHEMA_VERSION = 2
 
-    def __init__(self, state_root: Path, contracts: ContractRegistry) -> None:
+    def __init__(
+        self,
+        state_root: Path,
+        contracts: ContractRegistry,
+        *,
+        clock: Callable[[], datetime] | None = None,
+    ) -> None:
         if state_root.is_symlink():
             _fail("unsafe-state-path", "Policy state root cannot be a symbolic link")
         try:
@@ -240,6 +262,7 @@ class PolicyEngine:
         if database_path.exists() and database_path.is_symlink():
             _fail("unsafe-state-path", "Policy database cannot be a symbolic link")
         self._contracts = contracts
+        self._clock = clock or (lambda: datetime.now(UTC))
         self._lock = RLock()
         try:
             self._connection = sqlite3.connect(
@@ -258,40 +281,95 @@ class PolicyEngine:
             raise PolicyError("storage-failure", "Unable to open policy state") from error
 
     def _initialize(self) -> None:
-        version = cast(int, self._connection.execute("PRAGMA user_version").fetchone()[0])
-        if version not in {0, self.SCHEMA_VERSION}:
-            _fail("store-version-incompatible", "Policy store schema version is unsupported")
-        self._connection.executescript(
-            """
-            BEGIN IMMEDIATE;
-            CREATE TABLE IF NOT EXISTS plans (
-                plan_ref TEXT PRIMARY KEY, owner_ref TEXT NOT NULL, registration_ref TEXT NOT NULL,
-                capability_id TEXT NOT NULL, input_sha256 TEXT NOT NULL, document_json TEXT NOT NULL
-            );
-            CREATE TABLE IF NOT EXISTS approvals (
-                approval_ref TEXT PRIMARY KEY, plan_ref TEXT NOT NULL, owner_ref TEXT NOT NULL,
-                approver_ref TEXT NOT NULL, confirmation_kind TEXT NOT NULL,
-                approved_at TEXT NOT NULL, expires_at TEXT NOT NULL, used_grant_ref TEXT,
-                FOREIGN KEY(plan_ref) REFERENCES plans(plan_ref) ON DELETE RESTRICT
-            );
-            CREATE TABLE IF NOT EXISTS grants (
-                grant_ref TEXT PRIMARY KEY, document_json TEXT NOT NULL,
-                consumed_at TEXT, receipt_ref TEXT
-            );
-            CREATE TABLE IF NOT EXISTS quota_usage (
-                owner_ref TEXT NOT NULL, policy_sha256 TEXT NOT NULL, kind TEXT NOT NULL,
-                used INTEGER NOT NULL, PRIMARY KEY(owner_ref, policy_sha256, kind)
-            );
-            CREATE TABLE IF NOT EXISTS audit_events (
-                owner_ref TEXT NOT NULL, sequence INTEGER NOT NULL, event_type TEXT NOT NULL,
-                subject_ref TEXT NOT NULL, occurred_at TEXT NOT NULL, previous_sha256 TEXT NOT NULL,
-                event_sha256 TEXT NOT NULL, details_json TEXT NOT NULL,
-                PRIMARY KEY(owner_ref, sequence), UNIQUE(event_sha256)
-            );
-            PRAGMA user_version = 1;
-            COMMIT;
-            """
-        )
+        self._connection.execute("BEGIN IMMEDIATE")
+        try:
+            version = cast(int, self._connection.execute("PRAGMA user_version").fetchone()[0])
+            if version not in {0, 1, self.SCHEMA_VERSION}:
+                _fail("store-version-incompatible", "Policy store schema version is unsupported")
+            if version == 0:
+                self._connection.execute(
+                    "CREATE TABLE plans (plan_ref TEXT PRIMARY KEY, owner_ref TEXT NOT NULL, "
+                    "registration_ref TEXT NOT NULL, capability_id TEXT NOT NULL, "
+                    "input_sha256 TEXT NOT NULL, document_json TEXT NOT NULL)"
+                )
+                self._connection.execute(
+                    "CREATE TABLE approvals (approval_ref TEXT PRIMARY KEY, "
+                    "plan_ref TEXT NOT NULL, "
+                    "owner_ref TEXT NOT NULL, approver_ref TEXT NOT NULL, "
+                    "confirmation_kind TEXT NOT NULL, approved_at TEXT NOT NULL, "
+                    "expires_at TEXT NOT NULL, used_grant_ref TEXT, "
+                    "FOREIGN KEY(plan_ref) REFERENCES plans(plan_ref) ON DELETE RESTRICT)"
+                )
+                self._connection.execute(
+                    "CREATE TABLE grants (grant_ref TEXT PRIMARY KEY, document_json TEXT NOT NULL, "
+                    "consumed_at TEXT, receipt_ref TEXT, "
+                    "receipt_state TEXT NOT NULL DEFAULT 'pending' "
+                    "CHECK(receipt_state IN "
+                    "('pending', 'available', 'redeemed', 'legacy-closed')), "
+                    "redeemed_at TEXT)"
+                )
+                self._connection.execute(
+                    "CREATE TABLE quota_usage (owner_ref TEXT NOT NULL, "
+                    "policy_sha256 TEXT NOT NULL, "
+                    "kind TEXT NOT NULL, used INTEGER NOT NULL, "
+                    "PRIMARY KEY(owner_ref, policy_sha256, kind))"
+                )
+                self._connection.execute(
+                    "CREATE TABLE audit_events (owner_ref TEXT NOT NULL, "
+                    "sequence INTEGER NOT NULL, event_type TEXT NOT NULL, "
+                    "subject_ref TEXT NOT NULL, occurred_at TEXT NOT NULL, "
+                    "previous_sha256 TEXT NOT NULL, event_sha256 TEXT NOT NULL, "
+                    "details_json TEXT NOT NULL, PRIMARY KEY(owner_ref, sequence), "
+                    "UNIQUE(event_sha256))"
+                )
+                self._connection.execute(
+                    "CREATE TABLE schema_migrations (from_version INTEGER NOT NULL, "
+                    "to_version INTEGER NOT NULL, details_json TEXT NOT NULL, "
+                    "PRIMARY KEY(from_version, to_version))"
+                )
+            elif version == 1:
+                self._verify_audit()
+                closed_refs = [
+                    cast(str, row[0])
+                    for row in self._connection.execute(
+                        "SELECT grant_ref FROM grants WHERE consumed_at IS NOT NULL "
+                        "ORDER BY grant_ref"
+                    ).fetchall()
+                ]
+                self._connection.execute(
+                    "ALTER TABLE grants ADD COLUMN receipt_state TEXT NOT NULL DEFAULT 'pending' "
+                    "CHECK(receipt_state IN ('pending', 'available', 'redeemed', 'legacy-closed'))"
+                )
+                self._connection.execute("ALTER TABLE grants ADD COLUMN redeemed_at TEXT")
+                self._connection.execute(
+                    "UPDATE grants SET receipt_state = CASE WHEN consumed_at IS NULL "
+                    "THEN 'pending' ELSE 'legacy-closed' END"
+                )
+                self._connection.execute(
+                    "CREATE TABLE schema_migrations (from_version INTEGER NOT NULL, "
+                    "to_version INTEGER NOT NULL, details_json TEXT NOT NULL, "
+                    "PRIMARY KEY(from_version, to_version))"
+                )
+                closed_digest = hashlib.sha256(_canonical(closed_refs).encode("utf-8")).hexdigest()
+                self._connection.execute(
+                    "INSERT INTO schema_migrations VALUES (?, ?, ?)",
+                    (
+                        1,
+                        self.SCHEMA_VERSION,
+                        _canonical(
+                            {
+                                "legacy_closed_receipts": len(closed_refs),
+                                "legacy_closed_grant_refs_sha256": closed_digest,
+                            }
+                        ),
+                    ),
+                )
+            self._connection.execute(f"PRAGMA user_version = {self.SCHEMA_VERSION}")
+            self._connection.execute("COMMIT")
+        except Exception:
+            if self._connection.in_transaction:
+                self._connection.execute("ROLLBACK")
+            raise
 
     def close(self) -> None:
         with self._lock:
@@ -302,6 +380,14 @@ class PolicyEngine:
 
     def __exit__(self, *_: object) -> None:
         self.close()
+
+    def _trusted_now(self) -> datetime:
+        try:
+            return _time(self._clock(), "policy clock")
+        except PolicyError:
+            raise
+        except Exception as error:
+            raise PolicyError("invalid-clock", "Policy clock failed") from error
 
     @staticmethod
     def input_sha256(request: DispatchRequest) -> str:
@@ -640,12 +726,14 @@ class PolicyEngine:
             self._record_denial(request.owner_ref, request.request_ref, issued, "permission-denied")
             _fail("permission-denied", "Policy lacks an exact permission required by the plan")
         tier = target.capability.effect.tier
+        authorization_time = self._trusted_now() if approval is not None else issued
         if tier in {"R2", "R3", "R4"}:
             if (
                 approval is None
                 or approval.plan_ref != plan.plan_ref
                 or approval.owner_ref != request.owner_ref
-                or approval.expires_at <= issued
+                or approval.approved_at > authorization_time
+                or approval.expires_at <= authorization_time
             ):
                 self._record_denial(
                     request.owner_ref, request.request_ref, issued, "approval-required"
@@ -708,7 +796,7 @@ class PolicyEngine:
                     _fail("plan-invalid", "Operation plan is not durable and exact")
                 if approval is not None:
                     approval_row = self._connection.execute(
-                        "SELECT plan_ref, owner_ref, confirmation_kind, expires_at, "
+                        "SELECT plan_ref, owner_ref, confirmation_kind, approved_at, expires_at, "
                         "used_grant_ref FROM approvals WHERE approval_ref = ?",
                         (approval.approval_ref,),
                     ).fetchone()
@@ -717,7 +805,8 @@ class PolicyEngine:
                         or approval_row["plan_ref"] != plan.plan_ref
                         or approval_row["owner_ref"] != request.owner_ref
                         or approval_row["confirmation_kind"] != approval.confirmation_kind
-                        or _parse_time(cast(str, approval_row["expires_at"])) <= issued
+                        or _parse_time(cast(str, approval_row["approved_at"])) > authorization_time
+                        or _parse_time(cast(str, approval_row["expires_at"])) <= authorization_time
                         or approval_row["used_grant_ref"] is not None
                     ):
                         _fail(
@@ -725,7 +814,8 @@ class PolicyEngine:
                             "Approval is not durable, exact, unexpired, and unused",
                         )
                 self._connection.execute(
-                    "INSERT INTO grants VALUES (?, ?, NULL, NULL)",
+                    "INSERT INTO grants (grant_ref, document_json, consumed_at, receipt_ref, "
+                    "receipt_state, redeemed_at) VALUES (?, ?, NULL, NULL, 'pending', NULL)",
                     (grant_ref, _canonical(material)),
                 )
                 if approval is not None:
@@ -770,11 +860,13 @@ class PolicyEngine:
     ) -> AuthorizationReceipt:
         consumed = _time(consumed_at, "consumed_at")
         self._assert_binding(grant, request, target, policy)
+        authorization_time = self._trusted_now() if grant.approval_ref is not None else consumed
         with self._lock:
             self._connection.execute("BEGIN IMMEDIATE")
             try:
                 row = self._connection.execute(
-                    "SELECT document_json, consumed_at FROM grants WHERE grant_ref = ?",
+                    "SELECT document_json, consumed_at, receipt_state FROM grants "
+                    "WHERE grant_ref = ?",
                     (grant.grant_ref,),
                 ).fetchone()
                 if row is None:
@@ -793,18 +885,10 @@ class PolicyEngine:
                 }
                 if row["document_json"] != _canonical(expected_grant):
                     _fail("grant-invalid", "Authorization grant is not durable and exact")
-                if row["consumed_at"] is not None:
+                if row["consumed_at"] is not None or row["receipt_state"] != "pending":
                     _fail("grant-consumed", "Authorization grant is single-use")
                 if grant.approval_ref is not None:
-                    approval = self._connection.execute(
-                        "SELECT expires_at FROM approvals WHERE approval_ref = ?",
-                        (grant.approval_ref,),
-                    ).fetchone()
-                    if (
-                        approval is None
-                        or _parse_time(cast(str, approval["expires_at"])) <= consumed
-                    ):
-                        _fail("approval-expired", "Authorization approval has expired")
+                    self._assert_approval_active(expected_grant, authorization_time)
                 limits = {item.kind: item.limit for item in policy.quotas}
                 for charge in grant.charges:
                     used_row = self._connection.execute(
@@ -828,7 +912,9 @@ class PolicyEngine:
                         (grant.owner_ref, grant.policy_sha256, charge.kind, charge.units),
                     )
                 self._connection.execute(
-                    "UPDATE grants SET consumed_at = ?, receipt_ref = ? WHERE grant_ref = ?",
+                    "UPDATE grants SET consumed_at = ?, receipt_ref = ?, "
+                    "receipt_state = 'available' "
+                    "WHERE grant_ref = ? AND receipt_state = 'pending'",
                     (_timestamp(consumed, "consumed_at"), receipt_ref, grant.grant_ref),
                 )
                 self._audit(
@@ -915,24 +1001,170 @@ class PolicyEngine:
         target: CapabilityDetail,
         policy: PolicySnapshot,
     ) -> None:
+        receipt_value = cast(object, receipt)
+        if not isinstance(receipt_value, AuthorizationReceipt):
+            _fail("authorization-invalid", "Authorization receipt has the wrong type")
+        receipt = receipt_value
         self._assert_binding(receipt, request, target, policy)
         with self._lock:
-            row = self._connection.execute(
-                "SELECT consumed_at, receipt_ref FROM grants WHERE grant_ref = ?",
-                (receipt.grant_ref,),
-            ).fetchone()
-            if (
-                row is None
-                or row["receipt_ref"] != receipt.receipt_ref
-                or _parse_time(cast(str, row["consumed_at"])) != receipt.consumed_at
-            ):
+            try:
+                self._receipt_record(receipt, require_available=True)
+            except PolicyError as error:
                 self._record_denial(
                     request.owner_ref,
                     request.request_ref,
                     request.occurred_at,
-                    "authorization-invalid",
+                    error.code,
                 )
-                _fail("authorization-invalid", "Authorization receipt is not durable or exact")
+                raise
+
+    def _receipt_record(
+        self,
+        receipt: AuthorizationReceipt,
+        *,
+        require_available: bool,
+    ) -> tuple[sqlite3.Row, dict[str, object]]:
+        for value, field_name in (
+            (receipt.receipt_ref, "receipt_ref"),
+            (receipt.grant_ref, "grant_ref"),
+            (receipt.request_ref, "request_ref"),
+            (receipt.registration_ref, "registration_ref"),
+            (receipt.capability_id, "capability_id"),
+            (receipt.owner_ref, "owner_ref"),
+            (receipt.plan_ref, "plan_ref"),
+        ):
+            _reference(value, field_name)
+        _token(receipt.effect_tier, "effect_tier")
+        if (
+            type(receipt.input_sha256) is not str
+            or SHA256_PATTERN.fullmatch(receipt.input_sha256) is None
+            or type(receipt.policy_sha256) is not str
+            or SHA256_PATTERN.fullmatch(receipt.policy_sha256) is None
+        ):
+            _fail("authorization-invalid", "Authorization receipt digests are invalid")
+        receipt_consumed = _time(receipt.consumed_at, "consumed_at")
+        row = self._connection.execute(
+            "SELECT document_json, consumed_at, receipt_ref, receipt_state, redeemed_at "
+            "FROM grants WHERE grant_ref = ?",
+            (receipt.grant_ref,),
+        ).fetchone()
+        if row is None or row["consumed_at"] is None or row["receipt_ref"] is None:
+            _fail("authorization-invalid", "Authorization receipt is not durable or consumed")
+        try:
+            stored = json.loads(cast(str, row["document_json"]))
+        except (TypeError, json.JSONDecodeError) as error:
+            raise PolicyError("authorization-invalid", "Stored grant is malformed") from error
+        if not isinstance(stored, dict):
+            _fail("authorization-invalid", "Stored grant is malformed")
+        stored_document = cast(dict[str, object], stored)
+        consumed = _parse_time(cast(str, row["consumed_at"]))
+        receipt_material = {
+            "grant_ref": receipt.grant_ref,
+            "consumed_at": _timestamp(consumed, "consumed_at"),
+        }
+        expected_receipt_ref = f"urn:materials-mcp:receipt:{_digest(receipt_material)}"
+        fields = (
+            "request_ref",
+            "registration_ref",
+            "capability_id",
+            "owner_ref",
+            "input_sha256",
+            "effect_tier",
+            "plan_ref",
+            "policy_sha256",
+        )
+        if (
+            tuple(stored_document.get(field) for field in fields)
+            != tuple(getattr(receipt, field) for field in fields)
+            or row["receipt_ref"] != receipt.receipt_ref
+            or receipt.receipt_ref != expected_receipt_ref
+            or consumed != receipt_consumed
+        ):
+            _fail("authorization-invalid", "Authorization receipt is not durable and exact")
+        state = cast(str, row["receipt_state"])
+        if require_available and state == "legacy-closed":
+            _fail("receipt-legacy-closed", "Legacy receipt is closed after safe migration")
+        if require_available and state == "redeemed":
+            _fail("receipt-redeemed", "Authorization receipt has already been redeemed")
+        if require_available and state != "available":
+            _fail("authorization-invalid", "Authorization receipt is unavailable")
+        return row, stored_document
+
+    def _assert_approval_active(
+        self,
+        stored_grant: Mapping[str, object],
+        at: datetime,
+    ) -> None:
+        approval_ref = stored_grant.get("approval_ref")
+        if approval_ref is None:
+            return
+        _reference(cast(str, approval_ref), "approval_ref")
+        approval = self._connection.execute(
+            "SELECT approved_at, expires_at FROM approvals WHERE approval_ref = ?",
+            (approval_ref,),
+        ).fetchone()
+        if (
+            approval is None
+            or _parse_time(cast(str, approval["approved_at"])) > at
+            or _parse_time(cast(str, approval["expires_at"])) <= at
+        ):
+            _fail("approval-expired", "Authorization approval is not currently active")
+
+    def redeem_receipt(
+        self,
+        receipt: AuthorizationReceipt,
+        request: DispatchRequest,
+        target: CapabilityDetail,
+        policy: PolicySnapshot,
+    ) -> None:
+        """Atomically redeem one exact durable receipt immediately before dispatch."""
+        receipt_value = cast(object, receipt)
+        if not isinstance(receipt_value, AuthorizationReceipt):
+            _fail("authorization-invalid", "Authorization receipt has the wrong type")
+        receipt = receipt_value
+        self._assert_binding(receipt, request, target, policy)
+        redeemed = self._trusted_now()
+        with self._lock:
+            self._connection.execute("BEGIN IMMEDIATE")
+            try:
+                _, stored = self._receipt_record(receipt, require_available=True)
+                self._assert_approval_active(stored, redeemed)
+                cursor = self._connection.execute(
+                    "UPDATE grants SET receipt_state = 'redeemed', redeemed_at = ? "
+                    "WHERE grant_ref = ? AND receipt_ref = ? AND receipt_state = 'available'",
+                    (
+                        _timestamp(redeemed, "redeemed_at"),
+                        receipt.grant_ref,
+                        receipt.receipt_ref,
+                    ),
+                )
+                if cursor.rowcount != 1:
+                    _fail("receipt-redeemed", "Authorization receipt is not available")
+                self._audit(
+                    cast(str, stored["owner_ref"]),
+                    "receipt-redeemed",
+                    receipt.receipt_ref,
+                    redeemed,
+                    {
+                        "grant_ref": receipt.grant_ref,
+                        "request_ref": cast(str, stored["request_ref"]),
+                    },
+                )
+                self._connection.execute("COMMIT")
+            except PolicyError as error:
+                if self._connection.in_transaction:
+                    self._connection.execute("ROLLBACK")
+                self._record_denial(
+                    request.owner_ref,
+                    request.request_ref,
+                    redeemed,
+                    error.code,
+                )
+                raise
+            except Exception:
+                if self._connection.in_transaction:
+                    self._connection.execute("ROLLBACK")
+                raise
 
     def verify_run_receipt(
         self,
@@ -943,6 +1175,10 @@ class PolicyEngine:
         owner_ref: str,
         plan_ref: str,
     ) -> None:
+        receipt_value = cast(object, receipt)
+        if not isinstance(receipt_value, AuthorizationReceipt):
+            _fail("authorization-invalid", "Authorization receipt has the wrong type")
+        receipt = receipt_value
         expected = (
             request_ref,
             target.registration_ref,
@@ -961,17 +1197,10 @@ class PolicyEngine:
         )
         if expected != actual:
             _fail("authorization-mismatch", "Authorization does not bind the exact run")
+        verified_at = self._trusted_now()
         with self._lock:
-            row = self._connection.execute(
-                "SELECT consumed_at, receipt_ref FROM grants WHERE grant_ref = ?",
-                (receipt.grant_ref,),
-            ).fetchone()
-            if (
-                row is None
-                or row["receipt_ref"] != receipt.receipt_ref
-                or _parse_time(cast(str, row["consumed_at"])) != receipt.consumed_at
-            ):
-                _fail("authorization-invalid", "Run authorization receipt is not durable")
+            _, stored = self._receipt_record(receipt, require_available=True)
+            self._assert_approval_active(stored, verified_at)
 
     def audit_events(self, owner_ref: str) -> tuple[AuditEvent, ...]:
         _reference(owner_ref, "owner_ref")

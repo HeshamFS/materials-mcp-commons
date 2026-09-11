@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -93,3 +94,46 @@ def test_real_engine_state_snapshots_and_restores_to_fresh_root(
         recovered = restored_runs.recover_incomplete(OWNER_REF)
         assert recovered == (run,)
         assert restored_runs.latest(run.run_ref, OWNER_REF) == run
+
+
+def test_v1_policy_snapshot_restores_then_migrates_fail_closed(
+    tmp_path: Path,
+    contract_registry: ContractRegistry,
+) -> None:
+    state_root = tmp_path / "live-state"
+    state_root.mkdir()
+    snapshot_root = tmp_path / "v1-snapshot"
+    restored_root = tmp_path / "restored-v1"
+    recovery = StateRecovery()
+    with (
+        PolicyEngine(state_root, contract_registry),
+        RunStore(state_root, PUBLIC_ROOT, contract_registry),
+    ):
+        pass
+
+    policy_database = state_root / PolicyEngine.DATABASE_NAME
+    with sqlite3.connect(policy_database) as connection:
+        connection.execute("DROP TABLE schema_migrations")
+        connection.execute("ALTER TABLE grants DROP COLUMN redeemed_at")
+        connection.execute("ALTER TABLE grants DROP COLUMN receipt_state")
+        connection.execute("PRAGMA user_version = 1")
+    created = recovery.create_snapshot(state_root, snapshot_root)
+    assert (
+        dict((item.name, item.schema_version) for item in created.databases)[
+            PolicyEngine.DATABASE_NAME
+        ]
+        == 1
+    )
+
+    inspected = recovery.inspect_snapshot(snapshot_root)
+    assert (
+        dict((item.name, item.schema_version) for item in inspected.databases)[
+            PolicyEngine.DATABASE_NAME
+        ]
+        == 1
+    )
+    recovery.restore(snapshot_root, restored_root)
+    with PolicyEngine(restored_root, contract_registry):
+        pass
+    with sqlite3.connect(restored_root / PolicyEngine.DATABASE_NAME) as connection:
+        assert connection.execute("PRAGMA user_version").fetchone() == (2,)

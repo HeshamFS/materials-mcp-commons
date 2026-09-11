@@ -23,6 +23,10 @@ _DATABASES = (
     (RunStore.DATABASE_NAME, RunStore.SCHEMA_VERSION),
     (PolicyEngine.DATABASE_NAME, PolicyEngine.SCHEMA_VERSION),
 )
+_SUPPORTED_SNAPSHOT_VERSIONS = {
+    RunStore.DATABASE_NAME: frozenset({RunStore.SCHEMA_VERSION}),
+    PolicyEngine.DATABASE_NAME: frozenset({1, PolicyEngine.SCHEMA_VERSION}),
+}
 
 
 def _fail(code: str, message: str) -> Never:
@@ -91,7 +95,9 @@ def _open_read_only(path: Path) -> sqlite3.Connection:
         ) from error
 
 
-def _inspect_database(path: Path, expected_version: int, max_bytes: int) -> tuple[int, int, str]:
+def _inspect_database(
+    path: Path, expected_versions: int | frozenset[int], max_bytes: int
+) -> tuple[int, int, str]:
     if _is_indirect(path) or not path.is_file():
         _fail("snapshot-incomplete", "Required database file is missing or indirect")
     try:
@@ -116,7 +122,10 @@ def _inspect_database(path: Path, expected_version: int, max_bytes: int) -> tupl
         ) from error
     finally:
         connection.close()
-    if version != expected_version:
+    supported = (
+        frozenset({expected_versions}) if isinstance(expected_versions, int) else expected_versions
+    )
+    if version not in supported:
         _fail("store-version-incompatible", "Database schema version is unsupported")
     return size, version, _sha256(path)
 
@@ -167,12 +176,11 @@ class DatabaseSnapshot:
     sha256: str
 
     def __post_init__(self) -> None:
-        versions = dict(_DATABASES)
         if (
             type(self.name) is not str
-            or self.name not in versions
+            or self.name not in _SUPPORTED_SNAPSHOT_VERSIONS
             or type(self.schema_version) is not int
-            or self.schema_version != versions[self.name]
+            or self.schema_version not in _SUPPORTED_SNAPSHOT_VERSIONS[self.name]
         ):
             _fail("invalid-snapshot", "Database snapshot identity or version is invalid")
         if type(self.size_bytes) is not int or self.size_bytes < 1:
@@ -299,12 +307,14 @@ class StateRecovery:
             declared[name] = item
 
         snapshots: list[DatabaseSnapshot] = []
-        for name, expected_version in _DATABASES:
+        for name, _ in _DATABASES:
             item = declared.get(name)
             if item is None:
                 _fail("snapshot-incomplete", "Snapshot database set is incomplete")
             size_bytes, schema_version, digest = _inspect_database(
-                root / name, expected_version, self._limits.max_database_bytes
+                root / name,
+                _SUPPORTED_SNAPSHOT_VERSIONS[name],
+                self._limits.max_database_bytes,
             )
             if (
                 item["schema_version"] != schema_version
@@ -340,11 +350,16 @@ class StateRecovery:
             snapshots: list[DatabaseSnapshot] = []
             for name, expected_version in _DATABASES:
                 source = source_root / name
-                _inspect_database(source, expected_version, self._limits.max_database_bytes)
+                accepted_versions: int | frozenset[int] = (
+                    _SUPPORTED_SNAPSHOT_VERSIONS[name]
+                    if name == PolicyEngine.DATABASE_NAME
+                    else expected_version
+                )
+                _inspect_database(source, accepted_versions, self._limits.max_database_bytes)
                 copied = temporary / name
                 _online_backup(source, copied)
                 size_bytes, schema_version, digest = _inspect_database(
-                    copied, expected_version, self._limits.max_database_bytes
+                    copied, accepted_versions, self._limits.max_database_bytes
                 )
                 snapshots.append(DatabaseSnapshot(name, schema_version, size_bytes, digest))
             snapshot = StateSnapshot(timestamp.astimezone(UTC), tuple(snapshots))

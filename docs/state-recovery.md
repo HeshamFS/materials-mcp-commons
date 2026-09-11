@@ -18,7 +18,7 @@ The two databases are individually consistent but are not one cross-database tra
 
 ## Inspection and restore
 
-`inspect_snapshot(snapshot_root)` requires the exact two databases plus the manifest. It rejects extra members, missing members, symbolic links, malformed JSON, unsupported schema versions, failed SQLite integrity/foreign-key checks, and metadata or checksum drift.
+`inspect_snapshot(snapshot_root)` requires the exact two databases plus the manifest. It rejects extra members, missing members, symbolic links, malformed JSON, unsupported schema versions, failed SQLite integrity/foreign-key checks, and metadata or checksum drift. Policy database schema 1 remains an accepted snapshot, inspection, and recovery input for the a12 transition, so an operator can capture a rollback point before opening the store with a12. The restored database migrates transactionally to schema 2 when `PolicyEngine` first opens it. Consumed schema-1 receipts become `legacy-closed`, because the older store cannot prove whether they already invoked a handler. Their approvals and reserved quota are intentionally not refunded.
 
 `restore(snapshot_root, target_state_root)` first performs the complete inspection, then copies and revalidates both databases into a private staging directory. The target must not exist. Successful restore creates a fresh state root; it never replaces or merges live state.
 

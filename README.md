@@ -40,7 +40,7 @@ The repository now contains:
 - a deterministic multi-version conformance report and structural zero-coupling audit;
 - strict offline profile/package validation and deterministic registration, discovery, inspection, and activation leases;
 - exact-owner dispatch with immutable typed requests, two-sided schema validation, and contract-valid structured failures;
-- deterministic operation plans, exact scoped permissions, expiring single-use approvals, atomic quotas, and tamper-evident policy audit;
+- deterministic operation plans, exact scoped permissions, expiring single-use approvals, atomic quotas, atomic at-most-once receipt redemption, and tamper-evident policy audit;
 - canonical context measurement with identified host tokenizers, bounded linting, real-source compact projection, retrieval evaluation, and long-session lease checks;
 - deterministic empty-workspace scaffolding and exact-profile declarative package building without generated capabilities, handlers, or scientific results;
 - deterministic plugin-package and versioned compatibility reports, explicit migration assessment, and manifest-derived capability references without plugin-code execution;

@@ -129,6 +129,12 @@ def test_frozen_protocol_outputs_reject_incomplete_mixed_and_invalid_errors() ->
         assert not _schema_accepts(
             schema, {"ok": False, "error": {**error, "code": "NOT_A_PUBLIC_ERROR"}}
         )
+    execute_schema = cast(
+        dict[str, Any],
+        next(tool for tool in tools if tool["name"] == "materials_execute")["output_schema"],
+    )
+    for result in cast(tuple[object, ...], ([], "scalar", None, 1, True)):
+        assert _schema_accepts(execute_schema, {"ok": True, "result": result})
 
 
 def test_frozen_python_surface_records_awaitability() -> None:
@@ -145,7 +151,7 @@ def test_frozen_python_surface_records_awaitability() -> None:
 def test_frozen_surface_identifies_release_profiles_and_console_command() -> None:
     contract = _contract()
     assert contract["distribution"] == "materials-mcp-commons"
-    assert contract["distribution_version"] == "0.1.0a11"
+    assert contract["distribution_version"] == "0.1.0a12"
     assert contract["stability"] == "production-alpha-plugin-proof"
     assert contract["profile_versions"] == ["0.1.0", "0.2.0"]
     assert contract["console_scripts"] == {
