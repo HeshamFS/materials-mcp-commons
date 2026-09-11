@@ -36,7 +36,16 @@ The committed `uv.lock` controls development and verification dependencies. uv i
 
 The installed `materials-mcp-scaffold` command creates a fresh empty scientist workspace from explicit metadata. The typed `PluginPackageBuilder` then constructs a checksum-bound declarative package from complete authored schemas and validates it with the runtime loader. See the [Scientist Kit guide](authoring.md).
 
-The test suite reconstructs the actual engine-control package twice and compares every output byte. Generated malformed authoring inputs are isolated under `tests/runtime/negative_generated/`; they are boundary/security evidence, not scientific examples.
+The test suite reconstructs the actual engine-control package twice and compares every output byte. It also verifies the package report, exact-profile matrix, generated capability reference, and explicit migration assessment:
+
+```console
+uv run python -m tools.run_plugin_conformance package
+uv run python -m tools.run_plugin_conformance matrix
+uv run python -m tools.run_plugin_conformance reference
+uv run pytest tests/conformance/test_plugin_authoring_reports.py tests/runtime/test_plugin_migration.py tests/runtime/negative_generated/test_plugin_conformance_rejections.py
+```
+
+The passing migration case uses two checked-in declarations of actual engine-control behavior under `tests/runtime/positive-project/`. Generated mutations remain isolated under `tests/runtime/negative_generated/` and pass only when drift is rejected or reported; they are not scientific examples.
 
 ## Schema-host checks
 

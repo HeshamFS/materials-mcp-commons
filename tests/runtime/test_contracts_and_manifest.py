@@ -34,7 +34,7 @@ def test_real_engine_manifest_loads_as_an_immutable_snapshot(
     loaded_manifest: LoadedManifest,
 ) -> None:
     assert loaded_manifest.plugin_id == "https://schemas.autonomouslab.io/materials-mcp/engine"
-    assert loaded_manifest.plugin_version == "0.1.0-alpha.6"
+    assert loaded_manifest.plugin_version == "0.1.0-alpha.7"
     assert loaded_manifest.publisher_name == "Hesham Salama"
     assert loaded_manifest.license_expression == "Apache-2.0"
     assert len(loaded_manifest.capabilities) == 2

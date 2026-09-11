@@ -72,6 +72,7 @@
       "decimal",
       "datetime",
       "hashlib",
+      "html",
       "importlib",
       "inspect",
       "itertools",

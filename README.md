@@ -43,6 +43,7 @@ The repository now contains:
 - deterministic operation plans, exact scoped permissions, expiring single-use approvals, atomic quotas, and tamper-evident policy audit;
 - canonical context measurement with identified host tokenizers, bounded linting, real-source compact projection, retrieval evaluation, and long-session lease checks;
 - deterministic empty-workspace scaffolding and exact-profile declarative package building without generated capabilities, handlers, or scientific results;
+- deterministic plugin-package and versioned compatibility reports, explicit migration assessment, and manifest-derived capability references without plugin-code execution;
 - durable owner-isolated run events, reconnect/cancellation, and hash-verified artifact/provenance records;
 - one registered real positive scientific record, its lossless successor migration and bounded compact projection, and an isolated generated-negative rejection corpus; and
 - an independently deployable Cloudflare Worker boundary for the canonical schema hostname.

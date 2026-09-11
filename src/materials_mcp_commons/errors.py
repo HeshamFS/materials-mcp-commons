@@ -37,3 +37,7 @@ class ContextError(CommonsError):
 
 class AuthoringError(CommonsError):
     """Workspace scaffolding or declarative package authoring failed closed."""
+
+
+class PluginConformanceError(CommonsError):
+    """Plugin conformance, compatibility, or reference generation failed closed."""

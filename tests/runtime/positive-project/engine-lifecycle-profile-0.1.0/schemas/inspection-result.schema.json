@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/inspection-result.schema.json",
+  "title": "Engine capability inspection result",
+  "description": "Stable identity and schema references returned by the engine-owned inspection behavior.",
+  "type": "object",
+  "required": ["registration_ref", "plugin_id", "plugin_version", "capability_id", "input_schema", "result_schema", "error_schema"],
+  "properties": {
+    "registration_ref": {
+      "type": "string",
+      "pattern": "^urn:materials-mcp:registration:[a-f0-9]{64}$"
+    },
+    "plugin_id": {
+      "type": "string",
+      "format": "uri"
+    },
+    "plugin_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capability_id": {
+      "type": "string",
+      "format": "uri"
+    },
+    "input_schema": {
+      "type": "string",
+      "format": "uri"
+    },
+    "result_schema": {
+      "type": "string",
+      "format": "uri"
+    },
+    "error_schema": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "additionalProperties": false
+}

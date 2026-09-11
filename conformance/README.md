@@ -1,4 +1,4 @@
-# M1 conformance suite
+# Conformance evidence
 
 `m1-suite.json` and `m1-report.json` are the immutable machine-readable M1 acceptance snapshot from public commit `6a8e9b59222195321bdc0b5578a73229837438a7`. They pin both exact profile indexes, enumerate the then-accepted corpus, and record the engine dependency and import surface at the M1 gate.
 
@@ -6,18 +6,26 @@
 
 `context-engine-report.json` records W-0303 measurements over the actual engine control capabilities and registered real COD result. It identifies the exact verification tokenizer and model-window assumption, records canonical bytes/tokens, retrieval Recall@5, compact-result omissions, and the 100-turn activation workload. It explicitly does not claim scientific-domain retrieval breadth.
 
+`engine-plugin-report.json` is the deterministic exact-profile declarative report for the actual engine-control package. `authoring-matrix-report.json` records the explicit 0.1.0/0.2.0 profile matrix and compatibility checks. `engine-capabilities.md` is rendered only from the validated immutable manifest. These three authoring artifacts do not execute plugin code and do not establish backend, security, interoperability, or scientific validity.
+
 Run the suite from the repository root:
 
 ```console
 uv sync --locked --all-groups
 uv run python -m tools.run_conformance
 uv run python -m tools.run_context_benchmark
+uv run python -m tools.run_plugin_conformance package
+uv run python -m tools.run_plugin_conformance matrix
+uv run python -m tools.run_plugin_conformance reference
 ```
 
 Regenerate only the current engine report when an intentional, reviewed suite input changes:
 
 ```console
 uv run python -m tools.run_conformance --output conformance/engine-report.json
+uv run python -m tools.run_plugin_conformance package --output conformance/engine-plugin-report.json
+uv run python -m tools.run_plugin_conformance matrix --output conformance/authoring-matrix-report.json
+uv run python -m tools.run_plugin_conformance reference --output conformance/engine-capabilities.md
 uv run pytest tests/conformance
 ```
 

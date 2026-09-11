@@ -42,4 +42,26 @@ A `PackageReceipt` establishes the destination, file hashes, manifest hash, decl
 
 Keep executable handlers in the authored project and bind them through the engine's exact registration and dispatcher APIs. No manifest field names or imports executable code. Effectful execution remains subject to deterministic planning, permission, approval, quota, receipt, and audit enforcement.
 
-The broader cross-version conformance runner, migration checks, and generated capability-reference documentation are a later authoring milestone and are not claimed by this initial SDK.
+## Check a package and generate its reference
+
+`PluginConformanceRunner` loads a declarative package through the same exact-profile `ManifestLoader`, verifies its schema bytes and roles, and proves deterministic registration identity. Its report is structural: it does not import or execute implementation code, contact a backend, or assign a `Verified` or `Validated` trust level.
+
+`build_versioned_matrix` accepts explicit local `ProfileCase` and `PackageCase` values. Each package is checked only against the exact profile version declared in its manifest; there is no profile download, negotiation, or fallback. Supplied compatibility declarations are validated against their target profile and checked for exact source/target identity, complete resource partitioning, and preserved carried-contract validation semantics.
+
+`render_capability_reference` renders Markdown solely from one validated immutable manifest. The generated reference records capability identity, effect and approval posture, asynchronous behavior, and exact input/result/error schemas without inferring usage instructions or scientific claims.
+
+The repository's actual engine-control declarations provide reproducible structural evidence:
+
+```console
+uv run python -m tools.run_plugin_conformance package
+uv run python -m tools.run_plugin_conformance matrix
+uv run python -m tools.run_plugin_conformance reference
+```
+
+Pass `--output PATH` to write the deterministic bytes. The checked-in outputs are documented in [`conformance/`](../conformance/README.md).
+
+## Assess an explicit migration candidate
+
+`assess_plugin_migration` compares two separately valid caller-supplied packages against an explicit compatibility document and exact source/target registries. A passing assessment requires stable plugin and capability identities plus preserved manifest metadata, effects, extensions, schema-resource descriptors, and normalized validation semantics. Package versions may advance and are reported.
+
+The assessment never edits, rewrites, or publishes either package. Authors must construct and review the target package themselves; the result does not establish backend interoperability or scientific validity.

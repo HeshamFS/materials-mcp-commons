@@ -1,6 +1,6 @@
 # Engine runtime
 
-Engine distribution `0.1.0a6` implements the plugin-agnostic runtime boundary and its first authoring SDK: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner dispatch, deterministic effect planning and authorization, canonical context measurement and projection, durable local run/artifact state, deterministic empty-workspace scaffolding, and validated declarative package construction.
+Engine distribution `0.1.0a7` implements the plugin-agnostic runtime and Scientist Kit boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner dispatch, deterministic effect planning and authorization, canonical context measurement and projection, durable local run/artifact state, deterministic empty-workspace scaffolding and package construction, structural conformance reports, explicit migration assessment, and manifest-derived capability references.
 
 Registering metadata or binding a handler never creates network, filesystem, compute, cost, or external-write authority. R1-R4 dispatch requires a consumed grant whose receipt binds the exact owner, request, registered capability, input digest, effect tier, plan, and immutable policy snapshot. Handlers receive none of the policy state, approvals, or credentials.
 
@@ -109,6 +109,8 @@ The runtime also provides deterministic retrieval and 100-turn lifecycle evaluat
 The authoring SDK creates an empty installable scientist workspace and builds a declarative plugin package only from complete caller-authored capability, effect, rights, extension, and schema specifications. Schema bytes are preserved, resource hashes are computed, manifest output is deterministic, and the staged package must pass the same exact-profile loader used at runtime before it is published to a fresh destination.
 
 The SDK does not generate a sample capability, handler, backend, scientific result, or trust claim and does not execute plugin code. See the [Scientist Kit guide](authoring.md).
+
+`PluginConformanceRunner` produces a path-free, timestamp-free report from the validated package snapshot and repeats registration to prove stable identity. `build_versioned_matrix` evaluates only explicit local exact-version profiles and packages, while `assess_plugin_migration` compares two separately valid caller-supplied packages without mutating either one. Capability-reference Markdown is generated solely from the validated manifest. All of these checks are declarative and code-execution-free; none establish backend, security, interoperability, or scientific validity.
 
 ## Durable runs and artifacts
 

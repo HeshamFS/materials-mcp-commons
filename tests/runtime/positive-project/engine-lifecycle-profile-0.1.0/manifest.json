@@ -1,6 +1,6 @@
 {
-  "contract": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/plugin-manifest.schema.json",
-  "profile_version": "0.2.0",
+  "contract": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/plugin-manifest.schema.json",
+  "profile_version": "0.1.0",
   "plugin_id": "https://schemas.autonomouslab.io/materials-mcp/engine",
   "plugin_version": "0.1.0-alpha.7",
   "name": "Materials MCP Commons engine lifecycle",
@@ -28,7 +28,7 @@
       },
       "input_schema": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/discovery-input.schema.json",
       "result_schema": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/discovery-result.schema.json",
-      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/structured-error.schema.json",
       "supports_async": false
     },
     {
@@ -45,7 +45,7 @@
       },
       "input_schema": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/inspection-input.schema.json",
       "result_schema": "https://schemas.autonomouslab.io/materials-mcp/engine/0.1.0/inspection-result.schema.json",
-      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/structured-error.schema.json",
       "supports_async": false
     }
   ],
