@@ -13,7 +13,14 @@ from .dispatch import (
     HandlerBinding,
     HandlerRequest,
 )
-from .errors import CommonsError, ContractError, DispatchError, LifecycleError, RunStoreError
+from .errors import (
+    CommonsError,
+    ContractError,
+    DispatchError,
+    LifecycleError,
+    PolicyError,
+    RunStoreError,
+)
 from .lifecycle import (
     Activation,
     ActiveCapabilityTarget,
@@ -25,6 +32,18 @@ from .lifecycle import (
     Registration,
 )
 from .manifest import Capability, Effect, LoadedManifest, ManifestLoader, SchemaResource
+from .policy import (
+    ApprovalRecord,
+    AuditEvent,
+    AuthorizationGrant,
+    AuthorizationReceipt,
+    OperationPlan,
+    Permission,
+    PolicyEngine,
+    PolicySnapshot,
+    QuotaCharge,
+    QuotaLimit,
+)
 from .runs import ArtifactAttachment, ArtifactSnapshot, RunOwner, RunSnapshot, RunStore
 
 __version__: str = version("materials-mcp-commons")
@@ -34,8 +53,12 @@ __all__ = (
     "INSPECT_CAPABILITY_ID",
     "Activation",
     "ActiveCapabilityTarget",
+    "ApprovalRecord",
     "ArtifactAttachment",
     "ArtifactSnapshot",
+    "AuditEvent",
+    "AuthorizationGrant",
+    "AuthorizationReceipt",
     "Capability",
     "CapabilityCard",
     "CapabilityDetail",
@@ -58,6 +81,13 @@ __all__ = (
     "LifecycleRegistry",
     "LoadedManifest",
     "ManifestLoader",
+    "OperationPlan",
+    "Permission",
+    "PolicyEngine",
+    "PolicyError",
+    "PolicySnapshot",
+    "QuotaCharge",
+    "QuotaLimit",
     "Registration",
     "RunOwner",
     "RunSnapshot",

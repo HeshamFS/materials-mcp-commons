@@ -33,6 +33,7 @@ def _request(
         request_ref=f"urn:materials-mcp:request:{turn:064x}",
         registration_ref=registration_ref,
         capability_id=capability_id,
+        owner_ref="urn:materials-mcp:owner:runtime-tests",
         current_turn=turn,
         occurred_at=NOW,
         payload=payload,

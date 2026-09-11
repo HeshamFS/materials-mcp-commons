@@ -10,11 +10,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 from threading import RLock
 from types import MappingProxyType
-from typing import NoReturn, Self, cast
+from typing import TYPE_CHECKING, NoReturn, Self, cast
 
 from .contracts import ContractRegistry
-from .errors import ContractError, RunStoreError
+from .errors import ContractError, PolicyError, RunStoreError
 from .lifecycle import CapabilityDetail
+
+if TYPE_CHECKING:
+    from .policy import AuthorizationReceipt, PolicyEngine
 
 REFERENCE_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:[^\s]+$")
 TERMINAL_STATES = frozenset({"succeeded", "failed", "cancelled"})
@@ -193,6 +196,7 @@ class RunStore:
         state_root: Path,
         artifact_root: Path,
         contracts: ContractRegistry,
+        policy_engine: PolicyEngine | None = None,
     ) -> None:
         self._state_root = self._safe_root(state_root, "state")
         self._artifact_root = self._safe_root(artifact_root, "artifact")
@@ -200,6 +204,7 @@ class RunStore:
         if database_path.exists() and database_path.is_symlink():
             _fail("unsafe-state-path", "Run database cannot be a symbolic link")
         self._contracts = contracts
+        self._policy_engine = policy_engine
         self._lock = RLock()
         try:
             connection = sqlite3.connect(
@@ -334,12 +339,26 @@ class RunStore:
         owner: RunOwner,
         created_at: datetime,
         plan_ref: str | None = None,
+        authorization: AuthorizationReceipt | None = None,
     ) -> RunSnapshot:
         _reference(request_ref, "request_ref")
         _reference(target.registration_ref, "registration_ref")
         _reference(target.capability.capability_id, "capability_id")
         if target.capability.effect.tier not in {"R0", "R1"}:
-            _fail("effect-policy-required", "R2-R4 run creation requires the policy runtime")
+            if self._policy_engine is None or authorization is None or plan_ref is None:
+                _fail("effect-policy-required", "R2-R4 run creation requires exact authorization")
+            try:
+                self._policy_engine.verify_run_receipt(
+                    authorization,
+                    request_ref=request_ref,
+                    target=target,
+                    owner_ref=owner.owner_ref,
+                    plan_ref=plan_ref,
+                )
+            except PolicyError as error:
+                raise RunStoreError(
+                    "authorization-denied", "Run authorization receipt was rejected"
+                ) from error
         if plan_ref is not None:
             _reference(plan_ref, "plan_ref")
         created = _timestamp(created_at, "created_at")

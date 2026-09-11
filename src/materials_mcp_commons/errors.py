@@ -25,3 +25,7 @@ class DispatchError(CommonsError):
 
 class RunStoreError(CommonsError):
     """Durable run, provenance, or artifact state failed closed."""
+
+
+class PolicyError(CommonsError):
+    """Planning, approval, permission, quota, or audit policy failed closed."""

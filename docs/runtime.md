@@ -1,8 +1,8 @@
 # Engine runtime
 
-Engine distribution `0.1.0a3` implements the plugin-agnostic runtime boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner R0 dispatch, durable local run/artifact state, deactivation, and unregistration.
+Engine distribution `0.1.0a4` implements the plugin-agnostic runtime boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner dispatch, deterministic effect planning and authorization, durable local run/artifact state, deactivation, and unregistration.
 
-Registering metadata or binding a handler never creates network, filesystem, compute, cost, or external-write authority. This release executes only R0 capabilities; R1-R4 fail closed until the later planning, permission, approval, quota, and audit boundary exists.
+Registering metadata or binding a handler never creates network, filesystem, compute, cost, or external-write authority. R1-R4 dispatch requires a consumed grant whose receipt binds the exact owner, request, registered capability, input digest, effect tier, plan, and immutable policy snapshot. Handlers receive none of the policy state, approvals, or credentials.
 
 ## Load an exact profile and package
 
@@ -74,6 +74,7 @@ outcome = dispatcher.dispatch(
         request_ref="urn:example:request:1",
         registration_ref=registration.registration_ref,
         capability_id=DISCOVER_CAPABILITY_ID,
+        owner_ref="urn:example:owner:project",
         current_turn=1,
         occurred_at=datetime.now(UTC),
         payload={"query": "structure", "limit": 3},
@@ -83,11 +84,21 @@ outcome = dispatcher.dispatch(
 
 The handler sees an immutable detached request containing only identity and validated JSON data. Failures contain bounded cause, stage, evidence, retryability, corrective action, and the caller-supplied occurrence time; raw handler exceptions are withheld. Synchronous and asynchronous declarations are enforced at the dispatch entry points.
 
+## Plan and authorize effects
+
+`PolicyEngine` stores immutable operation plans, approvals, grants, quota usage, and an owner-separated audit chain in a fixed SQLite database beneath an explicit existing state root. Plan identity includes the owner and exact registration plus the contract-valid plan document. The document binds the capability, declared effect, input SHA-256, ordered steps and targets, exact permissions, expected outputs, estimates, risks, and R4 recovery procedure.
+
+Permissions reject wildcard names and scopes. R1 requires exact permissions and any declared quota but no approval. R2 and R3 require an unexpired standard-or-strong approval. R4 requires strong confirmation and recovery. An approval can authorize only one grant; a grant can be consumed only once. Consumption reserves all quota charges atomically and returns an immutable receipt. A failed replay, binding check, approval check, permission check, or quota reservation fails closed.
+
+The dispatcher accepts effectful work only when its `PolicyEngine` verifies that exact durable receipt immediately before handler invocation. R2-R4 run creation applies the same durable receipt check. No quota is silently refunded when an authorized operation is abandoned or fails.
+
+Audit records contain hashes and references rather than request payloads, credentials, or secrets. Each owner has a monotonic sequence and SHA-256 link to the previous event. The complete chain is verified whenever the store opens and before audit records are returned; corruption prevents further use.
+
 ## Durable runs and artifacts
 
 `RunStore` persists exact owner-scoped run snapshots and their complete sequence history in a fixed SQLite database beneath an explicit state root. Creation is deterministic and idempotent for one request identity. Updates require the expected sequence and non-decreasing explicit timestamps; terminal states are immutable. `deltas` supports bounded reconnect reads, `recover_incomplete` reconstructs nonterminal work after restart, and `cancel` records an explicit cancellation state without claiming remote-job termination.
 
-Artifact registration uses a contained relative path beneath a separate explicit artifact root. The store validates provenance and artifact documents, computes size and SHA-256 from actual bytes, attaches the reference transactionally, and rechecks path containment and bytes on every retrieval. It never copies, deletes, executes, or retrieves artifact content over a network. Run creation remains limited to R0/R1 until the effect-policy runtime is implemented.
+Artifact registration uses a contained relative path beneath a separate explicit artifact root. The store validates provenance and artifact documents, computes size and SHA-256 from actual bytes, attaches the reference transactionally, and rechecks path containment and bytes on every retrieval. It never copies, deletes, executes, or retrieves artifact content over a network. R2-R4 run records require the same exact consumed authorization receipt and preserve its plan reference.
 
 ## Evidence boundary
 

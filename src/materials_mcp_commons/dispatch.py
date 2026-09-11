@@ -10,11 +10,14 @@ from datetime import UTC, datetime
 from decimal import Decimal
 from threading import RLock
 from types import MappingProxyType
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from .contracts import ContractRegistry
-from .errors import CommonsError, ContractError, DispatchError, LifecycleError
+from .errors import CommonsError, ContractError, DispatchError, LifecycleError, PolicyError
 from .lifecycle import ActiveCapabilityTarget, LifecycleRegistry
+
+if TYPE_CHECKING:
+    from .policy import AuthorizationReceipt, PolicyEngine, PolicySnapshot
 
 REFERENCE_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:[^\s]+$")
 ERROR_CODE_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]{2,127}$")
@@ -93,6 +96,7 @@ class DispatchRequest:
     request_ref: str
     registration_ref: str
     capability_id: str
+    owner_ref: str
     current_turn: int
     occurred_at: datetime
     payload: Mapping[str, object]
@@ -102,6 +106,7 @@ class DispatchRequest:
             ("request_ref", self.request_ref),
             ("registration_ref", self.registration_ref),
             ("capability_id", self.capability_id),
+            ("owner_ref", self.owner_ref),
         ):
             if type(value) is not str:
                 raise DispatchError("invalid-reference", f"{name} must be a string")
@@ -170,11 +175,17 @@ DispatchOutcome = DispatchSuccess | DispatchFailure
 class Dispatcher:
     """Fail-closed typed dispatch over exact registered lifecycle snapshots."""
 
-    def __init__(self, lifecycle: LifecycleRegistry, contracts: ContractRegistry) -> None:
+    def __init__(
+        self,
+        lifecycle: LifecycleRegistry,
+        contracts: ContractRegistry,
+        policy_engine: PolicyEngine | None = None,
+    ) -> None:
         self._lifecycle = lifecycle
         self._contracts = contracts
         self._bindings: dict[tuple[str, str], HandlerBinding] = {}
         self._error_schema = f"{contracts.canonical_base}structured-error.schema.json"
+        self._policy_engine = policy_engine
         self._lock = RLock()
 
     def bind(self, registration_ref: str, capability_id: str, handler: Handler) -> HandlerBinding:
@@ -274,7 +285,12 @@ class Dispatcher:
         )
 
     def _prepare(
-        self, request: DispatchRequest, *, asynchronous: bool
+        self,
+        request: DispatchRequest,
+        *,
+        asynchronous: bool,
+        policy: PolicySnapshot | None,
+        authorization: AuthorizationReceipt | None,
     ) -> _PreparedDispatch | DispatchFailure:
         try:
             target = self._lifecycle.resolve_active(
@@ -309,18 +325,20 @@ class Dispatcher:
                 retryable=False,
                 next_action="Create a dispatcher with the exact profile used by the registration.",
             )
-        if capability.effect.tier != "R0":
+        if capability.effect.tier != "R0" and (
+            self._policy_engine is None or policy is None or authorization is None
+        ):
             return self._failure(
                 request,
                 code="EFFECT_POLICY_REQUIRED",
                 stage="authorization",
-                cause="This engine stage permits only effect tier R0.",
-                message="Effectful dispatch is disabled until policy enforcement is installed.",
+                cause="Effectful dispatch requires an exact consumed authorization receipt.",
+                message="Effectful dispatch stopped at the authorization boundary.",
                 evidence_kind="policy",
                 evidence_summary=f"Capability declares effect tier {capability.effect.tier}.",
                 retryable=False,
                 next_action=(
-                    "Use inspection only or install the approved effect-policy runtime later."
+                    "Create and consume an exact plan-bound authorization grant before retrying."
                 ),
             )
         if capability.supports_async and not asynchronous:
@@ -364,6 +382,29 @@ class Dispatcher:
                 retryable=False,
                 next_action="Correct the payload against the inspected input schema.",
             )
+        if capability.effect.tier != "R0":
+            assert self._policy_engine is not None
+            assert policy is not None
+            assert authorization is not None
+            try:
+                self._policy_engine.verify_receipt(authorization, request, target.detail, policy)
+            except PolicyError:
+                return self._failure(
+                    request,
+                    code="AUTHORIZATION_DENIED",
+                    stage="authorization",
+                    cause=(
+                        "The authorization receipt is absent, invalid, or does not bind "
+                        "this exact request."
+                    ),
+                    message="Effectful dispatch stopped before invoking a handler.",
+                    evidence_kind="policy",
+                    evidence_summary=(
+                        "Exact owner, target, input, effect, plan, and policy binding failed."
+                    ),
+                    retryable=False,
+                    next_action="Create and consume a new exact authorization grant.",
+                )
         handler_request = HandlerRequest(
             request_ref=request.request_ref,
             registration_ref=request.registration_ref,
@@ -399,8 +440,16 @@ class Dispatcher:
             result=_freeze_json(snapshot),
         )
 
-    def dispatch(self, request: DispatchRequest) -> DispatchOutcome:
-        prepared = self._prepare(request, asynchronous=False)
+    def dispatch(
+        self,
+        request: DispatchRequest,
+        *,
+        policy: PolicySnapshot | None = None,
+        authorization: AuthorizationReceipt | None = None,
+    ) -> DispatchOutcome:
+        prepared = self._prepare(
+            request, asynchronous=False, policy=policy, authorization=authorization
+        )
         if isinstance(prepared, DispatchFailure):
             return prepared
         try:
@@ -445,8 +494,16 @@ class Dispatcher:
             )
         return self._success_or_failure(request, prepared, result)
 
-    async def dispatch_async(self, request: DispatchRequest) -> DispatchOutcome:
-        prepared = self._prepare(request, asynchronous=True)
+    async def dispatch_async(
+        self,
+        request: DispatchRequest,
+        *,
+        policy: PolicySnapshot | None = None,
+        authorization: AuthorizationReceipt | None = None,
+    ) -> DispatchOutcome:
+        prepared = self._prepare(
+            request, asynchronous=True, policy=policy, authorization=authorization
+        )
         if isinstance(prepared, DispatchFailure):
             return prepared
         try:
