@@ -26,6 +26,16 @@ A host is not considered compatible merely because it can save an MCP configurat
 4. execute it successfully through the dispatcher; and
 5. return a complete structured failure for an invalid target.
 
+Current dated host evidence for the engine candidate is:
+
+| Host | Version | Result | Scope |
+|---|---:|---|---|
+| MCP Inspector | 2.6.0 | Pass | Exact four-tool listing and real discovery call over stdio |
+| Codex CLI | 0.153.3 | Pass | Exact four-tool availability, discovery, inspection, activation, R0 execution, and structured failure over stdio on 2026-09-11 |
+| Claude Code | 2.1.268 | Compatible | The same bounded end-to-end sequence over stdio on 2026-09-11; additional evidence, not a required release host |
+
+Codex's non-interactive default `approval policy is never` rejects an MCP call that requires approval. The passing run used Codex's bounded automatic-approval mode and verified completed tool events rather than trusting the model's summary. Host policies therefore remain part of installation and acceptance, even for an R0 engine operation.
+
 The distribution provides a composition library, not a preconfigured server with an invented plugin or trusted identity. An embedding application must explicitly supply the contract registry, selected declarative packages, lifecycle, handlers, dispatcher, and trusted owner boundary described in the [MCP host guide](mcp-host.md).
 
 ## Explicit exclusions

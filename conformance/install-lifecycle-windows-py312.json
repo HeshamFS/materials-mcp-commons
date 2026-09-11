@@ -1,8 +1,8 @@
 {
   "current": {
-    "sdist_sha256": "b901061c4929f8d2d09886e7a2546b9172961a54a002f3c764d30c7cb1bede03",
+    "sdist_sha256": "e843708bbc5d0ff7735d2cf42b36cc94dc459f320f4add75cf8637aa3225ed8c",
     "version": "0.1.0a11",
-    "wheel_sha256": "a111f6d7c931420d6c30491eaa655244b369a0f7471b0fe0cbf1e77f03afa606"
+    "wheel_sha256": "4a5c85c5e2be57ccf0adbb4abee2f1100f64a5f1f27895cbbdc973829fa84509"
   },
   "platform": "win32",
   "previous": {
