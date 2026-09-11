@@ -1,13 +1,13 @@
 {
   "current": {
-    "sdist_sha256": "e843708bbc5d0ff7735d2cf42b36cc94dc459f320f4add75cf8637aa3225ed8c",
-    "version": "0.1.0a11",
-    "wheel_sha256": "64d29da61bc43d99be41e157a8f13788984e54aa271d737aa036f1605378ddc1"
+    "sdist_sha256": "7396977b3ea9f91396f7a22a9fe5c47261a12303941ccda574e1514cf41daf1d",
+    "version": "0.1.0a12",
+    "wheel_sha256": "4f16765c0f515975c49365576b3dd25c9145c2f7597588c8fc0f1ae9e44cf1a0"
   },
   "platform": "linux",
   "previous": {
-    "git_ref": "828f8f3c45ce57cc2fceb5c645472632d44fce73",
-    "version": "0.1.0a8"
+    "git_ref": "5fb892d6597841542ddd5d721099c5f562a99472",
+    "version": "0.1.0a11"
   },
   "python": "3.12",
   "report_version": 1,
