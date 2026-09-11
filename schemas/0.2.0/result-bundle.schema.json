@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/result-bundle.schema.json",
+  "title": "Scientific result bundle",
+  "description": "The complete scientific record from which bounded model-facing projections are derived.",
+  "type": "object",
+  "required": ["contract", "profile_version", "result_ref", "produced_at", "status", "entities", "properties", "conditions", "artifacts", "quality", "provenance", "citations", "warnings"],
+  "properties": {
+    "contract": {
+      "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/result-bundle.schema.json"
+    },
+    "profile_version": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#profileVersion"
+    },
+    "result_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+    },
+    "produced_at": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+    },
+    "status": {"enum": ["complete", "partial"]},
+    "run_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/entity.schema.json"
+      }
+    },
+    "properties": {
+      "type": "array",
+      "maxItems": 1024,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-property.schema.json"
+      }
+    },
+    "conditions": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-property.schema.json"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/artifact.schema.json"
+      }
+    },
+    "quality": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/quality-assessment.schema.json"
+    },
+    "provenance": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/provenance.schema.json"
+    },
+    "citations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/citation.schema.json"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#nonEmptyString"
+      }
+    },
+    "extensions": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/extension.schema.json"
+    }
+  },
+  "anyOf": [
+    {"properties": {"properties": {"minItems": 1}}},
+    {"properties": {"artifacts": {"minItems": 1}}}
+  ],
+  "unevaluatedProperties": false
+}

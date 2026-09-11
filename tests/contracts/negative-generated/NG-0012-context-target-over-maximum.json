@@ -1,0 +1,16 @@
+{
+  "case_id": "NG-0012",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject a context manifest whose active-schema target exceeds its declared maximum.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/context-manifest.schema.json",
+  "base_instance": "profile-0.2.0/context-manifest.json",
+  "mutation": {
+    "operation": "add",
+    "path": "/budgets/activation/max_schemas",
+    "value": 4
+  },
+  "expected": {
+    "code": "activation-target-exceeds-maximum"
+  }
+}

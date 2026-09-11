@@ -1,8 +1,8 @@
-# Materials MCP Profile 0.1.0 contracts
+# Materials MCP Profile contracts
 
-The 0.1.0 contract line is a plugin-agnostic, language-neutral set of JSON Schema Draft 2020-12 resources. It defines the minimum scientific record and control-plane boundaries needed before runtime or concrete integration work can safely begin.
+The Materials MCP Profile is a plugin-agnostic, language-neutral set of JSON Schema Draft 2020-12 resources. The immutable 0.1.0 line defines the minimum scientific record and control-plane boundaries. Its additive 0.2.0 successor preserves those scientific/control records and adds compact-result, context-budget, and compatibility contracts.
 
-The normative sources are [`schemas/0.1.0/`](../schemas/0.1.0/README.md). The [resource index](../schemas/0.1.0/schema-index.json) pins every schema by canonical identifier, relative path, media type, and SHA-256 digest.
+The normative sources are [`schemas/0.1.0/`](../schemas/0.1.0/README.md) and [`schemas/0.2.0/`](../schemas/0.2.0/README.md). Each exact line has a resource index that pins every schema by canonical identifier, relative path, media type, and SHA-256 digest.
 
 ## Contract families
 
@@ -10,9 +10,18 @@ The normative sources are [`schemas/0.1.0/`](../schemas/0.1.0/README.md). The [r
 - **Evidence and records:** artifact, citation, provenance, quality assessment, and the rich result bundle.
 - **Controlled work:** effect, deterministic operation plan, durable run record, and structured error.
 - **Generic extensibility:** declarative plugin manifest and exact-schema extension maps.
+- **Context and projection in 0.2.0:** a bounded compact result, context budget manifest, and explicit predecessor compatibility declaration.
 - **Distribution integrity:** common definitions, schema-index contract, and checksum-pinned index instance.
 
-The rich ResultBundle is the complete scientific record. Future compact model-facing output is a bounded projection of that record, not an alternative scientific source of truth.
+The rich ResultBundle is the complete scientific record. A compact model-facing result is a bounded projection of that record, not an alternative scientific source of truth.
+
+## Compact result and context budgets
+
+Profile 0.2.0 requires every compact result to identify its rich source record and source contract, retain bounded scientific values and evidence links, state the selection rule, declare all omitted counts, and record the applied budget measurement. Nonzero omission counts require `truncated: true`.
+
+The context manifest bounds the always-visible control surface, discovery cards, active schemas, inline result, total MCP footprint, and lease behavior. Its baseline ceilings are four control tools, five discovery cards, eight active schemas, 500 discovery tokens, and 1,500 inline-result tokens. Token counts require the runtime host's identified tokenizer. Checked-in fixtures use exact UTF-8 byte measurement and do not pretend a byte count is a model token count.
+
+Large arrays, trajectories, meshes, logs, and binary content remain artifact references. The compact projection never embeds them.
 
 ## Scientific-record invariants
 
@@ -45,7 +54,7 @@ Core records reject undeclared fields. Domain-specific additions use an explicit
 
 Validation has two fail-closed phases:
 
-1. Validate the core record against an exact 0.1.0 root schema.
+1. Validate the core record against one exact supported profile root schema.
 2. Resolve each extension key from the caller's pre-registered schema registry and validate its payload.
 
 An unknown extension, a core schema misused as an extension, or an invalid extension payload fails validation. The validator does not retrieve missing schemas from the network.
@@ -74,4 +83,4 @@ The [positive corpus](../tests/contracts/positive-real/README.md) contains only 
 
 ## Deliberately outside this implementation slice
 
-This contract set does not yet implement runtime loading or dispatch, context-card and compact-projection behavior, host compatibility, or any concrete integration. Those layers must build on these contracts without introducing backend-specific fields into the core.
+This contract set does not yet implement runtime loading or dispatch, context-policy enforcement, host compatibility, or any concrete integration. Those layers must build on these contracts without introducing backend-specific fields into the core.

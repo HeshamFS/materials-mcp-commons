@@ -1,0 +1,105 @@
+{
+  "contract": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/compact-result.schema.json",
+  "profile_version": "0.2.0",
+  "source_result_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:result",
+  "produced_at": "2026-09-04T22:45:08+02:00",
+  "status": "complete",
+  "entity_refs": [
+    "https://www.crystallography.net/cod/9013102.html"
+  ],
+  "properties": [
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:property:cell-length-a",
+      "label": "Unit-cell length a",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 5.4304,
+        "unit": {"system": "UCUM", "identifier": "Ao", "symbol": "Å"}
+      },
+      "uncertainty_status": "not-reported",
+      "condition_refs": [
+        "urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature"
+      ],
+      "evidence_refs": [
+        "urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"
+      ]
+    },
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:property:cell-length-b",
+      "label": "Unit-cell length b",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 5.4304,
+        "unit": {"system": "UCUM", "identifier": "Ao", "symbol": "Å"}
+      },
+      "uncertainty_status": "not-reported",
+      "condition_refs": [
+        "urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature"
+      ],
+      "evidence_refs": [
+        "urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "property_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:condition:temperature",
+      "label": "Diffraction ambient temperature",
+      "subject_ref": "https://www.crystallography.net/cod/9013102.html",
+      "value": {
+        "value_type": "number",
+        "value": 298.15,
+        "unit": {"system": "UCUM", "identifier": "K", "symbol": "K"}
+      },
+      "uncertainty_status": "not-reported",
+      "condition_refs": [],
+      "evidence_refs": [
+        "urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"
+      ]
+    }
+  ],
+  "artifact_refs": [
+    "urn:materials-mcp:fixture:cod-9013102-r291877:artifact:cif"
+  ],
+  "quality": {
+    "status": "not-assessed",
+    "reason": "This fixture tests contract and provenance handling; it is not a scientific validation claim.",
+    "limitations": [
+      "The selected scalar values contain no reported standard uncertainties.",
+      "The source record does not include reflection observations."
+    ],
+    "omitted_limitations": 1
+  },
+  "provenance_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:provenance",
+  "citation_refs": [
+    "https://doi.org/10.1002/pssb.19620020803"
+  ],
+  "warnings": [],
+  "omitted": {
+    "entities": 0,
+    "properties": 5,
+    "conditions": 0,
+    "artifacts": 0,
+    "citations": 0,
+    "warnings": 0,
+    "truncated": true
+  },
+  "projection": {
+    "mode": "compact",
+    "source_contract": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/result-bundle.schema.json",
+    "generated_at": "2026-09-11T08:18:32.579Z",
+    "selection": "source-order",
+    "budget": {
+      "policy_ref": "urn:materials-mcp:profile:0.2.0:context-policy:baseline",
+      "class": "inline-result",
+      "unit": "utf8-bytes",
+      "limit": 8192,
+      "observed": 3507,
+      "measurement": {
+        "method": "utf8-bytes"
+      }
+    }
+  }
+}

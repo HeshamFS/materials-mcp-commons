@@ -16,5 +16,10 @@ Content here is never a positive example, scientific reference output, benchmark
 | `NG-0006-unregistered-extension.json` | Reject an extension absent from the exact offline schema registry |
 | `NG-0007-duplicate-key.json.txt` | Reject duplicate JSON object members during strict parsing |
 | `NG-0008-non-finite-number.json.txt` | Reject a non-finite JSON number during strict parsing |
+| `NG-0009-context-too-many-active-schemas.json` | Reject an active-schema ceiling above the profile limit |
+| `NG-0010-context-inline-token-ceiling.json` | Reject an inline-result token ceiling above the profile limit |
+| `NG-0011-compact-observed-over-limit.json` | Reject a measured compact result larger than its declared budget |
+| `NG-0012-context-target-over-maximum.json` | Reject an active-schema target above its declared maximum |
+| `NG-0013-context-fraction-order.json` | Reject out-of-order context target, warning, and intervention fractions |
 
 Each case declares `origin: generated`, `role: negative`, its purpose, and the expected rejection phase. The `.json.txt` suffix preserves intentionally non-interoperable JSON text without presenting it as an ordinary JSON document.

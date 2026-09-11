@@ -1,0 +1,59 @@
+{
+  "contract": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/profile-compatibility.schema.json",
+  "profile_version": "0.2.0",
+  "from_profile": "0.1.0",
+  "to_profile": "0.2.0",
+  "predecessor_schema_index": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/schema-index.json",
+  "successor_schema_index": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/schema-index.json",
+  "predecessor_publication_commit": "0bbece30da4df0aba0867033931c88a0e3a73515",
+  "change_level": "minor",
+  "resource_compatibility": "additive",
+  "data_model_compatibility": "carried-contracts-preserved",
+  "instance_validation": "migration-required",
+  "carried_resources": [
+    "artifact.schema.json",
+    "citation.schema.json",
+    "common.schema.json",
+    "effect.schema.json",
+    "entity.schema.json",
+    "extension.schema.json",
+    "operation-plan.schema.json",
+    "plugin-manifest.schema.json",
+    "provenance.schema.json",
+    "quality-assessment.schema.json",
+    "result-bundle.schema.json",
+    "run-record.schema.json",
+    "scientific-property.schema.json",
+    "scientific-value.schema.json",
+    "structured-error.schema.json"
+  ],
+  "changed_resources": [
+    "schema-index.schema.json"
+  ],
+  "added_resources": [
+    "compact-result.schema.json",
+    "context-manifest.schema.json",
+    "profile-compatibility.schema.json"
+  ],
+  "migration": {
+    "strategy": "exact-identifier-rewrite",
+    "lossless_for_carried_contracts": true,
+    "rewrites": [
+      "profile-version",
+      "version-local-core-schema-identifiers"
+    ],
+    "preserves": [
+      "scientific-values",
+      "units",
+      "entities",
+      "conditions",
+      "artifacts",
+      "quality",
+      "provenance",
+      "citations",
+      "warnings",
+      "effects",
+      "extension-payloads"
+    ]
+  }
+}

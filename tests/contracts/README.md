@@ -5,13 +5,17 @@ Contract evidence is split by purpose so generated rejection inputs cannot be mi
 - `positive-real/` accepts only registered, provenance-traceable real records with rights and integrity metadata.
 - `negative-generated/` accepts deliberately invalid or adversarial inputs only when the asserted outcome is rejection, containment, or safe failure.
 
-The current positive corpus contains one checksummed source record and a direct contract projection. The negative corpus contains eight generated rejection cases. Neither corpus is a substitute for later runtime, interoperability, or independent scientific-validation evidence.
+The positive corpus contains one checksummed source record, its direct 0.1.0 ResultBundle, a lossless 0.2.0 migration, and a bounded compact projection. The negative corpus contains generated rejection cases only. Neither corpus is a substitute for later runtime, interoperability, or independent scientific-validation evidence.
 
 ## What the executable checks cover
 
-- Draft 2020-12 meta-validation and exact path-derived root identifiers
+- Draft 2020-12 meta-validation and exact path-derived root identifiers for 0.1.0 and 0.2.0
+- byte-level immutability of 0.1.0 against its publication commit and fallback digest manifest
 - local-only reference resolution with network retrieval denied
 - schema-index completeness and byte-level SHA-256 parity
+- explicit successor compatibility, lossless identifier migration, and resource partitioning
+- compact-result source linkage, subset integrity, omission accounting, and declared byte budget
+- context budget ceilings and cross-field ordering
 - strict JSON parsing, including duplicate-key and non-finite-number rejection
 - core validation followed by exact-schema extension validation
 - integrity, rights, transformation, and internal-link checks for the real record

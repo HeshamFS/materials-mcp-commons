@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
 from collections.abc import Iterator
 from dataclasses import dataclass
 from decimal import Decimal
@@ -17,6 +18,7 @@ from referencing.jsonschema import DRAFT202012
 
 PUBLIC_ROOT = Path(__file__).parents[2]
 PROFILE_VERSION = "0.1.0"
+PROFILE_VERSION_PATTERN = re.compile(r"^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$")
 SCHEMA_ROOT = PUBLIC_ROOT / "schemas" / PROFILE_VERSION
 CORPUS_ROOT = PUBLIC_ROOT / "tests" / "contracts"
 CANONICAL_BASE = f"https://schemas.autonomouslab.io/materials-mcp/{PROFILE_VERSION}/"
@@ -172,15 +174,33 @@ def iter_schema_nodes(schema: object) -> Iterator[SchemaDocument]:
             yield from iter_schema_nodes(child)
 
 
-def load_schemas() -> dict[str, SchemaDocument]:
+def schema_root_for(profile_version: str) -> Path:
+    if PROFILE_VERSION_PATTERN.fullmatch(profile_version) is None:
+        raise ValueError(
+            f"Profile version must be an exact stable semantic version: {profile_version}"
+        )
+    return PUBLIC_ROOT / "schemas" / profile_version
+
+
+def canonical_base_for(profile_version: str) -> str:
+    if PROFILE_VERSION_PATTERN.fullmatch(profile_version) is None:
+        raise ValueError(
+            f"Profile version must be an exact stable semantic version: {profile_version}"
+        )
+    return f"https://schemas.autonomouslab.io/materials-mcp/{profile_version}/"
+
+
+def load_schemas(profile_version: str = PROFILE_VERSION) -> dict[str, SchemaDocument]:
     schemas: dict[str, SchemaDocument] = {}
-    root = SCHEMA_ROOT.resolve(strict=True)
-    for path in sorted(SCHEMA_ROOT.glob("*.schema.json")):
+    schema_root = schema_root_for(profile_version)
+    canonical_base = canonical_base_for(profile_version)
+    root = schema_root.resolve(strict=True)
+    for path in sorted(schema_root.glob("*.schema.json")):
         if path.is_symlink() or path.resolve(strict=True).parent != root:
             raise ValueError(f"Unsafe schema path: {path.name}")
         document = load_json(path)
         schema_id = document.get("$id")
-        expected_id = f"{CANONICAL_BASE}{path.name}"
+        expected_id = f"{canonical_base}{path.name}"
         if document.get("$schema") != DIALECT:
             raise ValueError(f"Wrong schema dialect: {path.name}")
         if schema_id != expected_id:

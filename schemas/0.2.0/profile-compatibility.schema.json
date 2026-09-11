@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/profile-compatibility.schema.json",
+  "title": "Profile 0.1.0 to 0.2.0 compatibility declaration",
+  "description": "The machine-validatable compatibility and migration policy for the additive 0.2.0 successor.",
+  "type": "object",
+  "required": [
+    "contract",
+    "profile_version",
+    "from_profile",
+    "to_profile",
+    "predecessor_schema_index",
+    "successor_schema_index",
+    "predecessor_publication_commit",
+    "change_level",
+    "resource_compatibility",
+    "data_model_compatibility",
+    "instance_validation",
+    "carried_resources",
+    "changed_resources",
+    "added_resources",
+    "migration"
+  ],
+  "properties": {
+    "contract": {
+      "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/profile-compatibility.schema.json"
+    },
+    "profile_version": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#profileVersion"
+    },
+    "from_profile": {"const": "0.1.0"},
+    "to_profile": {"const": "0.2.0"},
+    "predecessor_schema_index": {
+      "const": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/schema-index.json"
+    },
+    "successor_schema_index": {
+      "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/schema-index.json"
+    },
+    "predecessor_publication_commit": {
+      "const": "0bbece30da4df0aba0867033931c88a0e3a73515"
+    },
+    "change_level": {"const": "minor"},
+    "resource_compatibility": {"const": "additive"},
+    "data_model_compatibility": {"const": "carried-contracts-preserved"},
+    "instance_validation": {"const": "migration-required"},
+    "carried_resources": {
+      "type": "array",
+      "minItems": 15,
+      "maxItems": 15,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*\\.schema\\.json$", "maxLength": 128}
+    },
+    "changed_resources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "uniqueItems": true,
+      "items": {"const": "schema-index.schema.json"}
+    },
+    "added_resources": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*\\.schema\\.json$", "maxLength": 128}
+    },
+    "migration": {
+      "type": "object",
+      "required": ["strategy", "lossless_for_carried_contracts", "rewrites", "preserves"],
+      "properties": {
+        "strategy": {"const": "exact-identifier-rewrite"},
+        "lossless_for_carried_contracts": {"const": true},
+        "rewrites": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {"enum": ["profile-version", "version-local-core-schema-identifiers"]}
+        },
+        "preserves": {
+          "type": "array",
+          "minItems": 11,
+          "maxItems": 11,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "scientific-values",
+              "units",
+              "entities",
+              "conditions",
+              "artifacts",
+              "quality",
+              "provenance",
+              "citations",
+              "warnings",
+              "effects",
+              "extension-payloads"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false
+}

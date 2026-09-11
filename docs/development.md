@@ -16,7 +16,7 @@ uv run pyright
 uv build --no-sources
 ```
 
-The complete test run includes the 0.1.0 schema/meta-schema checks, offline reference resolution, real-positive corpus integrity, and generated-negative rejection cases. To run only that boundary:
+The complete test run includes both exact profile lines, the frozen-0.1.0 publication check, offline reference resolution, successor migration, compact/context budgets, real-positive corpus integrity, and generated-negative rejection cases. To run only that boundary:
 
 ```console
 uv run pytest tests/contracts

@@ -53,13 +53,14 @@ def test_initial_source_package_contains_only_the_version_surface() -> None:
     assert package_files == ["__init__.py", "py.typed"]
 
 
-def test_contract_layout_has_one_exact_version_and_no_mutable_alias() -> None:
+def test_contract_layout_has_exact_versions_and_no_mutable_alias() -> None:
     schema_root = PUBLIC_ROOT / "schemas"
     contract_directories = sorted(path.name for path in schema_root.iterdir() if path.is_dir())
 
-    assert contract_directories == ["0.1.0"]
+    assert contract_directories == ["0.1.0", "0.2.0"]
     assert not (schema_root / "latest").exists()
     assert (schema_root / "0.1.0" / "schema-index.json").is_file()
+    assert (schema_root / "0.2.0" / "schema-index.json").is_file()
 
 
 def test_contract_corpora_remain_physically_separated() -> None:

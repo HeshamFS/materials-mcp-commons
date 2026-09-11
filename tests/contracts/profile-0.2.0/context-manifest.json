@@ -1,0 +1,49 @@
+{
+  "contract": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/context-manifest.schema.json",
+  "profile_version": "0.2.0",
+  "manifest_ref": "urn:materials-mcp:profile:0.2.0:context-policy:baseline",
+  "declared_at": "2026-09-11T08:18:32.579Z",
+  "budgets": {
+    "control_surface": {
+      "max_tools": 4,
+      "max_context_fraction": 0.02
+    },
+    "discovery": {
+      "max_cards": 5,
+      "max_tokens": 500
+    },
+    "activation": {
+      "target_schemas": 5,
+      "max_schemas": 8,
+      "max_context_fraction": 0.03
+    },
+    "inline_result": {
+      "target_tokens": 800,
+      "max_tokens": 1500,
+      "max_utf8_bytes": 8192
+    },
+    "total_mcp": {
+      "target_fraction": 0.10,
+      "warning_fraction": 0.12,
+      "intervention_fraction": 0.15,
+      "minimum_reasoning_fraction": 0.20
+    }
+  },
+  "lease_policy": {
+    "default_turns": 20,
+    "max_turns": 100,
+    "renewal": "explicit",
+    "eviction": "earliest-expiry"
+  },
+  "result_policy": {
+    "default_mode": "compact",
+    "supported_modes": ["compact", "artifact-reference", "rich"],
+    "large_output_policy": "artifact-reference-only",
+    "rich_result_is_authoritative": true
+  },
+  "measurement_requirements": {
+    "token_counts": "host-tokenizer",
+    "tokenizer_ref_required": true,
+    "byte_measurement": "utf8-encoded-json"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json",
+  "title": "Materials MCP Profile 0.2.0 common definitions",
+  "description": "Primitive identifiers and bounded scalar definitions shared by the profile.",
+  "$defs": {
+    "profileVersion": {
+      "$anchor": "profileVersion",
+      "const": "0.2.0"
+    },
+    "absoluteReference": {
+      "$anchor": "absoluteReference",
+      "type": "string",
+      "format": "uri",
+      "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
+      "maxLength": 2048
+    },
+    "httpsResourceId": {
+      "$anchor": "httpsResourceId",
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^\\s?#]+(?:/[^\\s?#]*)?$",
+      "maxLength": 2048
+    },
+    "date": {
+      "$anchor": "date",
+      "type": "string",
+      "format": "date",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$"
+    },
+    "dateTime": {
+      "$anchor": "dateTime",
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$"
+    },
+    "semanticVersion": {
+      "$anchor": "semanticVersion",
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)(?:-(?:0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)(?:\\.(?:0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*)?(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$",
+      "maxLength": 128
+    },
+    "sha256": {
+      "$anchor": "sha256",
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "mediaType": {
+      "$anchor": "mediaType",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9!#$&^_.+-]+/[A-Za-z0-9!#$&^_.+-]+$",
+      "maxLength": 127
+    },
+    "spdxExpression": {
+      "$anchor": "spdxExpression",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9.+() -]{0,254}$"
+    },
+    "token": {
+      "$anchor": "token",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$",
+      "maxLength": 128
+    },
+    "nonEmptyString": {
+      "$anchor": "nonEmptyString",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "shortText": {
+      "$anchor": "shortText",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384
+    },
+    "jsonPointer": {
+      "$anchor": "jsonPointer",
+      "type": "string",
+      "pattern": "^(?:/(?:[^~/]|~0|~1)*)*$",
+      "maxLength": 2048
+    }
+  }
+}

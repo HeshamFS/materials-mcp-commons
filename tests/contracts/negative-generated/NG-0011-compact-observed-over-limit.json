@@ -1,0 +1,16 @@
+{
+  "case_id": "NG-0011",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject compact output whose measured size exceeds its declared inline budget.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/compact-result.schema.json",
+  "base_instance": "positive-real/cod-9013102/compact-result-0.2.0.json",
+  "mutation": {
+    "operation": "add",
+    "path": "/projection/budget/observed",
+    "value": 8193
+  },
+  "expected": {
+    "code": "observed-exceeds-limit"
+  }
+}

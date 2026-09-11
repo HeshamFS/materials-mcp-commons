@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/extension.schema.json",
+  "title": "Extension set",
+  "description": "Additive extension payloads keyed by the exact HTTPS identifier of a registered extension schema.",
+  "type": "object",
+  "maxProperties": 32,
+  "propertyNames": {
+    "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#httpsResourceId"
+  },
+  "additionalProperties": {
+    "type": "object"
+  }
+}

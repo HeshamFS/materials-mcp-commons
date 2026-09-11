@@ -1,0 +1,16 @@
+{
+  "case_id": "NG-0013",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject a context manifest whose warning threshold is below its target threshold.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/context-manifest.schema.json",
+  "base_instance": "profile-0.2.0/context-manifest.json",
+  "mutation": {
+    "operation": "add",
+    "path": "/budgets/total_mcp/warning_fraction",
+    "value": 0.08
+  },
+  "expected": {
+    "code": "context-fractions-out-of-order"
+  }
+}

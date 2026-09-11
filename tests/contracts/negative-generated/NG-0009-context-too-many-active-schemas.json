@@ -1,0 +1,18 @@
+{
+  "case_id": "NG-0009",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject a context manifest whose active-schema ceiling exceeds the profile limit.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/context-manifest.schema.json",
+  "base_instance": "profile-0.2.0/context-manifest.json",
+  "mutation": {
+    "operation": "add",
+    "path": "/budgets/activation/max_schemas",
+    "value": 9
+  },
+  "expected": {
+    "validator": "maximum",
+    "instance_path": ["budgets", "activation", "max_schemas"],
+    "schema_path": ["properties", "budgets", "properties", "activation", "properties", "max_schemas", "maximum"]
+  }
+}

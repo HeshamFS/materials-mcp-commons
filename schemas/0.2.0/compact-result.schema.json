@@ -1,0 +1,294 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/compact-result.schema.json",
+  "title": "Compact scientific result projection",
+  "description": "A bounded, loss-declaring model-facing projection linked to an authoritative rich ResultBundle.",
+  "type": "object",
+  "required": [
+    "contract",
+    "profile_version",
+    "source_result_ref",
+    "produced_at",
+    "status",
+    "entity_refs",
+    "properties",
+    "conditions",
+    "artifact_refs",
+    "quality",
+    "provenance_ref",
+    "citation_refs",
+    "warnings",
+    "omitted",
+    "projection"
+  ],
+  "properties": {
+    "contract": {
+      "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/compact-result.schema.json"
+    },
+    "profile_version": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#profileVersion"
+    },
+    "source_result_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+    },
+    "run_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+    },
+    "produced_at": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+    },
+    "status": {"enum": ["complete", "partial"]},
+    "entity_refs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+      }
+    },
+    "properties": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {"$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/compact-result.schema.json#compactProperty"}
+    },
+    "conditions": {
+      "type": "array",
+      "maxItems": 4,
+      "items": {"$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/compact-result.schema.json#compactProperty"}
+    },
+    "artifact_refs": {
+      "type": "array",
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+      }
+    },
+    "quality": {
+      "type": "object",
+      "required": ["status", "reason", "limitations", "omitted_limitations"],
+      "properties": {
+        "status": {"enum": ["not-assessed", "source-reported", "assessed"]},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 512},
+        "limitations": {
+          "type": "array",
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "omitted_limitations": {"type": "integer", "minimum": 0, "maximum": 1024}
+      },
+      "additionalProperties": false
+    },
+    "provenance_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+    },
+    "citation_refs": {
+      "type": "array",
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 512
+      }
+    },
+    "omitted": {
+      "type": "object",
+      "required": ["entities", "properties", "conditions", "artifacts", "citations", "warnings", "truncated"],
+      "properties": {
+        "entities": {"type": "integer", "minimum": 0, "maximum": 1000000000},
+        "properties": {"type": "integer", "minimum": 0, "maximum": 1000000000},
+        "conditions": {"type": "integer", "minimum": 0, "maximum": 1000000000},
+        "artifacts": {"type": "integer", "minimum": 0, "maximum": 1000000000},
+        "citations": {"type": "integer", "minimum": 0, "maximum": 1000000000},
+        "warnings": {"type": "integer", "minimum": 0, "maximum": 1000000000},
+        "truncated": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "projection": {
+      "type": "object",
+      "required": ["mode", "source_contract", "generated_at", "selection", "budget"],
+      "properties": {
+        "mode": {"const": "compact"},
+        "source_contract": {
+          "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/result-bundle.schema.json"
+        },
+        "generated_at": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+        },
+        "selection": {"enum": ["all-within-budget", "requested-fields", "source-order"]},
+        "budget": {
+          "type": "object",
+          "required": ["policy_ref", "class", "unit", "limit", "observed", "measurement"],
+          "properties": {
+            "policy_ref": {
+              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+            },
+            "class": {"const": "inline-result"},
+            "unit": {"enum": ["tokens", "utf8-bytes"]},
+            "limit": {"type": "integer", "minimum": 1, "maximum": 16384},
+            "observed": {"type": "integer", "minimum": 0, "maximum": 16384},
+            "measurement": {
+              "type": "object",
+              "required": ["method"],
+              "properties": {
+                "method": {"enum": ["host-tokenizer", "utf8-bytes"]},
+                "tokenizer_ref": {
+                  "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+                }
+              },
+              "allOf": [
+                {
+                  "if": {"properties": {"method": {"const": "host-tokenizer"}}, "required": ["method"]},
+                  "then": {"required": ["tokenizer_ref"]}
+                }
+              ],
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "extensions": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/extension.schema.json"
+    }
+  },
+  "$defs": {
+    "compactProperty": {
+      "$anchor": "compactProperty",
+      "type": "object",
+      "required": ["property_ref", "label", "subject_ref", "value", "uncertainty_status", "condition_refs", "evidence_refs"],
+      "properties": {
+        "property_ref": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+        },
+        "label": {"type": "string", "minLength": 1, "maxLength": 256},
+        "subject_ref": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+        },
+        "value": {"$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/compact-result.schema.json#compactValue"},
+        "uncertainty_status": {"enum": ["not-reported", "reported"]},
+        "condition_refs": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "compactValue": {
+      "$anchor": "compactValue",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["value_type", "value", "unit"],
+          "properties": {
+            "value_type": {"const": "number"},
+            "value": {"type": "number"},
+            "unit": {"$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-value.schema.json#unit"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["value_type", "value", "unit"],
+          "properties": {
+            "value_type": {"const": "integer"},
+            "value": {"type": "integer"},
+            "unit": {"$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-value.schema.json#unit"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["value_type", "value", "unit"],
+          "properties": {
+            "value_type": {"const": "number-array"},
+            "value": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"type": "number"}},
+            "unit": {"$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-value.schema.json#unit"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["value_type", "value"],
+          "properties": {
+            "value_type": {"const": "text"},
+            "value": {"type": "string", "minLength": 1, "maxLength": 512}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["value_type", "value"],
+          "properties": {
+            "value_type": {"const": "boolean"},
+            "value": {"type": "boolean"}
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["value_type", "artifact_ref"],
+          "properties": {
+            "value_type": {"const": "artifact"},
+            "artifact_ref": {
+              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"omitted": {"properties": {"truncated": {"const": false}}, "required": ["truncated"]}},
+        "required": ["omitted"]
+      },
+      "then": {
+        "properties": {
+          "omitted": {
+            "properties": {
+              "entities": {"const": 0},
+              "properties": {"const": 0},
+              "conditions": {"const": 0},
+              "artifacts": {"const": 0},
+              "citations": {"const": 0},
+              "warnings": {"const": 0}
+            }
+          }
+        }
+      }
+    }
+  ],
+  "unevaluatedProperties": false
+}

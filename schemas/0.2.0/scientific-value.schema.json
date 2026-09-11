@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-value.schema.json",
+  "title": "Scientific value",
+  "description": "A bounded scalar, short vector, text value, or artifact-backed value with explicit numeric units.",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": ["value_type", "value", "unit"],
+      "properties": {
+        "value_type": {"const": "number"},
+        "value": {"type": "number"},
+        "unit": {"$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-value.schema.json#unit"}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["value_type", "value", "unit"],
+      "properties": {
+        "value_type": {"const": "integer"},
+        "value": {"type": "integer"},
+        "unit": {"$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-value.schema.json#unit"}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["value_type", "value", "unit"],
+      "properties": {
+        "value_type": {"const": "number-array"},
+        "value": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {"type": "number"}
+        },
+        "unit": {"$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-value.schema.json#unit"}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["value_type", "value"],
+      "properties": {
+        "value_type": {"const": "text"},
+        "value": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#shortText"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["value_type", "value"],
+      "properties": {
+        "value_type": {"const": "boolean"},
+        "value": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": ["value_type", "artifact_ref"],
+      "properties": {
+        "value_type": {"const": "artifact"},
+        "artifact_ref": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+        }
+      },
+      "additionalProperties": false
+    }
+  ],
+  "$defs": {
+    "unit": {
+      "$anchor": "unit",
+      "type": "object",
+      "required": ["system", "identifier", "symbol"],
+      "properties": {
+        "system": {"const": "UCUM"},
+        "identifier": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "symbol": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

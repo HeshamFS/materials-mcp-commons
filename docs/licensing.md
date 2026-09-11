@@ -30,20 +30,20 @@ The Cloudflare schema-host deployment has no application runtime dependency. Its
 
 | Package | Pinned version | Role | Reported license |
 |---|---:|---|---|
-| Wrangler | `4.129.0` | Worker development and deployment CLI | MIT OR Apache-2.0 |
-| `@cloudflare/workers-types` | `5.20260904.1` | Worker runtime type declarations | MIT OR Apache-2.0 |
+| Wrangler | `4.131.0` | Worker development and deployment CLI | MIT OR Apache-2.0 |
+| `@cloudflare/workers-types` | `5.20260910.1` | Worker runtime type declarations | MIT OR Apache-2.0 |
 | TypeScript | `7.0.2` | Static compilation check | Apache-2.0 |
 
 The exact Node.js dependency graph is recorded in [`deployment/cloudflare-schema-host/package-lock.json`](../deployment/cloudflare-schema-host/package-lock.json). Wrangler, TypeScript, and type declarations are not imported by the deployed Worker.
 
-License expressions above were reviewed from package metadata on 2026-09-04. Lockfiles preserve the reviewed version graph; a release still requires a refreshed transitive-license, vulnerability, and artifact inventory.
+Python license expressions were reviewed from package metadata on 2026-09-04. The Cloudflare toolchain expressions and zero-vulnerability npm audit were refreshed on 2026-09-11 after updating Wrangler and its compatible Worker types. Lockfiles preserve the reviewed version graphs; a release still requires a refreshed transitive-license, vulnerability, and artifact inventory.
 
 ## Included data and test-vector rights
 
 | Path | Material | Rights |
 |---|---|---|
 | [`tests/contracts/positive-real/cod-9013102/source.cif`](../tests/contracts/positive-real/cod-9013102/source.cif) | Crystallography Open Database record 9013102, revision 291877 | CC0-1.0; redistribution permitted; acknowledge B. N. Dutta and the original structural-data sources as requested by COD |
-| [`tests/contracts/positive-real/cod-9013102/registration.json`](../tests/contracts/positive-real/cod-9013102/registration.json) and [`result-bundle.json`](../tests/contracts/positive-real/cod-9013102/result-bundle.json) | Project-authored registration and direct contract projection | CC BY 4.0; embedded source facts retain their source provenance |
+| [`tests/contracts/positive-real/cod-9013102/`](../tests/contracts/positive-real/cod-9013102/README.md) registration and result records | Project-authored source registration, direct contract projection, lossless successor migration, and compact projection | CC BY 4.0; embedded source facts retain their source provenance |
 | [`tests/contracts/negative-generated/`](../tests/contracts/negative-generated/README.md) | Project-authored invalid contract inputs used only for rejection testing | CC BY 4.0; no scientific-validity claim |
 | [`schemas/`](../schemas/README.md) and [`docs/`](README.md) | Project-authored schema specifications and documentation | CC BY 4.0 |
 | `src/`, executable tests, and `deployment/` code | Project-authored software | Apache-2.0 |

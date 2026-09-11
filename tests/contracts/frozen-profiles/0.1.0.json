@@ -1,0 +1,25 @@
+{
+  "profile_version": "0.1.0",
+  "publication_commit": "0bbece30da4df0aba0867033931c88a0e3a73515",
+  "tree_path": "schemas/0.1.0",
+  "files": [
+    {"path": "artifact.schema.json", "sha256": "2875b078f014741ded9f4481e9d1d6f6cc3c41ec6d0be2551cd16c49451dedbb"},
+    {"path": "citation.schema.json", "sha256": "259f1f36b234ad3ade4d0af136dbb4db3ce5e4b5160ce546471bbe51f43a1038"},
+    {"path": "common.schema.json", "sha256": "3a263ac898ba89dcd9b07dc1fe62c81f32f6e0f9d9fd000e18ccce1ff3c46efd"},
+    {"path": "effect.schema.json", "sha256": "4f14a464eff60e628cc42c02b27e2b437871ac361d87d60ad8171b6e64289a33"},
+    {"path": "entity.schema.json", "sha256": "6e1192714acf068882bdc1774aca3403ef5bfa684a8fd031cbd8f25da81dd576"},
+    {"path": "extension.schema.json", "sha256": "522f9a5416cf8fe4e776853fa8a2c357ed031a6f2bbec823c2cec4b5137c13a1"},
+    {"path": "operation-plan.schema.json", "sha256": "e71f5dc3508d550765b0082227d32cd55b99351359bd555dca3c73aa80f44b9e"},
+    {"path": "plugin-manifest.schema.json", "sha256": "4c2a663d5ff90f1ab0dd09b084fd6b3383aedd2dff869847bb501af223c9c086"},
+    {"path": "provenance.schema.json", "sha256": "fd5b7c3be03efa90abddb8ad1d4dc645b2650a47897f60b7b369624e86c0592d"},
+    {"path": "quality-assessment.schema.json", "sha256": "e3f8d4e83a91a96c5156ff2e0bdd1d5d0c216e350072df45d513a4c7b2b7be22"},
+    {"path": "README.md", "sha256": "46020b4399ed7a8e5b0116f0e88b29d52936d13de0b2af01eacd32494d687c4e"},
+    {"path": "result-bundle.schema.json", "sha256": "66a0c2997dc8f25be73d3d0e9648bed81ae8300cd404bad6121dd8fb5a666f83"},
+    {"path": "run-record.schema.json", "sha256": "fc4e64ae147f8053ca7ef919c419448eed9fa46405a04ee7885c70a814c0de2c"},
+    {"path": "schema-index.json", "sha256": "617d982d3a8132f9a5a4123f312b4d8ed70b7cae62b3ba190901b0ad27b5f459"},
+    {"path": "schema-index.schema.json", "sha256": "7ebbfee99e958be3c4853baea1ef886ca6be1e23b9807ea793c44be11200b669"},
+    {"path": "scientific-property.schema.json", "sha256": "b88140db3eefa527f48306039c3308d1a67a7fa5c19603f9342964cc1407387f"},
+    {"path": "scientific-value.schema.json", "sha256": "b20c890278f1cb51a061fa301bbfaf950ed3f28d2fea45ad5fb65e485e5b3b5d"},
+    {"path": "structured-error.schema.json", "sha256": "da3d3f3e36510fbaf308459f99ccd8bbbd7f674066ede58764e2130448bc4d48"}
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "case_id": "NG-0010",
+  "origin": "generated",
+  "role": "negative",
+  "purpose": "Reject a context manifest whose inline-result token ceiling exceeds the profile limit.",
+  "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/context-manifest.schema.json",
+  "base_instance": "profile-0.2.0/context-manifest.json",
+  "mutation": {
+    "operation": "add",
+    "path": "/budgets/inline_result/max_tokens",
+    "value": 1501
+  },
+  "expected": {
+    "validator": "maximum",
+    "instance_path": ["budgets", "inline_result", "max_tokens"],
+    "schema_path": ["properties", "budgets", "properties", "inline_result", "properties", "max_tokens", "maximum"]
+  }
+}

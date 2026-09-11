@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/context-manifest.schema.json",
+  "title": "Context budget manifest",
+  "description": "A provider-neutral declaration of discovery, activation, inline-result, lease, and total-context limits.",
+  "type": "object",
+  "required": ["contract", "profile_version", "manifest_ref", "declared_at", "budgets", "lease_policy", "result_policy", "measurement_requirements"],
+  "properties": {
+    "contract": {
+      "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/context-manifest.schema.json"
+    },
+    "profile_version": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#profileVersion"
+    },
+    "manifest_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+    },
+    "declared_at": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+    },
+    "budgets": {
+      "type": "object",
+      "required": ["control_surface", "discovery", "activation", "inline_result", "total_mcp"],
+      "properties": {
+        "control_surface": {
+          "type": "object",
+          "required": ["max_tools", "max_context_fraction"],
+          "properties": {
+            "max_tools": {"type": "integer", "minimum": 1, "maximum": 4},
+            "max_context_fraction": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.02}
+          },
+          "additionalProperties": false
+        },
+        "discovery": {
+          "type": "object",
+          "required": ["max_cards", "max_tokens"],
+          "properties": {
+            "max_cards": {"type": "integer", "minimum": 1, "maximum": 5},
+            "max_tokens": {"type": "integer", "minimum": 1, "maximum": 500}
+          },
+          "additionalProperties": false
+        },
+        "activation": {
+          "type": "object",
+          "required": ["target_schemas", "max_schemas", "max_context_fraction"],
+          "properties": {
+            "target_schemas": {"type": "integer", "minimum": 1, "maximum": 5},
+            "max_schemas": {"type": "integer", "minimum": 1, "maximum": 8},
+            "max_context_fraction": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.03}
+          },
+          "additionalProperties": false
+        },
+        "inline_result": {
+          "type": "object",
+          "required": ["target_tokens", "max_tokens", "max_utf8_bytes"],
+          "properties": {
+            "target_tokens": {"type": "integer", "minimum": 1, "maximum": 800},
+            "max_tokens": {"type": "integer", "minimum": 1, "maximum": 1500},
+            "max_utf8_bytes": {"type": "integer", "minimum": 1, "maximum": 16384}
+          },
+          "additionalProperties": false
+        },
+        "total_mcp": {
+          "type": "object",
+          "required": ["target_fraction", "warning_fraction", "intervention_fraction", "minimum_reasoning_fraction"],
+          "properties": {
+            "target_fraction": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.10},
+            "warning_fraction": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.12},
+            "intervention_fraction": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.15},
+            "minimum_reasoning_fraction": {"type": "number", "minimum": 0.20, "maximum": 1}
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "lease_policy": {
+      "type": "object",
+      "required": ["default_turns", "max_turns", "renewal", "eviction"],
+      "properties": {
+        "default_turns": {"type": "integer", "minimum": 1, "maximum": 100},
+        "max_turns": {"type": "integer", "minimum": 1, "maximum": 100},
+        "renewal": {"enum": ["explicit", "on-use"]},
+        "eviction": {"enum": ["least-recently-used", "earliest-expiry"]}
+      },
+      "additionalProperties": false
+    },
+    "result_policy": {
+      "type": "object",
+      "required": ["default_mode", "supported_modes", "large_output_policy", "rich_result_is_authoritative"],
+      "properties": {
+        "default_mode": {"const": "compact"},
+        "supported_modes": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {"enum": ["compact", "artifact-reference", "rich"]},
+          "contains": {"const": "compact"}
+        },
+        "large_output_policy": {"const": "artifact-reference-only"},
+        "rich_result_is_authoritative": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "measurement_requirements": {
+      "type": "object",
+      "required": ["token_counts", "tokenizer_ref_required", "byte_measurement"],
+      "properties": {
+        "token_counts": {"const": "host-tokenizer"},
+        "tokenizer_ref_required": {"const": true},
+        "byte_measurement": {"const": "utf8-encoded-json"}
+      },
+      "additionalProperties": false
+    },
+    "extensions": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/extension.schema.json"
+    }
+  },
+  "unevaluatedProperties": false
+}

@@ -8,7 +8,7 @@ The initial Python distribution version is `0.1.0a0` under PEP 440. The alpha ma
 
 ## Contract version
 
-Contract source versions use exact Semantic Versioning directories, beginning with `schemas/0.1.0/`. Published directories are immutable and there is no `latest` alias. A future compatibility matrix will declare which contract versions each engine release accepts and emits.
+Contract source versions use exact Semantic Versioning directories, beginning with `schemas/0.1.0/`. Published directories are immutable and there is no `latest` alias. Engine releases declare the exact profile versions they accept and emit; support is never inferred from a mutable alias.
 
 JSON Schema Draft 2020-12 is normative. The 0.1.0 line contains 16 root schemas whose absolute identifiers use:
 
@@ -18,6 +18,30 @@ Its `schema-index.json` pins the exact identifier, path, media type, and SHA-256
 
 After an exact-version resource or index is publicly distributed, its bytes and meaning are permanent. Corrections and additions use a new exact profile version. Branch names, mutable aliases, query strings, fragments, and local paths are not contract identifiers.
 
+## Exact profile lines
+
+| Profile | Classification | Instance behavior | Status |
+|---|---|---|---|
+| `0.1.0` | Initial minimum contracts | Exact 0.1.0 identifiers required | Published and immutable |
+| `0.2.0` | Additive minor successor | Explicit migration from 0.1.0 required | Source and conformance line; publication requires a separate clean deployment gate |
+
+Profile 0.2.0 carries fifteen scientific and control-plane schema families forward, evolves the version-specific schema index with predecessor metadata, and adds compact-result, context-manifest, and compatibility schemas.
+
+## Compatibility classification
+
+The 0.1.0-to-0.2.0 transition is:
+
+- `minor` at the profile version level;
+- `additive` at the resource-set level;
+- `carried-contracts-preserved` at the scientific/control data-model level; and
+- `migration-required` at the instance-validation level.
+
+An unchanged 0.1.0 document is not a 0.2.0 document. Exact `contract` and `profile_version` values deliberately prevent silent cross-version validation.
+
+For the fifteen carried scientific/control contracts, migration rewrites only the exact profile version and version-local core schema identifiers. It does not change scientific values, units, entities, conditions, artifacts, quality, provenance, citations, warnings, effects, or extension payloads. A migrated schema-index instance additionally receives the required predecessor declaration.
+
+The executable compatibility declaration is in [`../tests/contracts/profile-0.2.0/profile-compatibility.json`](../tests/contracts/profile-0.2.0/profile-compatibility.json). The registered real migration and compact projection are documented in the [positive corpus](../tests/contracts/positive-real/cod-9013102/README.md).
+
 Normative contract sources are distributed separately from the Python engine package so their version and CC BY 4.0 licensing remain explicit.
 
-See [the contract guide](contracts.md) for 0.1.0 semantics and [canonical schema hosting](schema-hosting.md) for distribution and integrity verification.
+See [the contract guide](contracts.md) for profile semantics and [canonical schema hosting](schema-hosting.md) for distribution and integrity verification.

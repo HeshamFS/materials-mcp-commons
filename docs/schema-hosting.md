@@ -12,7 +12,7 @@ For example:
 
 `https://schemas.autonomouslab.io/materials-mcp/0.1.0/result-bundle.schema.json`
 
-The version inventory is:
+The published 0.1.0 inventory is:
 
 `https://schemas.autonomouslab.io/materials-mcp/0.1.0/schema-index.json`
 
@@ -20,7 +20,7 @@ There is no mutable `latest` route. Canonical root identifiers contain no query 
 
 ## Source of truth and integrity
 
-The checked-in [exact-version source directory](../schemas/0.1.0/README.md) is the authoring source. Its [schema index](../schemas/0.1.0/schema-index.json) records the expected SHA-256 digest and media type of all 16 normative schema resources.
+Each checked-in exact-version directory is an authoring source. The published [0.1.0 directory](../schemas/0.1.0/README.md) and [schema index](../schemas/0.1.0/schema-index.json) remain immutable. The [0.2.0 successor source](../schemas/0.2.0/README.md) has its own index and must not be treated as hosted or published until a separate clean deployment and live-parity gate passes.
 
 The host is a byte-preserving distribution boundary. Deployment must not generate, transform, or rewrite schema content. Once an exact-version resource is publicly distributed, changing its bytes or meaning requires a new profile version rather than an overwrite.
 
@@ -60,7 +60,7 @@ For a local HTTP check:
 npx wrangler dev --local
 ```
 
-Request a canonical 0.1.0 path from the printed local origin, then verify missing, alias, encoded-delimiter, traversal, and unsupported-method paths as well.
+Request a canonical exact-version path from the printed local origin, then verify missing, alias, encoded-delimiter, traversal, and unsupported-method paths as well.
 
 Cloudflare normalizes percent-encoding of RFC 3986 unreserved characters before the Worker handles a request. An equivalent spelling such as an encoded ASCII letter or full stop can therefore resolve to the same resource. This does not change the canonical `$id`. Encoded path delimiters, traversal, backslashes, extra segments, and double-encoded traversal must still fail closed.
 
@@ -74,7 +74,7 @@ npm run deploy
 
 After deployment:
 
-1. fetch every resource listed in `schema-index.json`;
+1. fetch every resource listed in the exact version's `schema-index.json`;
 2. require HTTP 200 and the declared media type;
 3. compare each response body SHA-256 with the index and checked-in source;
 4. verify immutable cache, CORS, cross-origin-resource, and `nosniff` headers;

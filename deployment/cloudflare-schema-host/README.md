@@ -22,6 +22,6 @@ npm run check
 npm run deploy
 ```
 
-The first four commands install/check locally; `npm run deploy` is an external production change. Run deployment only with the domain owner's authenticated Cloudflare account. After deployment, compare every hosted exact-version resource with [`../../schemas/0.1.0/schema-index.json`](../../schemas/0.1.0/schema-index.json) and verify `Content-Type`, cache, CORS, allowed methods, unknown paths, encoded delimiters and traversal, and the unaffected apex site.
+The first four commands install/check locally; `npm run deploy` is an external production change. Run deployment only with the domain owner's authenticated Cloudflare account. After deployment, compare every hosted resource with the matching `schemas/{exact-version}/schema-index.json` and verify `Content-Type`, cache, CORS, allowed methods, unknown paths, encoded delimiters and traversal, and the unaffected apex site. Adding a source directory does not publish it; each new exact version needs its own clean deployment and live-parity evidence.
 
 Wrangler is pinned in `package-lock.json`; update it deliberately and repeat local plus live verification before deployment.

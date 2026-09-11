@@ -25,10 +25,12 @@ The [COD licensing statement](https://www.crystallography.net/cod/licensing/) de
 | Remote revision-pinned CIF | 5,190 bytes | `4ccd895a831a4d4539a687f23c03b8708a97fbb14fadbf9e43a22bb338b92176` |
 | Repository mirror [`source.cif`](source.cif) | 5,191 bytes | `2645028926b3d4bed278417dc2812f8705bb23d792bcdcd2a7538f2a7c0e9cd8` |
 | [`result-bundle.json`](result-bundle.json) | 12,136 bytes | `170cd7b9e00fe0ca55abcc129d09941668a6079be6f5fdb61bd91f9d58829c7c` |
+| [`result-bundle-0.2.0.json`](result-bundle-0.2.0.json) | 12,136 bytes | `33e88c8890676a8d43f963f8598a8547df23f8bcafe7ba78e586ea4b2d59b35c` |
+| [`compact-result-0.2.0.json`](compact-result-0.2.0.json) | 3,507 bytes | `8d23d98bbb9c0053a9ea5676f79f7e427c83c27db93de0a20440a7a8ed67b985` |
 
 The repository mirror appends exactly one final LF for text-file normalization. Removing that LF reproduces the 5,190 source bytes and the remote digest.
 
-[`registration.json`](registration.json) is the machine-readable rights, integrity, transformation, citation, and limitations record.
+[`registration.json`](registration.json) is the machine-readable source-rights, integrity, transformation, citation, and limitations record. [`registration-0.2.0.json`](registration-0.2.0.json) records the successor migration and compact-projection derivations.
 
 ## Direct projection
 
@@ -44,6 +46,10 @@ The result copies declared CIF fields without numerical conversion:
 The unit identifiers annotate the units declared by the relevant IUCr CIF Core dictionary fields. The source also provides the chemical formula, sample origin, space-group number, Hermann-Mauguin symbol, and Hall symbol represented in the entity identifiers.
 
 The associated scientific citation is B. N. Dutta, “Lattice constants and thermal expansion of silicon up to 900 C by X-ray method,” 1962, [DOI 10.1002/pssb.19620020803](https://doi.org/10.1002/pssb.19620020803).
+
+## Successor migration and compact projection
+
+The 0.2.0 ResultBundle changes only the exact profile version and contract identifier; the source-derived scientific content is byte-for-byte equivalent after those two fields are normalized. The compact result selects the first two properties and the source condition in source order, retains artifact/provenance/citation links, declares every omitted count, and measures its checked-in UTF-8 JSON representation against the context manifest's byte ceiling. It remains a projection of the rich result, never the authoritative record.
 
 ## Limitations and trust scope
 

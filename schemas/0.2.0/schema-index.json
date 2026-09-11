@@ -1,0 +1,131 @@
+{
+  "contract": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/schema-index.schema.json",
+  "profile_version": "0.2.0",
+  "canonical_base": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/",
+  "generated_at": "2026-09-11T08:18:32.579Z",
+  "predecessor": {
+    "profile_version": "0.1.0",
+    "schema_index": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/schema-index.json",
+    "publication_commit": "0bbece30da4df0aba0867033931c88a0e3a73515",
+    "change_level": "minor",
+    "resource_compatibility": "additive",
+    "instance_validation": "migration-required",
+    "compatibility_contract": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/profile-compatibility.schema.json"
+  },
+  "resources": [
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/artifact.schema.json",
+      "path": "artifact.schema.json",
+      "sha256": "ebbfa52ad756f7b4dea1dfec9b658e1297997d812eab52e9a4842d7362903cbf",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/citation.schema.json",
+      "path": "citation.schema.json",
+      "sha256": "8efdd00ffaf9cd53602e27d79f8d503de3e2e08a3aabceb2238a656da107cba2",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json",
+      "path": "common.schema.json",
+      "sha256": "518952b0a74018813503bc5761e63c63ba8294fa9f1104031f9386124577558a",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/compact-result.schema.json",
+      "path": "compact-result.schema.json",
+      "sha256": "df348855a6b68423d708b6fa1bf58ea4e598b4ffde57a4a634d4a1285d8749de",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/context-manifest.schema.json",
+      "path": "context-manifest.schema.json",
+      "sha256": "aa6c2821aacdf24f0954abd1ea6aea7b53061766d812f1d1b823480cd906c547",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/effect.schema.json",
+      "path": "effect.schema.json",
+      "sha256": "76bc15765eed7730622e2d46c46e8944f07bbec6ff5794a851e6197f533a59a8",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/entity.schema.json",
+      "path": "entity.schema.json",
+      "sha256": "ed5e7e610641b908d4c798be4cd5b8f1dadfd2cad70e43a1b71591f8b204bb31",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/extension.schema.json",
+      "path": "extension.schema.json",
+      "sha256": "485373b1db4212826a0f2c178a0d1f9886858c418815cb37903c923bcf3cdd3b",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/operation-plan.schema.json",
+      "path": "operation-plan.schema.json",
+      "sha256": "8e253d62188bfa30b630c4405a1262545948d02764bceb8530f40984ae65d98b",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/plugin-manifest.schema.json",
+      "path": "plugin-manifest.schema.json",
+      "sha256": "d8b821cd548e441bbb482ba7bfa41adf2b00c2d74cb7b37218b89f8157b55b16",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/profile-compatibility.schema.json",
+      "path": "profile-compatibility.schema.json",
+      "sha256": "49b7edb4d9b3ae5a0ea085e4ab49b83947d3c1a60b3b47ef71ab7a5b2dfc79dc",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/provenance.schema.json",
+      "path": "provenance.schema.json",
+      "sha256": "9671b9785bd552ed5839e20a503da09d87fdc3db23a1e4a78d2e7db5b2c35239",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/quality-assessment.schema.json",
+      "path": "quality-assessment.schema.json",
+      "sha256": "62c10c549c9f20f449b32a7decaed4786cfed56952a3e165b9c3ab77d2378042",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/result-bundle.schema.json",
+      "path": "result-bundle.schema.json",
+      "sha256": "2b776b66e763bc8492bf5f0bffad93ba63b4b68d304528be27f5d859c98daeac",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/run-record.schema.json",
+      "path": "run-record.schema.json",
+      "sha256": "c4d6579e9556ddc01c07d6f63d2125f7afa7e6d82294025d08f66985e3d588b7",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/schema-index.schema.json",
+      "path": "schema-index.schema.json",
+      "sha256": "6521f497e0ba0eb30fef70cf475e3c245637e316c5b4d43188c133f2c507eefc",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-property.schema.json",
+      "path": "scientific-property.schema.json",
+      "sha256": "1c4f7f19bbe87ad2d2a4b904137d511c00e88968c23512fa5d2329d77147aac8",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/scientific-value.schema.json",
+      "path": "scientific-value.schema.json",
+      "sha256": "16de95348a1f0a6011f0ba2de2b867a2ba5b8fa3dc2ad26118441505a28516af",
+      "media_type": "application/schema+json"
+    },
+    {
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "path": "structured-error.schema.json",
+      "sha256": "b65dc480905ceba0e021a466a214e343dd920e2bf4ddc07f5331adc79323c963",
+      "media_type": "application/schema+json"
+    }
+  ]
+}
