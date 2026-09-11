@@ -8,6 +8,8 @@
 
 `engine-plugin-report.json` is the deterministic exact-profile declarative report for the actual engine-control package. `authoring-matrix-report.json` records the explicit 0.1.0/0.2.0 profile matrix and compatibility checks. `engine-capabilities.md` is rendered only from the validated immutable manifest. These three authoring artifacts do not execute plugin code and do not establish backend, security, interoperability, or scientific validity.
 
+`public-api.json` is the W-0502 production-alpha compatibility lock. It is freshly derived from the installed root package, project metadata, exact local profile inventory, and an actual official-SDK server composition. It freezes Python exports and signatures, the console entry point, supported profile lines, and all four MCP tool schemas. It does not claim publication, network hosting, external usability, or scientific validation.
+
 Run the suite from the repository root:
 
 ```console
@@ -17,6 +19,7 @@ uv run python -m tools.run_context_benchmark
 uv run python -m tools.run_plugin_conformance package
 uv run python -m tools.run_plugin_conformance matrix
 uv run python -m tools.run_plugin_conformance reference
+uv run python -m tools.freeze_public_api
 ```
 
 Regenerate only the current engine report when an intentional, reviewed suite input changes:
@@ -26,6 +29,7 @@ uv run python -m tools.run_conformance --output conformance/engine-report.json
 uv run python -m tools.run_plugin_conformance package --output conformance/engine-plugin-report.json
 uv run python -m tools.run_plugin_conformance matrix --output conformance/authoring-matrix-report.json
 uv run python -m tools.run_plugin_conformance reference --output conformance/engine-capabilities.md
+uv run python -m tools.freeze_public_api --output conformance/public-api.json
 uv run pytest tests/conformance
 ```
 

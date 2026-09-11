@@ -28,6 +28,14 @@ The deterministic current-engine conformance runner evaluates the declared multi
 uv run python -m tools.run_conformance
 ```
 
+The production-alpha API lock is regenerated from the actual installed package and official-SDK host composition:
+
+```console
+uv run python -m tools.freeze_public_api --output public-api.candidate.json
+```
+
+The candidate must be byte-identical to `conformance/public-api.json`; `tests/conformance/test_public_api.py` enforces the same comparison in the supported Python matrix.
+
 Its current and frozen milestone suites and committed reproducible reports are documented in [`conformance/`](../conformance/README.md). The runner is public development tooling; it is intentionally outside the installed engine distribution.
 
 The committed `uv.lock` controls development and verification dependencies. uv is not a runtime requirement of the installed engine package.

@@ -51,12 +51,12 @@
   "plugin": {
     "description": "Self-description of the engine-owned bounded discovery and inspection behaviors implemented by this source tree.",
     "license_expression": "Apache-2.0",
-    "manifest_sha256": "9237684312fd4815f563591fbb172e32b49685cb67e793514c521f7522006bf4",
+    "manifest_sha256": "0880df4258baad35bdf3641b8b249644c71bf71511447ba0ec4dd3dd73530cba",
     "name": "Materials MCP Commons engine lifecycle",
     "plugin_id": "https://schemas.autonomouslab.io/materials-mcp/engine",
-    "plugin_version": "0.1.0-alpha.8",
+    "plugin_version": "0.1.0-alpha.9",
     "publisher_name": "Hesham Salama",
-    "registration_ref": "urn:materials-mcp:registration:3043fae8a8acc1eb1cd8d291263f0d20d5942290d973cd23f15b2f76412932f4"
+    "registration_ref": "urn:materials-mcp:registration:c07bad00ddbf78f8f66878003396323c9f52ff87a915a2812f036f93f115caf7"
   },
   "profile_version": "0.2.0",
   "report_version": 1,

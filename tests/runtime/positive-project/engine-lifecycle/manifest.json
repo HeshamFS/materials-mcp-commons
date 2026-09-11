@@ -2,7 +2,7 @@
   "contract": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/plugin-manifest.schema.json",
   "profile_version": "0.2.0",
   "plugin_id": "https://schemas.autonomouslab.io/materials-mcp/engine",
-  "plugin_version": "0.1.0-alpha.8",
+  "plugin_version": "0.1.0-alpha.9",
   "name": "Materials MCP Commons engine lifecycle",
   "description": "Self-description of the engine-owned bounded discovery and inspection behaviors implemented by this source tree.",
   "publisher": {
