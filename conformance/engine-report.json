@@ -27,7 +27,7 @@
       "mcp-host"
     ],
     "result": "pass",
-    "runtime_dependency_count": 2,
+    "runtime_dependency_count": 3,
     "source_root_count": 1
   },
   "profiles": [
@@ -46,5 +46,5 @@
   ],
   "report_version": 1,
   "result": "pass",
-  "suite_sha256": "5b891dab41616acd0c56fafb83e1734030c784593025efd4261f9865f35d0b1c"
+  "suite_sha256": "b5c8d91792f00cba5e05d363fc5a95ee07abfcb37a6821f4048a38d1a79a15eb"
 }

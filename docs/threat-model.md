@@ -16,6 +16,6 @@ This production-alpha threat model covers the generic engine, its optional local
 | Corrupt or substituted state is restored | Exact snapshot member set, SQLite integrity/foreign-key checks, schema versions, size limits, SHA-256, fresh-target-only restore | Snapshots are integrity manifests, not signed authenticity proofs; protect them with operator access controls |
 | Snapshot loses artifact bytes | Database snapshot explicitly excludes artifact content; run retrieval rechecks artifact SHA-256 | Operators must coordinate storage-native artifact backups with state snapshots |
 | Dependency compromise or drift | Protocol SDK is optional and version-bounded; exact development graph is locked; build artifacts use strict allowlists | Every release still needs refreshed vulnerability, license, and provenance checks |
-| Resource exhaustion | Bounded cards, leases, schemas, request validation, recovery sizes, and serialized host transitions | Handler CPU, memory, external cost, and HTTP limits belong to the embedding/deployment layer |
+| Resource exhaustion | Bounded cards, leases, schemas, dispatch payload bytes/depth/nodes, recovery sizes, and serialized host transitions | Handler CPU, memory, external cost, and HTTP limits belong to the embedding/deployment layer |
 
 Trust labels remain separate: protocol and operational checks may support `Conformant`, but only applicable backend and scientific evidence can support `Verified` or `Validated`.

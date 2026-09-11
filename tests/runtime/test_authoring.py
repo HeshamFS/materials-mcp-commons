@@ -19,9 +19,11 @@ from materials_mcp_commons import (
     PluginPackageSpec,
     SchemaSpec,
     WorkspaceSpec,
+    plugin_conformance_main,
     scaffold_workspace,
 )
 from materials_mcp_commons.authoring import scaffold_main
+from tools.build_engine_control_package import main as build_engine_control_main
 
 PUBLIC_ROOT = Path(__file__).parents[2]
 ENGINE_PACKAGE = PUBLIC_ROOT / "tests/runtime/positive-project/engine-lifecycle"
@@ -181,3 +183,52 @@ def test_builder_reconstructs_actual_engine_package_deterministically(
     loaded = ManifestLoader(contract_registry).load(first)
     registration = LifecycleRegistry().register(loaded)
     assert registration.manifest_sha256 == first_receipt.manifest_sha256
+
+
+def test_documented_engine_control_builder_example_is_executable(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    destination = tmp_path / "rebuilt-engine-control"
+    assert build_engine_control_main([str(destination)]) == 0
+    assert capsys.readouterr().err == ""
+    assert _json(destination / "manifest.json") == _json(ENGINE_PACKAGE / "manifest.json")
+    assert {
+        path.relative_to(destination).as_posix()
+        for path in destination.rglob("*")
+        if path.is_file()
+    } == {
+        "manifest.json",
+        "schemas/discovery-input.schema.json",
+        "schemas/discovery-result.schema.json",
+        "schemas/inspection-input.schema.json",
+        "schemas/inspection-result.schema.json",
+    }
+    for schema in (destination / "schemas").iterdir():
+        assert schema.read_bytes() == (ENGINE_PACKAGE / "schemas" / schema.name).read_bytes()
+
+
+def test_installed_conformance_cli_checks_actual_engine_package(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    output = tmp_path / "report.json"
+    assert (
+        plugin_conformance_main(
+            [
+                "--profile-root",
+                str(PUBLIC_ROOT / "schemas/0.2.0"),
+                "--profile-version",
+                "0.2.0",
+                "--package",
+                str(ENGINE_PACKAGE),
+                "--output",
+                str(output),
+            ]
+        )
+        == 0
+    )
+    assert capsys.readouterr() == ("", "")
+    assert output.read_text(encoding="utf-8") == (
+        PUBLIC_ROOT / "conformance/engine-plugin-report.json"
+    ).read_text(encoding="utf-8")

@@ -1,20 +1,40 @@
 {
   "console_scripts": {
+    "materials-mcp-conformance": "materials_mcp_commons.plugin_conformance:plugin_conformance_main",
     "materials-mcp-scaffold": "materials_mcp_commons.authoring:scaffold_main"
   },
   "contract_version": 1,
   "distribution": "materials-mcp-commons",
-  "distribution_version": "0.1.0a9",
+  "distribution_version": "0.1.0a10",
   "profile_versions": [
     "0.1.0",
     "0.2.0"
   ],
   "protocol": {
+    "error_codes": [
+      "ACTIVATION_FAILED",
+      "ASYNC_DISPATCH_REQUIRED",
+      "AUTHORIZATION_DENIED",
+      "AUTHORIZATION_RESOLVER_FAILED",
+      "DISCOVERY_FAILED",
+      "EFFECT_POLICY_REQUIRED",
+      "EXECUTION_FAILED",
+      "HANDLER_FAILED",
+      "HANDLER_MODE_MISMATCH",
+      "HANDLER_NOT_BOUND",
+      "HANDLER_REJECTED",
+      "INPUT_SCHEMA_REJECTED",
+      "INSPECTION_FAILED",
+      "PROFILE_INCOMPATIBLE",
+      "RESULT_SCHEMA_REJECTED",
+      "TARGET_UNAVAILABLE"
+    ],
     "sdk_extra": "mcp-host",
     "tools": [
       {
         "description": "Discover bounded capability cards by query.",
         "input_schema": {
+          "additionalProperties": false,
           "properties": {
             "limit": {
               "anyOf": [
@@ -39,14 +59,169 @@
         },
         "name": "materials_discover",
         "output_schema": {
-          "additionalProperties": true,
-          "title": "discoverDictOutput",
+          "$defs": {
+            "_CapabilityCardOutput": {
+              "additionalProperties": false,
+              "properties": {
+                "capability_id": {
+                  "title": "Capability Id",
+                  "type": "string"
+                },
+                "description": {
+                  "title": "Description",
+                  "type": "string"
+                },
+                "effect_tier": {
+                  "title": "Effect Tier",
+                  "type": "string"
+                },
+                "supports_async": {
+                  "title": "Supports Async",
+                  "type": "boolean"
+                },
+                "title": {
+                  "title": "Title",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "capability_id",
+                "title",
+                "description",
+                "effect_tier",
+                "supports_async"
+              ],
+              "title": "_CapabilityCardOutput",
+              "type": "object"
+            },
+            "_ErrorEvidence": {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "ref": {
+                  "title": "Ref",
+                  "type": "string"
+                },
+                "summary": {
+                  "title": "Summary",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "summary"
+              ],
+              "title": "_ErrorEvidence",
+              "type": "object"
+            },
+            "_StructuredError": {
+              "additionalProperties": false,
+              "properties": {
+                "cause": {
+                  "title": "Cause",
+                  "type": "string"
+                },
+                "code": {
+                  "title": "Code",
+                  "type": "string"
+                },
+                "contract": {
+                  "title": "Contract",
+                  "type": "string"
+                },
+                "error_ref": {
+                  "title": "Error Ref",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/_ErrorEvidence"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "extensions": {
+                  "additionalProperties": true,
+                  "title": "Extensions",
+                  "type": "object"
+                },
+                "message": {
+                  "title": "Message",
+                  "type": "string"
+                },
+                "next_action": {
+                  "title": "Next Action",
+                  "type": "string"
+                },
+                "occurred_at": {
+                  "title": "Occurred At",
+                  "type": "string"
+                },
+                "profile_version": {
+                  "title": "Profile Version",
+                  "type": "string"
+                },
+                "retryable": {
+                  "title": "Retryable",
+                  "type": "boolean"
+                },
+                "run_ref": {
+                  "title": "Run Ref",
+                  "type": "string"
+                },
+                "stage": {
+                  "title": "Stage",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "contract",
+                "profile_version",
+                "error_ref",
+                "code",
+                "stage",
+                "cause",
+                "message",
+                "evidence",
+                "retryable",
+                "next_action",
+                "occurred_at"
+              ],
+              "title": "_StructuredError",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "cards": {
+              "items": {
+                "$ref": "#/$defs/_CapabilityCardOutput"
+              },
+              "title": "Cards",
+              "type": "array"
+            },
+            "error": {
+              "$ref": "#/$defs/_StructuredError"
+            },
+            "ok": {
+              "title": "Ok",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "ok"
+          ],
+          "title": "_DiscoverOutput",
           "type": "object"
         }
       },
       {
         "description": "Inspect one registered capability contract and effect declaration.",
         "input_schema": {
+          "additionalProperties": false,
           "properties": {
             "capability_id": {
               "title": "Capability Id",
@@ -61,14 +236,164 @@
         },
         "name": "materials_inspect",
         "output_schema": {
-          "additionalProperties": true,
-          "title": "inspectDictOutput",
+          "$defs": {
+            "_ErrorEvidence": {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "ref": {
+                  "title": "Ref",
+                  "type": "string"
+                },
+                "summary": {
+                  "title": "Summary",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "summary"
+              ],
+              "title": "_ErrorEvidence",
+              "type": "object"
+            },
+            "_StructuredError": {
+              "additionalProperties": false,
+              "properties": {
+                "cause": {
+                  "title": "Cause",
+                  "type": "string"
+                },
+                "code": {
+                  "title": "Code",
+                  "type": "string"
+                },
+                "contract": {
+                  "title": "Contract",
+                  "type": "string"
+                },
+                "error_ref": {
+                  "title": "Error Ref",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/_ErrorEvidence"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "extensions": {
+                  "additionalProperties": true,
+                  "title": "Extensions",
+                  "type": "object"
+                },
+                "message": {
+                  "title": "Message",
+                  "type": "string"
+                },
+                "next_action": {
+                  "title": "Next Action",
+                  "type": "string"
+                },
+                "occurred_at": {
+                  "title": "Occurred At",
+                  "type": "string"
+                },
+                "profile_version": {
+                  "title": "Profile Version",
+                  "type": "string"
+                },
+                "retryable": {
+                  "title": "Retryable",
+                  "type": "boolean"
+                },
+                "run_ref": {
+                  "title": "Run Ref",
+                  "type": "string"
+                },
+                "stage": {
+                  "title": "Stage",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "contract",
+                "profile_version",
+                "error_ref",
+                "code",
+                "stage",
+                "cause",
+                "message",
+                "evidence",
+                "retryable",
+                "next_action",
+                "occurred_at"
+              ],
+              "title": "_StructuredError",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "capability_id": {
+              "title": "Capability Id",
+              "type": "string"
+            },
+            "effect_tier": {
+              "title": "Effect Tier",
+              "type": "string"
+            },
+            "error": {
+              "$ref": "#/$defs/_StructuredError"
+            },
+            "error_schema": {
+              "title": "Error Schema",
+              "type": "string"
+            },
+            "input_schema": {
+              "title": "Input Schema",
+              "type": "string"
+            },
+            "ok": {
+              "title": "Ok",
+              "type": "boolean"
+            },
+            "plugin_id": {
+              "title": "Plugin Id",
+              "type": "string"
+            },
+            "plugin_version": {
+              "title": "Plugin Version",
+              "type": "string"
+            },
+            "registration_ref": {
+              "title": "Registration Ref",
+              "type": "string"
+            },
+            "result_schema": {
+              "title": "Result Schema",
+              "type": "string"
+            },
+            "supports_async": {
+              "title": "Supports Async",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "ok"
+          ],
+          "title": "_InspectOutput",
           "type": "object"
         }
       },
       {
         "description": "Activate or renew one bounded capability lease.",
         "input_schema": {
+          "additionalProperties": false,
           "properties": {
             "capability_id": {
               "title": "Capability Id",
@@ -95,14 +420,148 @@
         },
         "name": "materials_activate",
         "output_schema": {
-          "additionalProperties": true,
-          "title": "activateDictOutput",
+          "$defs": {
+            "_ErrorEvidence": {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "ref": {
+                  "title": "Ref",
+                  "type": "string"
+                },
+                "summary": {
+                  "title": "Summary",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "summary"
+              ],
+              "title": "_ErrorEvidence",
+              "type": "object"
+            },
+            "_StructuredError": {
+              "additionalProperties": false,
+              "properties": {
+                "cause": {
+                  "title": "Cause",
+                  "type": "string"
+                },
+                "code": {
+                  "title": "Code",
+                  "type": "string"
+                },
+                "contract": {
+                  "title": "Contract",
+                  "type": "string"
+                },
+                "error_ref": {
+                  "title": "Error Ref",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/_ErrorEvidence"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "extensions": {
+                  "additionalProperties": true,
+                  "title": "Extensions",
+                  "type": "object"
+                },
+                "message": {
+                  "title": "Message",
+                  "type": "string"
+                },
+                "next_action": {
+                  "title": "Next Action",
+                  "type": "string"
+                },
+                "occurred_at": {
+                  "title": "Occurred At",
+                  "type": "string"
+                },
+                "profile_version": {
+                  "title": "Profile Version",
+                  "type": "string"
+                },
+                "retryable": {
+                  "title": "Retryable",
+                  "type": "boolean"
+                },
+                "run_ref": {
+                  "title": "Run Ref",
+                  "type": "string"
+                },
+                "stage": {
+                  "title": "Stage",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "contract",
+                "profile_version",
+                "error_ref",
+                "code",
+                "stage",
+                "cause",
+                "message",
+                "evidence",
+                "retryable",
+                "next_action",
+                "occurred_at"
+              ],
+              "title": "_StructuredError",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "activated_at_turn": {
+              "title": "Activated At Turn",
+              "type": "integer"
+            },
+            "activation_ref": {
+              "title": "Activation Ref",
+              "type": "string"
+            },
+            "capability_id": {
+              "title": "Capability Id",
+              "type": "string"
+            },
+            "error": {
+              "$ref": "#/$defs/_StructuredError"
+            },
+            "expires_at_turn": {
+              "title": "Expires At Turn",
+              "type": "integer"
+            },
+            "ok": {
+              "title": "Ok",
+              "type": "boolean"
+            },
+            "registration_ref": {
+              "title": "Registration Ref",
+              "type": "string"
+            }
+          },
+          "required": [
+            "ok"
+          ],
+          "title": "_ActivateOutput",
           "type": "object"
         }
       },
       {
         "description": "Execute one exact active capability through the engine policy boundary.",
         "input_schema": {
+          "additionalProperties": false,
           "properties": {
             "capability_id": {
               "title": "Capability Id",
@@ -128,8 +587,126 @@
         },
         "name": "materials_execute",
         "output_schema": {
-          "additionalProperties": true,
-          "title": "executeDictOutput",
+          "$defs": {
+            "_ErrorEvidence": {
+              "additionalProperties": false,
+              "properties": {
+                "kind": {
+                  "title": "Kind",
+                  "type": "string"
+                },
+                "ref": {
+                  "title": "Ref",
+                  "type": "string"
+                },
+                "summary": {
+                  "title": "Summary",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "summary"
+              ],
+              "title": "_ErrorEvidence",
+              "type": "object"
+            },
+            "_StructuredError": {
+              "additionalProperties": false,
+              "properties": {
+                "cause": {
+                  "title": "Cause",
+                  "type": "string"
+                },
+                "code": {
+                  "title": "Code",
+                  "type": "string"
+                },
+                "contract": {
+                  "title": "Contract",
+                  "type": "string"
+                },
+                "error_ref": {
+                  "title": "Error Ref",
+                  "type": "string"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/_ErrorEvidence"
+                  },
+                  "title": "Evidence",
+                  "type": "array"
+                },
+                "extensions": {
+                  "additionalProperties": true,
+                  "title": "Extensions",
+                  "type": "object"
+                },
+                "message": {
+                  "title": "Message",
+                  "type": "string"
+                },
+                "next_action": {
+                  "title": "Next Action",
+                  "type": "string"
+                },
+                "occurred_at": {
+                  "title": "Occurred At",
+                  "type": "string"
+                },
+                "profile_version": {
+                  "title": "Profile Version",
+                  "type": "string"
+                },
+                "retryable": {
+                  "title": "Retryable",
+                  "type": "boolean"
+                },
+                "run_ref": {
+                  "title": "Run Ref",
+                  "type": "string"
+                },
+                "stage": {
+                  "title": "Stage",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "contract",
+                "profile_version",
+                "error_ref",
+                "code",
+                "stage",
+                "cause",
+                "message",
+                "evidence",
+                "retryable",
+                "next_action",
+                "occurred_at"
+              ],
+              "title": "_StructuredError",
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "properties": {
+            "error": {
+              "$ref": "#/$defs/_StructuredError"
+            },
+            "ok": {
+              "title": "Ok",
+              "type": "boolean"
+            },
+            "result": {
+              "additionalProperties": true,
+              "title": "Result",
+              "type": "object"
+            }
+          },
+          "required": [
+            "ok"
+          ],
+          "title": "_ExecuteOutput",
           "type": "object"
         }
       }
@@ -146,12 +723,49 @@
       {
         "kind": "constant",
         "name": "ENGINE_REQUIREMENT",
-        "value": "materials-mcp-commons==0.1.0a9"
+        "value": "materials-mcp-commons==0.1.0a10"
       },
       {
         "kind": "constant",
         "name": "INSPECT_CAPABILITY_ID",
         "value": "https://schemas.autonomouslab.io/materials-mcp/engine/inspect"
+      },
+      {
+        "kind": "constant",
+        "name": "MAX_DISPATCH_PAYLOAD_BYTES",
+        "value": 65536
+      },
+      {
+        "kind": "constant",
+        "name": "MAX_DISPATCH_PAYLOAD_DEPTH",
+        "value": 32
+      },
+      {
+        "kind": "constant",
+        "name": "MAX_DISPATCH_PAYLOAD_NODES",
+        "value": 4096
+      },
+      {
+        "kind": "constant",
+        "name": "PUBLIC_MCP_ERROR_CODES",
+        "value": [
+          "ACTIVATION_FAILED",
+          "ASYNC_DISPATCH_REQUIRED",
+          "AUTHORIZATION_DENIED",
+          "AUTHORIZATION_RESOLVER_FAILED",
+          "DISCOVERY_FAILED",
+          "EFFECT_POLICY_REQUIRED",
+          "EXECUTION_FAILED",
+          "HANDLER_FAILED",
+          "HANDLER_MODE_MISMATCH",
+          "HANDLER_NOT_BOUND",
+          "HANDLER_REJECTED",
+          "INPUT_SCHEMA_REJECTED",
+          "INSPECTION_FAILED",
+          "PROFILE_INCOMPATIBLE",
+          "RESULT_SCHEMA_REJECTED",
+          "TARGET_UNAVAILABLE"
+        ]
       },
       {
         "bases": [
@@ -188,6 +802,7 @@
         "module": "materials_mcp_commons.lifecycle",
         "name": "Activation",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -248,6 +863,7 @@
         "module": "materials_mcp_commons.lifecycle",
         "name": "ActiveCapabilityTarget",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "CapabilityDetail",
@@ -316,6 +932,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "ApprovalRecord",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -383,6 +1000,7 @@
         "module": "materials_mcp_commons.runs",
         "name": "ArtifactAttachment",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "ArtifactSnapshot",
@@ -432,6 +1050,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -446,6 +1065,7 @@
             "kind": "method",
             "name": "provenance_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -460,6 +1080,7 @@
         "module": "materials_mcp_commons.runs",
         "name": "ArtifactSnapshot",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -539,6 +1160,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "AuditEvent",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -600,6 +1222,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "AuthoringError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -682,6 +1305,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "AuthorizationGrant",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -818,6 +1442,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "AuthorizationReceipt",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -899,6 +1524,7 @@
             "kind": "method",
             "name": "__call__",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -925,6 +1551,7 @@
         "module": "materials_mcp_commons.mcp_host",
         "name": "AuthorizationResolver",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "kind": "var_positional",
@@ -989,6 +1616,7 @@
         "module": "materials_mcp_commons.manifest",
         "name": "Capability",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1077,6 +1705,7 @@
         "module": "materials_mcp_commons.lifecycle",
         "name": "CapabilityCard",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1142,6 +1771,7 @@
         "module": "materials_mcp_commons.lifecycle",
         "name": "CapabilityDetail",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1223,6 +1853,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -1237,6 +1868,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "CapabilitySpec",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1310,6 +1942,7 @@
         "module": "materials_mcp_commons.lifecycle",
         "name": "CapabilityTarget",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "CapabilityDetail",
@@ -1341,6 +1974,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "CommonsError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1385,6 +2019,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -1399,6 +2034,7 @@
         "module": "materials_mcp_commons.context",
         "name": "CompactProjection",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Mapping[str, object]",
@@ -1430,6 +2066,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "ContextError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1457,6 +2094,7 @@
             "kind": "method",
             "name": "lint",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -1507,6 +2145,7 @@
             "kind": "method",
             "name": "project_result",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -1539,6 +2178,7 @@
         "module": "materials_mcp_commons.context",
         "name": "ContextGateway",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "ContextPolicy",
@@ -1603,6 +2243,7 @@
         "module": "materials_mcp_commons.context",
         "name": "ContextMeasurement",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1725,6 +2366,7 @@
             "kind": "classmethod",
             "name": "from_manifest",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "annotation": "Mapping[str, object]",
@@ -1746,6 +2388,7 @@
         "module": "materials_mcp_commons.context",
         "name": "ContextPolicy",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1876,6 +2519,7 @@
         "module": "materials_mcp_commons.context",
         "name": "ContextReport",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1941,6 +2585,7 @@
         "module": "materials_mcp_commons.context",
         "name": "ContextViolation",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -1978,6 +2623,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "ContractError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -2032,6 +2678,7 @@
             "kind": "classmethod",
             "name": "from_directory",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "annotation": "Path",
@@ -2053,6 +2700,7 @@
             "kind": "staticmethod",
             "name": "validate_instance",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "annotation": "str",
@@ -2086,6 +2734,7 @@
             "kind": "method",
             "name": "validate",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2112,6 +2761,7 @@
             "kind": "method",
             "name": "combined_registry",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2132,6 +2782,7 @@
         "module": "materials_mcp_commons.contracts",
         "name": "ContractRegistry",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -2199,6 +2850,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2213,6 +2865,7 @@
         "module": "materials_mcp_commons.state_recovery",
         "name": "DatabaseSnapshot",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -2250,6 +2903,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "DispatchError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -2299,6 +2953,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2313,6 +2968,7 @@
         "module": "materials_mcp_commons.dispatch",
         "name": "DispatchFailure",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -2398,6 +3054,7 @@
         "module": "materials_mcp_commons.dispatch",
         "name": "DispatchRequest",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -2477,6 +3134,7 @@
             "kind": "method",
             "name": "to_result",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2491,6 +3149,7 @@
         "module": "materials_mcp_commons.dispatch",
         "name": "DispatchSuccess",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -2530,6 +3189,7 @@
             "kind": "method",
             "name": "bind",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2562,6 +3222,7 @@
             "kind": "method",
             "name": "unbind",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2588,6 +3249,7 @@
             "kind": "method",
             "name": "bindings",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2602,6 +3264,7 @@
             "kind": "property",
             "name": "profile_version",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2616,6 +3279,7 @@
             "kind": "method",
             "name": "dispatch",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2648,6 +3312,7 @@
             "kind": "method",
             "name": "dispatch_async",
             "signature": {
+              "callable_mode": "coroutine",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2680,6 +3345,7 @@
         "module": "materials_mcp_commons.dispatch",
         "name": "Dispatcher",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "LifecycleRegistry",
@@ -2743,6 +3409,7 @@
         "module": "materials_mcp_commons.manifest",
         "name": "Effect",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -2826,6 +3493,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2840,6 +3508,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "EffectSpec",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -2898,6 +3567,7 @@
             "kind": "method",
             "name": "discover",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2918,6 +3588,7 @@
             "kind": "method",
             "name": "inspect",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2938,6 +3609,7 @@
         "module": "materials_mcp_commons.control",
         "name": "EngineControlHandlers",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "LifecycleRegistry",
@@ -2959,6 +3631,7 @@
             "kind": "method",
             "name": "discover",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2978,13 +3651,14 @@
                   "name": "limit"
                 }
               ],
-              "return": "dict[str, object]"
+              "return": "_DiscoverOutput"
             }
           },
           {
             "kind": "method",
             "name": "inspect",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -2998,13 +3672,14 @@
                   "required": true
                 }
               ],
-              "return": "dict[str, object]"
+              "return": "_InspectOutput"
             }
           },
           {
             "kind": "method",
             "name": "activate",
             "signature": {
+              "callable_mode": "coroutine",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3024,13 +3699,14 @@
                   "name": "lease_turns"
                 }
               ],
-              "return": "dict[str, object]"
+              "return": "_ActivateOutput"
             }
           },
           {
             "kind": "method",
             "name": "execute",
             "signature": {
+              "callable_mode": "coroutine",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3056,13 +3732,14 @@
                   "required": true
                 }
               ],
-              "return": "dict[str, object]"
+              "return": "_ExecuteOutput"
             }
           },
           {
             "kind": "method",
             "name": "health",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3077,6 +3754,7 @@
             "kind": "property",
             "name": "observer",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3091,6 +3769,7 @@
         "module": "materials_mcp_commons.mcp_host",
         "name": "EngineMCPHost",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "LifecycleRegistry",
@@ -3175,6 +3854,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "ExtensionSpec",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -3217,6 +3897,7 @@
         "module": "materials_mcp_commons.dispatch",
         "name": "HandlerBinding",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -3270,6 +3951,7 @@
         "module": "materials_mcp_commons.dispatch",
         "name": "HandlerRequest",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -3307,6 +3989,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "HostError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -3361,6 +4044,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3375,6 +4059,7 @@
         "module": "materials_mcp_commons.mcp_host",
         "name": "HostHealth",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -3418,6 +4103,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "LifecycleError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -3472,6 +4158,7 @@
             "kind": "classmethod",
             "name": "from_context_manifest",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "annotation": "Mapping[str, object]",
@@ -3487,6 +4174,7 @@
         "module": "materials_mcp_commons.lifecycle",
         "name": "LifecyclePolicy",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "int",
@@ -3532,6 +4220,7 @@
             "kind": "method",
             "name": "register",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3552,6 +4241,7 @@
             "kind": "method",
             "name": "unregister",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3572,6 +4262,7 @@
             "kind": "method",
             "name": "registrations",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3586,6 +4277,7 @@
             "kind": "method",
             "name": "discover",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3612,6 +4304,7 @@
             "kind": "method",
             "name": "inspect",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3632,6 +4325,7 @@
             "kind": "method",
             "name": "resolve",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3658,6 +4352,7 @@
             "kind": "method",
             "name": "resolve_active",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3690,6 +4385,7 @@
             "kind": "method",
             "name": "activate",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3722,6 +4418,7 @@
             "kind": "method",
             "name": "deactivate",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3748,6 +4445,7 @@
             "kind": "method",
             "name": "active",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3768,6 +4466,7 @@
         "module": "materials_mcp_commons.lifecycle",
         "name": "LifecycleRegistry",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "LifecyclePolicy | None",
@@ -3814,6 +4513,7 @@
         "module": "materials_mcp_commons.context",
         "name": "LifecycleWorkloadReport",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "int",
@@ -3921,6 +4621,7 @@
             "kind": "method",
             "name": "validate",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -3947,6 +4648,7 @@
         "module": "materials_mcp_commons.manifest",
         "name": "LoadedManifest",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -4034,6 +4736,7 @@
             "kind": "method",
             "name": "load",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4060,6 +4763,7 @@
         "module": "materials_mcp_commons.manifest",
         "name": "ManifestLoader",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "ContractRegistry",
@@ -4094,6 +4798,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4108,6 +4813,7 @@
             "kind": "property",
             "name": "result",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4122,6 +4828,7 @@
             "kind": "method",
             "name": "to_json",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4136,6 +4843,7 @@
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "MigrationAssessment",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Mapping[str, object]",
@@ -4199,6 +4907,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4213,6 +4922,7 @@
         "module": "materials_mcp_commons.operations",
         "name": "OperationEvent",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "int",
@@ -4301,6 +5011,7 @@
         "module": "materials_mcp_commons.operations",
         "name": "OperationMetric",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "OperationName",
@@ -4358,6 +5069,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4372,6 +5084,7 @@
         "module": "materials_mcp_commons.operations",
         "name": "OperationMetricsSnapshot",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "tuple[OperationMetric, ...]",
@@ -4399,6 +5112,7 @@
             "kind": "method",
             "name": "begin",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4413,6 +5127,7 @@
             "kind": "method",
             "name": "finish",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4463,6 +5178,7 @@
             "kind": "method",
             "name": "snapshot",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4477,6 +5193,7 @@
         "module": "materials_mcp_commons.operations",
         "name": "OperationObserver",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "EventSink | None",
@@ -4542,6 +5259,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4556,6 +5274,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "OperationPlan",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -4617,6 +5336,7 @@
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "PackageCase",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -4669,6 +5389,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "PackageReceipt",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Path",
@@ -4726,6 +5447,7 @@
             "kind": "method",
             "name": "document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4740,6 +5462,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "Permission",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -4765,6 +5488,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "PluginConformanceError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -4799,6 +5523,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4813,6 +5538,7 @@
             "kind": "method",
             "name": "to_json",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4827,6 +5553,7 @@
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "PluginConformanceReport",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Mapping[str, object]",
@@ -4848,6 +5575,7 @@
             "kind": "method",
             "name": "evaluate",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4868,6 +5596,7 @@
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "PluginConformanceRunner",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "ContractRegistry",
@@ -4889,6 +5618,7 @@
             "kind": "method",
             "name": "build",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -4921,6 +5651,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "PluginPackageBuilder",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "ContractRegistry",
@@ -5007,6 +5738,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "PluginPackageSpec",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -5100,6 +5832,7 @@
             "kind": "method",
             "name": "close",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5114,6 +5847,7 @@
             "kind": "staticmethod",
             "name": "input_sha256",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "annotation": "DispatchRequest",
@@ -5129,6 +5863,7 @@
             "kind": "method",
             "name": "create_plan",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5191,6 +5926,7 @@
             "kind": "method",
             "name": "approve",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5235,6 +5971,7 @@
             "kind": "method",
             "name": "issue_grant",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5291,6 +6028,7 @@
             "kind": "method",
             "name": "consume",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5335,6 +6073,7 @@
             "kind": "method",
             "name": "verify_receipt",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5373,6 +6112,7 @@
             "kind": "method",
             "name": "verify_run_receipt",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5417,6 +6157,7 @@
             "kind": "method",
             "name": "audit_events",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5437,6 +6178,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "PolicyEngine",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Path",
@@ -5472,6 +6214,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "PolicyError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -5516,6 +6259,7 @@
             "kind": "property",
             "name": "sha256",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5530,6 +6274,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "PolicySnapshot",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -5573,6 +6318,7 @@
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "ProfileCase",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -5610,6 +6356,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "QuotaCharge",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -5647,6 +6394,7 @@
         "module": "materials_mcp_commons.policy",
         "name": "QuotaLimit",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -5684,6 +6432,7 @@
         "module": "materials_mcp_commons.state_recovery",
         "name": "RecoveryLimits",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "int",
@@ -5731,6 +6480,7 @@
         "module": "materials_mcp_commons.lifecycle",
         "name": "Registration",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -5785,6 +6535,7 @@
         "module": "materials_mcp_commons.context",
         "name": "RetrievalCase",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -5838,6 +6589,7 @@
         "module": "materials_mcp_commons.context",
         "name": "RetrievalReport",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "int",
@@ -5887,6 +6639,7 @@
         "module": "materials_mcp_commons.runs",
         "name": "RunOwner",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -5936,6 +6689,7 @@
             "kind": "classmethod",
             "name": "from_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "annotation": "dict[str, object]",
@@ -5951,6 +6705,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -5965,6 +6720,7 @@
         "module": "materials_mcp_commons.runs",
         "name": "RunSnapshot",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -6004,6 +6760,7 @@
             "kind": "method",
             "name": "close",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6018,6 +6775,7 @@
             "kind": "method",
             "name": "create_run",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6068,6 +6826,7 @@
             "kind": "method",
             "name": "latest",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6094,6 +6853,7 @@
             "kind": "method",
             "name": "deltas",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6132,6 +6892,7 @@
             "kind": "method",
             "name": "recover_incomplete",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6158,6 +6919,7 @@
             "kind": "method",
             "name": "transition",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6220,6 +6982,7 @@
             "kind": "method",
             "name": "cancel",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6264,6 +7027,7 @@
             "kind": "method",
             "name": "attach_artifact",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6338,6 +7102,7 @@
             "kind": "method",
             "name": "artifact",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6364,6 +7129,7 @@
         "module": "materials_mcp_commons.runs",
         "name": "RunStore",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Path",
@@ -6411,6 +7177,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "RunStoreError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -6453,6 +7220,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "ScaffoldReceipt",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Path",
@@ -6506,6 +7274,7 @@
         "module": "materials_mcp_commons.manifest",
         "name": "SchemaResource",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -6565,6 +7334,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "SchemaSpec",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -6604,6 +7374,7 @@
             "kind": "method",
             "name": "inspect_snapshot",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6624,6 +7395,7 @@
             "kind": "method",
             "name": "create_snapshot",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6656,6 +7428,7 @@
             "kind": "method",
             "name": "restore",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6682,6 +7455,7 @@
         "module": "materials_mcp_commons.state_recovery",
         "name": "StateRecovery",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "RecoveryLimits | None",
@@ -6701,6 +7475,7 @@
         "module": "materials_mcp_commons.errors",
         "name": "StateRecoveryError",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -6740,6 +7515,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6754,6 +7530,7 @@
         "module": "materials_mcp_commons.state_recovery",
         "name": "StateSnapshot",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "datetime",
@@ -6788,6 +7565,7 @@
             "kind": "method",
             "name": "to_document",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6802,6 +7580,7 @@
             "kind": "method",
             "name": "to_json",
             "signature": {
+              "callable_mode": "synchronous",
               "parameters": [
                 {
                   "kind": "positional_or_keyword",
@@ -6816,6 +7595,7 @@
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "VersionedConformanceMatrix",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Mapping[str, object]",
@@ -6862,6 +7642,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "WorkspaceSpec",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -6900,13 +7681,14 @@
       {
         "kind": "constant",
         "name": "__version__",
-        "value": "0.1.0a9"
+        "value": "0.1.0a10"
       },
       {
         "kind": "function",
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "assess_plugin_migration",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Path",
@@ -6947,6 +7729,7 @@
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "build_versioned_matrix",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Sequence[ProfileCase]",
@@ -6975,6 +7758,7 @@
         "module": "materials_mcp_commons.context",
         "name": "canonical_json",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "object",
@@ -6991,6 +7775,7 @@
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "capability_reference_sha256",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "str",
@@ -7007,6 +7792,7 @@
         "module": "materials_mcp_commons.context",
         "name": "card_document",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "CapabilityCard",
@@ -7023,6 +7809,7 @@
         "module": "materials_mcp_commons.mcp_host",
         "name": "create_mcp_server",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "EngineMCPHost",
@@ -7039,6 +7826,7 @@
         "module": "materials_mcp_commons.context",
         "name": "evaluate_retrieval",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "LifecycleRegistry",
@@ -7065,8 +7853,26 @@
       {
         "kind": "function",
         "module": "materials_mcp_commons.plugin_conformance",
+        "name": "plugin_conformance_main",
+        "signature": {
+          "callable_mode": "synchronous",
+          "parameters": [
+            {
+              "annotation": "Sequence[str] | None",
+              "default": null,
+              "kind": "positional_or_keyword",
+              "name": "argv"
+            }
+          ],
+          "return": "int"
+        }
+      },
+      {
+        "kind": "function",
+        "module": "materials_mcp_commons.plugin_conformance",
         "name": "render_capability_reference",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "LoadedManifest",
@@ -7083,6 +7889,7 @@
         "module": "materials_mcp_commons.context",
         "name": "run_lifecycle_workload",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "LifecycleRegistry",
@@ -7117,6 +7924,7 @@
         "module": "materials_mcp_commons.authoring",
         "name": "scaffold_workspace",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "WorkspaceSpec",
@@ -7139,6 +7947,7 @@
         "module": "materials_mcp_commons.plugin_conformance",
         "name": "serialize_plugin_report",
         "signature": {
+          "callable_mode": "synchronous",
           "parameters": [
             {
               "annotation": "Mapping[str, object]",

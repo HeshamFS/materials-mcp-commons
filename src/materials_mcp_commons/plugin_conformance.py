@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import argparse
 import hashlib
 import html
 import json
 import re
+import sys
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -608,3 +610,35 @@ def render_capability_reference(manifest: LoadedManifest) -> str:
 
 def capability_reference_sha256(reference: str) -> str:
     return hashlib.sha256(reference.encode()).hexdigest()
+
+
+def _conformance_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="materials-mcp-conformance",
+        description="Validate one declarative package against one exact local profile.",
+    )
+    parser.add_argument("--profile-root", type=Path, required=True)
+    parser.add_argument("--profile-version", required=True)
+    parser.add_argument("--package", type=Path, required=True)
+    parser.add_argument("--output", type=Path)
+    return parser
+
+
+def plugin_conformance_main(argv: Sequence[str] | None = None) -> int:
+    """Run exact-profile declarative conformance without loading plugin code."""
+    args = _conformance_parser().parse_args(argv)
+    try:
+        contracts = ContractRegistry.from_directory(
+            cast(Path, args.profile_root), cast(str, args.profile_version)
+        )
+        rendered = PluginConformanceRunner(contracts).evaluate(cast(Path, args.package)).to_json()
+        output = cast(Path | None, args.output)
+        if output is None:
+            sys.stdout.write(rendered)
+        else:
+            output.write_text(rendered, encoding="utf-8", newline="\n")
+    except (ContractError, OSError, PluginConformanceError) as error:
+        code = getattr(error, "code", "conformance-failed")
+        sys.stderr.write(f"conformance failed [{code}]: {error}\n")
+        return 2
+    return 0

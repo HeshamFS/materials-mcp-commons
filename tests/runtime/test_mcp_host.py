@@ -8,6 +8,7 @@ from typing import cast
 
 from mcp import StdioServerParameters
 from mcp.client import Client
+from mcp_types import TextContent
 
 from materials_mcp_commons import (
     DISCOVER_CAPABILITY_ID,
@@ -67,11 +68,24 @@ def test_actual_engine_controls_work_through_in_process_mcp(
         async with Client(server) as client:
             listed = await client.list_tools()
             assert [tool.name for tool in listed.tools] == EXPECTED_TOOLS
+            for tool in listed.tools:
+                assert tool.input_schema["additionalProperties"] is False
+                assert tool.output_schema is not None
+                assert tool.output_schema["additionalProperties"] is False
             execute_tool = next(tool for tool in listed.tools if tool.name == "materials_execute")
             properties = cast(dict[str, object], execute_tool.input_schema["properties"])
             assert set(properties) == {"registration_ref", "capability_id", "payload"}
             assert "owner_ref" not in execute_tool.input_schema
             assert "authorization" not in execute_tool.input_schema
+
+            rejected = await client.call_tool(
+                "materials_discover",
+                {"limit": 2, "owner_ref": "urn:materials-mcp:owner:untrusted"},
+            )
+            assert rejected.is_error is True
+            assert rejected.structured_content is None
+            assert isinstance(rejected.content[0], TextContent)
+            assert "unexpected top-level arguments: owner_ref" in rejected.content[0].text
 
             discovery = await client.call_tool("materials_discover", {"limit": 2})
             assert discovery.is_error is False
@@ -132,6 +146,20 @@ def test_actual_engine_controls_work_through_in_process_mcp(
     assert health["registrations"] == 1
     assert health["bindings"] == 2
     assert "owner" not in json.dumps(health, sort_keys=True)
+
+
+def test_host_failure_uses_exact_profile_structured_error(
+    loaded_manifest: LoadedManifest,
+    contract_registry: ContractRegistry,
+) -> None:
+    host, _ = _host(loaded_manifest, contract_registry)
+    document = host.inspect("urn:materials-mcp:capability:not-registered")
+    error = cast(dict[str, object], document.get("error"))
+    assert document["ok"] is False
+    assert error["code"] == "INSPECTION_FAILED"
+    assert error["cause"]
+    assert len(cast(list[object], error["evidence"])) == 1
+    contract_registry.validate(cast(str, error["contract"]), error)
 
 
 def test_actual_stdio_subprocess_lists_and_calls_bounded_tools() -> None:

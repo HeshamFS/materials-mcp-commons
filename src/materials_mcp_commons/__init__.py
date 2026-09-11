@@ -33,6 +33,9 @@ from .context import (
 from .contracts import ContractRegistry
 from .control import DISCOVER_CAPABILITY_ID, INSPECT_CAPABILITY_ID, EngineControlHandlers
 from .dispatch import (
+    MAX_DISPATCH_PAYLOAD_BYTES,
+    MAX_DISPATCH_PAYLOAD_DEPTH,
+    MAX_DISPATCH_PAYLOAD_NODES,
     Dispatcher,
     DispatchFailure,
     DispatchOutcome,
@@ -65,7 +68,13 @@ from .lifecycle import (
     Registration,
 )
 from .manifest import Capability, Effect, LoadedManifest, ManifestLoader, SchemaResource
-from .mcp_host import AuthorizationResolver, EngineMCPHost, HostHealth, create_mcp_server
+from .mcp_host import (
+    PUBLIC_MCP_ERROR_CODES,
+    AuthorizationResolver,
+    EngineMCPHost,
+    HostHealth,
+    create_mcp_server,
+)
 from .operations import (
     EventSink,
     OperationEvent,
@@ -83,6 +92,7 @@ from .plugin_conformance import (
     assess_plugin_migration,
     build_versioned_matrix,
     capability_reference_sha256,
+    plugin_conformance_main,
     render_capability_reference,
     serialize_plugin_report,
 )
@@ -107,6 +117,10 @@ __all__ = (
     "DISCOVER_CAPABILITY_ID",
     "ENGINE_REQUIREMENT",
     "INSPECT_CAPABILITY_ID",
+    "MAX_DISPATCH_PAYLOAD_BYTES",
+    "MAX_DISPATCH_PAYLOAD_DEPTH",
+    "MAX_DISPATCH_PAYLOAD_NODES",
+    "PUBLIC_MCP_ERROR_CODES",
     "Activation",
     "ActiveCapabilityTarget",
     "ApprovalRecord",
@@ -199,6 +213,7 @@ __all__ = (
     "card_document",
     "create_mcp_server",
     "evaluate_retrieval",
+    "plugin_conformance_main",
     "render_capability_reference",
     "run_lifecycle_workload",
     "scaffold_workspace",

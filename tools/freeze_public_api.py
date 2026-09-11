@@ -91,7 +91,18 @@ def _signature(value: object) -> dict[str, object]:
         else:
             item["default"] = _literal(parameter.default)
         parameters.append(item)
-    document: dict[str, object] = {"parameters": parameters}
+    document: dict[str, object] = {
+        "parameters": parameters,
+        "callable_mode": (
+            "async-generator"
+            if inspect.isasyncgenfunction(value)
+            else "coroutine"
+            if inspect.iscoroutinefunction(value)
+            else "generator"
+            if inspect.isgeneratorfunction(value)
+            else "synchronous"
+        ),
+    }
     return_annotation = _annotation(signature.return_annotation)
     if return_annotation is not None:
         document["return"] = return_annotation
@@ -207,6 +218,12 @@ def _python_export(name: str) -> dict[str, object]:
             "module": value.__module__,
             "signature": _signature(value),
         }
+    if isinstance(value, tuple):
+        return {
+            "name": name,
+            "kind": "constant",
+            "value": _literal(cast(tuple[object, ...], value)),
+        }
     if value is None or type(value) in {bool, int, float, str}:
         return {"name": name, "kind": "constant", "value": _literal(value)}
     return {"name": name, "kind": "type-alias", "expression": _alias_expression(value)}
@@ -268,6 +285,7 @@ def build_public_api_contract() -> dict[str, object]:
         },
         "console_scripts": scripts,
         "protocol": {
+            "error_codes": list(commons.PUBLIC_MCP_ERROR_CODES),
             "sdk_extra": "mcp-host",
             "transport": "MCP",
             "tools": asyncio.run(_protocol_tools()),

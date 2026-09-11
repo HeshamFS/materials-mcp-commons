@@ -17,6 +17,7 @@ from materials_mcp_commons import (
     ProfileCase,
     assess_plugin_migration,
     build_versioned_matrix,
+    plugin_conformance_main,
     render_capability_reference,
 )
 from materials_mcp_commons.contracts import load_json_object
@@ -280,3 +281,26 @@ def test_generated_capability_reference_escapes_manifest_markdown(tmp_path: Path
     assert "<script>" not in reference
     assert "&lt;script&gt;" in reference
     assert "\\*unsafe\\*" in reference
+
+
+def test_generated_conformance_cli_failure_is_typed_and_corrective(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    missing = tmp_path / "missing-package"
+    assert (
+        plugin_conformance_main(
+            [
+                "--profile-root",
+                str(PUBLIC_ROOT / "schemas/0.2.0"),
+                "--profile-version",
+                "0.2.0",
+                "--package",
+                str(missing),
+            ]
+        )
+        == 2
+    )
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert "conformance failed [package-conformance-failed]" in captured.err

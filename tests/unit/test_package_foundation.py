@@ -19,17 +19,20 @@ def test_distribution_metadata() -> None:
     project = cast(dict[str, Any], load_pyproject()["project"])
 
     assert project["name"] == "materials-mcp-commons"
-    assert project["version"] == "0.1.0a9"
+    assert project["version"] == "0.1.0a10"
     assert project["requires-python"] == ">=3.11,<3.15"
     assert project["license"] == "Apache-2.0"
     assert project["authors"] == [{"name": "Hesham Salama"}]
     assert project["scripts"] == {
-        "materials-mcp-scaffold": "materials_mcp_commons.authoring:scaffold_main"
+        "materials-mcp-conformance": (
+            "materials_mcp_commons.plugin_conformance:plugin_conformance_main"
+        ),
+        "materials-mcp-scaffold": "materials_mcp_commons.authoring:scaffold_main",
     }
 
 
 def test_runtime_version_matches_distribution_metadata() -> None:
-    assert materials_mcp_commons.__version__ == "0.1.0a9"
+    assert materials_mcp_commons.__version__ == "0.1.0a10"
     assert materials_mcp_commons.__version__ == version("materials-mcp-commons")
 
 
@@ -41,6 +44,7 @@ def test_base_runtime_and_optional_host_dependencies_are_separated() -> None:
     assert project["dependencies"] == [
         "jsonschema>=4.26,<5",
         "referencing>=0.37,<0.38",
+        "typing-extensions>=4.12,<5",
     ]
     assert project["optional-dependencies"] == {"mcp-host": ["mcp>=2.2,<2.3"]}
     assert build_system == {

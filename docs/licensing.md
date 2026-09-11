@@ -9,12 +9,13 @@ These licenses apply only to material for which Hesham Salama owns or controls t
 
 ## Current dependency inventory
 
-The engine package declares two generic base runtime dependencies and one optional official MCP host dependency. It does not vendor or redistribute their source in its wheel:
+The engine package declares three generic base runtime dependencies and one optional official MCP host dependency. It does not vendor or redistribute their source in its wheel:
 
 | Package | Constraint | Runtime role | Reported license |
 |---|---|---|---|
 | jsonschema | `>=4.26,<5` | JSON Schema Draft 2020-12 validation | MIT |
 | referencing | `>=0.37,<0.38` | Explicit offline schema registry | MIT |
+| typing-extensions | `>=4.12,<5` | Closed typed protocol response declarations on every supported Python line | PSF-2.0 |
 | mcp | `>=2.2,<2.3` (optional `mcp-host` extra) | Official MCP v2 protocol server/client composition | MIT |
 
 The current directly declared Python build and verification tools are:
@@ -29,7 +30,7 @@ The current directly declared Python build and verification tools are:
 | tiktoken | `0.14.0` | Identified host-tokenizer verification in tests only | MIT |
 | uv | `>=0.9.18` | Resolver, environment runner, and build frontend | Apache-2.0 OR MIT |
 
-The exact Python runtime and verification graph, including the optional host's transitive versions, is recorded in [`uv.lock`](../uv.lock). Build and verification tools are not installed engine requirements. The two validation libraries are base requirements; the MCP dependency and its transport stack are installed only when the `mcp-host` extra is selected.
+The exact Python runtime and verification graph, including the optional host's transitive versions, is recorded in [`uv.lock`](../uv.lock). The generated Windows and Linux Python 3.12 production graphs, with installed versions, direct/transitive relationships, licenses, and the governing lock digest, are checked in as [`dependency-inventory-windows-py312.json`](../conformance/dependency-inventory-windows-py312.json) and [`dependency-inventory-linux-py312.json`](../conformance/dependency-inventory-linux-py312.json). `tools.build_dependency_inventory` regenerates them from installed distribution metadata and fails if any production dependency lacks a bounded license record. Build and verification tools are not installed engine requirements. The three base libraries are base requirements; the MCP dependency and its transport stack are installed only when the `mcp-host` extra is selected.
 
 The Cloudflare schema-host deployment has no application runtime dependency. Its directly pinned development/deployment tools are:
 
@@ -41,7 +42,7 @@ The Cloudflare schema-host deployment has no application runtime dependency. Its
 
 The exact Node.js dependency graph is recorded in [`deployment/cloudflare-schema-host/package-lock.json`](../deployment/cloudflare-schema-host/package-lock.json). Wrangler, TypeScript, and type declarations are not imported by the deployed Worker.
 
-Base Python license expressions were reviewed from package metadata on 2026-09-04. The optional `mcp` 2.2.0 package reports MIT in its installed metadata; its locked direct transport dependencies were inspected on 2026-09-11 and report MIT, BSD-3-Clause, or Apache-2.0/BSD-3-Clause expressions. The Cloudflare toolchain expressions and zero-vulnerability npm audit were refreshed on 2026-09-11 after updating Wrangler and its compatible Worker types. Lockfiles preserve the reviewed version graphs; a release still requires a refreshed complete transitive-license, vulnerability, and artifact inventory.
+The checked-in Python inventories were regenerated from clean locked environments on Windows and Ubuntu-compatible Linux. The optional `mcp` 2.2.0 graph reports permissive or weak-copyleft expressions recorded package by package; `pywin32` is the only platform-specific host dependency in the current graphs. The Cloudflare toolchain expressions and zero-vulnerability npm audit were refreshed on 2026-09-11 after updating Wrangler and its compatible Worker types. CI regenerates the platform inventory and runs vulnerability scans; a release record must retain those results and the built artifact hashes.
 
 ## Included data and test-vector rights
 

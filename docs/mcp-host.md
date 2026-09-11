@@ -21,7 +21,9 @@ The host serializes activation and execution transitions so concurrent protocol 
 
 ## Identity and authorization
 
-`owner_ref` is trusted host configuration. It is not an MCP tool argument. Tool arguments also cannot supply a policy snapshot, approval, grant, receipt, state path, transport setting, or telemetry sink.
+`owner_ref` is trusted host configuration. It is not an MCP tool argument. All four top-level tool schemas are closed and the host rejects unknown top-level arguments rather than allowing the SDK to ignore them. Tool arguments also cannot supply a policy snapshot, approval, grant, receipt, state path, transport setting, or telemetry sink. Only the capability-specific nested `payload` remains open for validation by its exact declared schema.
+
+All host and dispatcher failures use the exact profile structured-error envelope with cause, stage, evidence, retryability, corrective next action, and occurrence time. The stable public code inventory is frozen in `conformance/public-api.json`; raw resolver, handler, and internal exception text is never returned.
 
 R0 execution uses the normal dispatcher without authorization material. For R1-R4, the embedding application may provide an `AuthorizationResolver`. The resolver receives the immutable exact dispatch request and inspected target, and must return the policy snapshot and already-consumed authorization receipt for that request. The dispatcher performs the final exact binding check. A missing, rejected, or failing resolver produces a sanitized failure before the handler is invoked.
 

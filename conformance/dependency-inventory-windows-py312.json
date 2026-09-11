@@ -1,0 +1,236 @@
+{
+  "inventory_version": 1,
+  "machine": "amd64",
+  "platform": "win32",
+  "python": "3.12",
+  "scopes": {
+    "base": [
+      {
+        "license": "MIT",
+        "name": "attrs",
+        "relationship": "transitive",
+        "version": "26.1.0"
+      },
+      {
+        "license": "MIT",
+        "name": "jsonschema",
+        "relationship": "direct",
+        "version": "4.26.0"
+      },
+      {
+        "license": "MIT",
+        "name": "jsonschema-specifications",
+        "relationship": "transitive",
+        "version": "2025.9.1"
+      },
+      {
+        "license": "Apache-2.0",
+        "name": "materials-mcp-commons",
+        "relationship": "root",
+        "version": "0.1.0a10"
+      },
+      {
+        "license": "MIT",
+        "name": "referencing",
+        "relationship": "direct",
+        "version": "0.37.0"
+      },
+      {
+        "license": "MIT",
+        "name": "rpds-py",
+        "relationship": "transitive",
+        "version": "2026.6.3"
+      },
+      {
+        "license": "PSF-2.0",
+        "name": "typing-extensions",
+        "relationship": "direct",
+        "version": "4.16.0"
+      }
+    ],
+    "mcp-host": [
+      {
+        "license": "MIT",
+        "name": "annotated-types",
+        "relationship": "transitive",
+        "version": "0.8.0"
+      },
+      {
+        "license": "MIT",
+        "name": "anyio",
+        "relationship": "transitive",
+        "version": "4.15.1"
+      },
+      {
+        "license": "MIT",
+        "name": "attrs",
+        "relationship": "transitive",
+        "version": "26.1.0"
+      },
+      {
+        "license": "MIT-0",
+        "name": "cffi",
+        "relationship": "transitive",
+        "version": "2.1.1"
+      },
+      {
+        "license": "BSD-3-Clause",
+        "name": "click",
+        "relationship": "transitive",
+        "version": "8.5.0"
+      },
+      {
+        "license": "Apache-2.0 OR BSD-3-Clause",
+        "name": "cryptography",
+        "relationship": "transitive",
+        "version": "50.0.1"
+      },
+      {
+        "license": "MIT",
+        "name": "h11",
+        "relationship": "transitive",
+        "version": "0.16.0"
+      },
+      {
+        "license": "BSD-3-Clause",
+        "name": "httpcore2",
+        "relationship": "transitive",
+        "version": "2.12.0"
+      },
+      {
+        "license": "BSD-3-Clause",
+        "name": "httpx2",
+        "relationship": "transitive",
+        "version": "2.12.0"
+      },
+      {
+        "license": "BSD-3-Clause",
+        "name": "idna",
+        "relationship": "transitive",
+        "version": "3.19"
+      },
+      {
+        "license": "MIT",
+        "name": "jsonschema",
+        "relationship": "direct",
+        "version": "4.26.0"
+      },
+      {
+        "license": "MIT",
+        "name": "jsonschema-specifications",
+        "relationship": "transitive",
+        "version": "2025.9.1"
+      },
+      {
+        "license": "Apache-2.0",
+        "name": "materials-mcp-commons",
+        "relationship": "root",
+        "version": "0.1.0a10"
+      },
+      {
+        "license": "MIT",
+        "name": "mcp",
+        "relationship": "direct",
+        "version": "2.2.0"
+      },
+      {
+        "license": "MIT",
+        "name": "mcp-types",
+        "relationship": "transitive",
+        "version": "2.2.0"
+      },
+      {
+        "license": "Apache-2.0",
+        "name": "opentelemetry-api",
+        "relationship": "transitive",
+        "version": "1.44.0"
+      },
+      {
+        "license": "BSD-3-Clause",
+        "name": "pycparser",
+        "relationship": "transitive",
+        "version": "3.0"
+      },
+      {
+        "license": "MIT",
+        "name": "pydantic",
+        "relationship": "transitive",
+        "version": "2.13.5"
+      },
+      {
+        "license": "MIT",
+        "name": "pydantic-core",
+        "relationship": "transitive",
+        "version": "2.46.5"
+      },
+      {
+        "license": "MIT",
+        "name": "pyjwt",
+        "relationship": "transitive",
+        "version": "2.14.0"
+      },
+      {
+        "license": "Apache-2.0",
+        "name": "python-multipart",
+        "relationship": "transitive",
+        "version": "0.0.32"
+      },
+      {
+        "license": "PSF",
+        "name": "pywin32",
+        "relationship": "transitive",
+        "version": "312"
+      },
+      {
+        "license": "MIT",
+        "name": "referencing",
+        "relationship": "direct",
+        "version": "0.37.0"
+      },
+      {
+        "license": "MIT",
+        "name": "rpds-py",
+        "relationship": "transitive",
+        "version": "2026.6.3"
+      },
+      {
+        "license": "BSD-3-Clause",
+        "name": "sse-starlette",
+        "relationship": "transitive",
+        "version": "3.4.11"
+      },
+      {
+        "license": "BSD-3-Clause",
+        "name": "starlette",
+        "relationship": "transitive",
+        "version": "1.6.0"
+      },
+      {
+        "license": "MIT",
+        "name": "truststore",
+        "relationship": "transitive",
+        "version": "0.10.4"
+      },
+      {
+        "license": "PSF-2.0",
+        "name": "typing-extensions",
+        "relationship": "direct",
+        "version": "4.16.0"
+      },
+      {
+        "license": "MIT",
+        "name": "typing-inspection",
+        "relationship": "transitive",
+        "version": "0.4.4"
+      },
+      {
+        "license": "BSD-3-Clause",
+        "name": "uvicorn",
+        "relationship": "transitive",
+        "version": "0.52.4"
+      }
+    ]
+  },
+  "source": "installed distribution metadata resolved by the checked-in uv lock",
+  "uv_lock_sha256": "7afe8f6ee2e9f3ba361821384779c04905108192707080b7e1a3168c670edb8c"
+}

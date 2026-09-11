@@ -94,11 +94,13 @@
       "time",
       "types",
       "typing",
+      "typing_extensions",
       "uuid"
     ],
     "expected_runtime_dependencies": [
       "jsonschema>=4.26,<5",
-      "referencing>=0.37,<0.38"
+      "referencing>=0.37,<0.38",
+      "typing-extensions>=4.12,<5"
     ],
     "expected_optional_dependencies": {
       "mcp-host": ["mcp>=2.2,<2.3"]

@@ -53,3 +53,55 @@ jobs:
         run: uv run pytest
       - name: Build wheel and source distribution
         run: uv build --clear --no-sources
+
+  release-lifecycle:
+    name: Release lifecycle / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Check out complete public history
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - name: Install pinned uv and Python
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.9.18"
+          python-version: "3.12"
+          enable-cache: true
+      - name: Sync locked release-verification environment
+        run: uv sync --locked --all-groups --all-extras
+      - name: Regenerate platform release evidence
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "Windows" ]; then
+            platform=windows
+          else
+            platform=linux
+          fi
+          uv run python -m tools.build_dependency_inventory \
+            --output "conformance/dependency-inventory-${platform}-py312.json"
+          uv run python -m tools.verify_install_lifecycle \
+            --output "conformance/install-lifecycle-${platform}-py312.json"
+          git diff --exit-code -- \
+            "conformance/dependency-inventory-${platform}-py312.json" \
+            "conformance/install-lifecycle-${platform}-py312.json"
+
+  vulnerability-audit:
+    name: Locked production vulnerability audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out public repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.9.18"
+          enable-cache: true
+      - name: Export locked production host graph
+        run: uv export --locked --no-dev --extra mcp-host --no-emit-project --output-file audit-requirements.txt
+      - name: Audit the exact production host graph
+        run: uvx --from pip-audit==2.9.0 pip-audit --requirement audit-requirements.txt

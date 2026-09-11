@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import inspect
+import json
 import math
 import re
 from collections.abc import Awaitable, Callable, Mapping
@@ -36,33 +37,75 @@ ERROR_STAGES = frozenset(
     }
 )
 EVIDENCE_KINDS = frozenset({"input", "schema", "run", "artifact", "log", "policy", "other"})
+MAX_DISPATCH_PAYLOAD_BYTES = 65_536
+MAX_DISPATCH_PAYLOAD_DEPTH = 32
+MAX_DISPATCH_PAYLOAD_NODES = 4_096
 
 
-def _snapshot_json(value: object) -> object:
+@dataclass
+class _PayloadBudget:
+    nodes: int = 0
+    encoded_bytes: int = 0
+
+    def add_node(self, depth: int) -> None:
+        if depth > MAX_DISPATCH_PAYLOAD_DEPTH:
+            raise DispatchError("payload-too-deep", "Dispatch payload exceeds the depth limit")
+        self.nodes += 1
+        if self.nodes > MAX_DISPATCH_PAYLOAD_NODES:
+            raise DispatchError("payload-too-complex", "Dispatch payload exceeds the node limit")
+
+    def add_bytes(self, amount: int) -> None:
+        self.encoded_bytes += amount
+        if self.encoded_bytes > MAX_DISPATCH_PAYLOAD_BYTES:
+            raise DispatchError("payload-too-large", "Dispatch payload exceeds the byte limit")
+
+
+def _snapshot_json(
+    value: object, *, depth: int = 0, budget: _PayloadBudget | None = None
+) -> object:
+    active_budget = budget or _PayloadBudget()
+    active_budget.add_node(depth)
     if type(value) is dict:
+        active_budget.add_bytes(2)
         result: dict[str, object] = {}
-        for key, item in cast(dict[object, object], value).items():
+        items = cast(dict[object, object], value).items()
+        for index, (key, item) in enumerate(items):
             if type(key) is not str:
                 raise DispatchError("invalid-json-value", "JSON object keys must be strings")
-            result[key] = _snapshot_json(item)
+            if index:
+                active_budget.add_bytes(1)
+            active_budget.add_bytes(len(json.dumps(key, ensure_ascii=False).encode("utf-8")) + 1)
+            result[key] = _snapshot_json(item, depth=depth + 1, budget=active_budget)
         return result
     if type(value) is list:
-        return [_snapshot_json(item) for item in cast(list[object], value)]
+        active_budget.add_bytes(2)
+        result_list: list[object] = []
+        for index, item in enumerate(cast(list[object], value)):
+            if index:
+                active_budget.add_bytes(1)
+            result_list.append(_snapshot_json(item, depth=depth + 1, budget=active_budget))
+        return result_list
     if value is None:
+        active_budget.add_bytes(4)
         return None
     if type(value) is str:
+        active_budget.add_bytes(len(json.dumps(value, ensure_ascii=False).encode("utf-8")))
         return value
     if type(value) is bool:
+        active_budget.add_bytes(4 if value else 5)
         return value
     if type(value) is int:
+        active_budget.add_bytes(len(str(value).encode("ascii")))
         return value
     if isinstance(value, Decimal) and type(value) is Decimal:
         if not value.is_finite():
             raise DispatchError("invalid-json-value", "JSON numbers must be finite")
+        active_budget.add_bytes(len(str(value).encode("ascii")))
         return value
     if isinstance(value, float) and type(value) is float:
         if not math.isfinite(value):
             raise DispatchError("invalid-json-value", "JSON numbers must be finite")
+        active_budget.add_bytes(len(json.dumps(value, allow_nan=False).encode("ascii")))
         return value
     raise DispatchError("invalid-json-value", "Dispatch values must use JSON-compatible types")
 

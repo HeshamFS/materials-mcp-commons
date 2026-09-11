@@ -1,6 +1,6 @@
 # Engine runtime
 
-Engine distribution `0.1.0a9` implements the plugin-agnostic runtime and Scientist Kit boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner dispatch, deterministic effect planning and authorization, canonical context measurement and projection, durable local run/artifact state, deterministic empty-workspace scaffolding and package construction, structural conformance reports, explicit migration assessment, manifest-derived capability references, an optional official-SDK MCP adapter, metadata-only operational signals, integrity-checked state snapshots, and a machine-checked production-alpha API baseline.
+Engine distribution `0.1.0a10` implements the plugin-agnostic runtime and Scientist Kit boundary: exact profile loading, contained manifest-package validation, registration, bounded discovery, inspection, activation leases, exact-owner dispatch, deterministic effect planning and authorization, canonical context measurement and projection, durable local run/artifact state, deterministic empty-workspace scaffolding and package construction, structural conformance reports, explicit migration assessment, manifest-derived capability references, an optional official-SDK MCP adapter, metadata-only operational signals, integrity-checked state snapshots, and a machine-checked production-alpha API baseline.
 
 Registering metadata or binding a handler never creates network, filesystem, compute, cost, or external-write authority. R1-R4 dispatch requires a consumed grant whose receipt binds the exact owner, request, registered capability, input digest, effect tier, plan, and immutable policy snapshot. Handlers receive none of the policy state, approvals, or credentials.
 
@@ -82,7 +82,7 @@ outcome = dispatcher.dispatch(
 )
 ```
 
-The handler sees an immutable detached request containing only identity and validated JSON data. Failures contain bounded cause, stage, evidence, retryability, corrective action, and the caller-supplied occurrence time; raw handler exceptions are withheld. Synchronous and asynchronous declarations are enforced at the dispatch entry points.
+The handler sees an immutable detached request containing only identity and validated JSON data. Before copying or schema validation, dispatch limits payloads to 65,536 compact JSON bytes, depth 32, and 4,096 nodes. Failures contain bounded cause, stage, evidence, retryability, corrective action, and the caller-supplied occurrence time; raw handler and authorization-resolver exceptions are withheld. Synchronous and asynchronous declarations are enforced at the dispatch entry points.
 
 ## Plan and authorize effects
 

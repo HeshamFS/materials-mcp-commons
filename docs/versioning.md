@@ -4,9 +4,13 @@ Materials MCP Commons versions the engine distribution and the Materials MCP Pro
 
 ## Engine version
 
-The Python distribution began at `0.1.0a0` under PEP 440. Engine `0.1.0a9` is the first frozen production-alpha API candidate for the later plugin proof. The alpha marker communicates remaining release and scope risk; it does not lower requirements for compatibility review, scientific validity, provenance, security, reproducibility, or real-system evidence.
+The Python distribution began at `0.1.0a0` under PEP 440. Engine `0.1.0a9` was the first frozen production-alpha API candidate; `0.1.0a10` supersedes it after independent review found open-world protocol schemas and an incomplete host-error envelope. The alpha marker communicates remaining release and scope risk; it does not lower requirements for compatibility review, scientific validity, provenance, security, reproducibility, or real-system evidence.
 
 The exact supported Python, console, profile, and protocol surfaces are recorded in the [machine-readable API baseline](../conformance/public-api.json) and explained in the [API compatibility guide](api-compatibility.md). Engine and profile versions remain independent.
+
+### Engine 0.1.0a9 to 0.1.0a10
+
+Authors must update the exact engine pin and regenerate their API/conformance evidence. Embedders must stop sending unknown top-level MCP arguments, handle the complete profile structured-error envelope, and treat the frozen public error-code registry and callable awaitability as compatibility surfaces. Capability-specific nested payload semantics are unchanged. Dispatch payloads above the documented byte, depth, or node ceilings now fail before handler invocation.
 
 ## Contract version
 

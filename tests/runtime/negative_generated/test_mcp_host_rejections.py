@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import replace
+from typing import cast
 
 import pytest
 
@@ -78,7 +79,7 @@ def test_generated_effectful_tool_input_cannot_supply_authority(
         owner_ref="urn:materials-mcp:owner:effect-boundary-test",
     )
 
-    async def exercise() -> dict[str, object]:
+    async def exercise() -> object:
         activated = await host.activate(DISCOVER_CAPABILITY_ID)
         assert activated["ok"] is True
         return await host.execute(
@@ -87,7 +88,7 @@ def test_generated_effectful_tool_input_cannot_supply_authority(
             {"query": "generated-authority-input", "authorization": {"allow": True}},
         )
 
-    result = asyncio.run(exercise())
+    result = cast(dict[str, object], asyncio.run(exercise()))
     error = result["error"]
     assert isinstance(error, dict)
     assert error["code"] == "EFFECT_POLICY_REQUIRED"

@@ -1,15 +1,16 @@
 # Production-alpha API compatibility
 
-Engine `0.1.0a9` is the frozen production-alpha API candidate for the later concrete-plugin proof. The freeze gives plugin authors and embedders one explicit engine target; it does not mean that a package, network service, or production-alpha release has been published.
+Engine `0.1.0a10` is the frozen production-alpha API candidate for the later concrete-plugin proof. It supersedes the incomplete `0.1.0a9` snapshot by closing top-level MCP inputs and outputs, publishing the protocol error-code registry, preserving callable awaitability, bounding dispatch payloads, and adding installed conformance. The freeze gives plugin authors and embedders one explicit engine target; it does not mean that a package, network service, or production-alpha release has been published.
 
 ## What is public
 
 The machine-readable baseline is [`../conformance/public-api.json`](../conformance/public-api.json). It records:
 
 - every name exported by `materials_mcp_commons.__all__`, its origin and kind, callable signature, declared dataclass fields, and declared public class members;
-- the `materials-mcp-scaffold` console-script mapping;
+- the `materials-mcp-scaffold` and `materials-mcp-conformance` console-script mappings;
 - the exact supported Profile `0.1.0` and `0.2.0` lines; and
-- the ordered four-tool MCP inventory with descriptions and official-SDK-generated input and output schemas.
+- the ordered four-tool MCP inventory with descriptions, closed top-level input and output schemas, and the stable public MCP error-code registry;
+- whether every exported callable is synchronous, a coroutine, a generator, or an asynchronous generator.
 
 Names that are merely importable from an underscored name or package submodule are implementation details unless they also appear in the root export list. Profile resource bytes are governed separately by their exact-version schema indexes and publication rules.
 
@@ -19,7 +20,7 @@ Within the frozen `0.1` production-alpha line, a backward-compatible addition st
 
 An incompatible change requires a new incompatible engine line and an explicit migration decision. Correctness or security defects may force that decision, but alpha status does not permit an unrecorded break.
 
-Structured error `code` values are stable machine identifiers within the frozen line. New codes may be added. Existing codes cannot be repurposed; human-readable messages can improve and are not compatibility keys.
+Structured error `code` values in the contract's `protocol.error_codes` registry are stable machine identifiers within the frozen line. New codes may be added. Existing codes cannot be repurposed; human-readable messages can improve and are not compatibility keys. Internal Python exception codes are diagnostic implementation details unless separately promoted into that registry.
 
 ## Verify the baseline
 

@@ -9,8 +9,12 @@ import pytest
 from materials_mcp_commons import (
     DISCOVER_CAPABILITY_ID,
     INSPECT_CAPABILITY_ID,
+    MAX_DISPATCH_PAYLOAD_BYTES,
+    MAX_DISPATCH_PAYLOAD_DEPTH,
+    MAX_DISPATCH_PAYLOAD_NODES,
     ContractRegistry,
     Dispatcher,
+    DispatchError,
     DispatchFailure,
     DispatchRequest,
     DispatchSuccess,
@@ -114,6 +118,43 @@ def test_request_and_success_snapshots_are_immutable_and_detached(
     cast(list[object], first["cards"]).clear()
     second = cast(dict[str, object], outcome.to_result())
     assert len(cast(list[object], second["cards"])) == 1
+
+
+def test_request_payload_limits_reject_bytes_depth_and_node_exhaustion(
+    loaded_manifest: LoadedManifest,
+) -> None:
+    lifecycle = LifecycleRegistry()
+    registration = lifecycle.register(loaded_manifest)
+
+    with pytest.raises(DispatchError) as too_large:
+        _request(
+            registration.registration_ref,
+            DISCOVER_CAPABILITY_ID,
+            {"value": "x" * MAX_DISPATCH_PAYLOAD_BYTES},
+            turn=1,
+        )
+    assert too_large.value.code == "payload-too-large"
+
+    nested: object = "leaf"
+    for _ in range(MAX_DISPATCH_PAYLOAD_DEPTH + 1):
+        nested = [nested]
+    with pytest.raises(DispatchError) as too_deep:
+        _request(
+            registration.registration_ref,
+            DISCOVER_CAPABILITY_ID,
+            {"value": nested},
+            turn=2,
+        )
+    assert too_deep.value.code == "payload-too-deep"
+
+    with pytest.raises(DispatchError) as too_complex:
+        _request(
+            registration.registration_ref,
+            DISCOVER_CAPABILITY_ID,
+            {"values": [None] * MAX_DISPATCH_PAYLOAD_NODES},
+            turn=3,
+        )
+    assert too_complex.value.code == "payload-too-complex"
 
 
 def test_structured_failure_is_deterministic_valid_and_detached(

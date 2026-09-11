@@ -494,11 +494,12 @@ wheels = [
 
 [[package]]
 name = "materials-mcp-commons"
-version = "0.1.0a9"
+version = "0.1.0a10"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
     { name = "referencing" },
+    { name = "typing-extensions" },
 ]
 
 [package.optional-dependencies]
@@ -510,6 +511,7 @@ mcp-host = [
 dev = [
     { name = "jsonschema" },
     { name = "mcp" },
+    { name = "packaging" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -523,6 +525,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">=4.26,<5" },
     { name = "mcp", marker = "extra == 'mcp-host'", specifier = ">=2.2,<2.3" },
     { name = "referencing", specifier = ">=0.37,<0.38" },
+    { name = "typing-extensions", specifier = ">=4.12,<5" },
 ]
 provides-extras = ["mcp-host"]
 
@@ -530,6 +533,7 @@ provides-extras = ["mcp-host"]
 dev = [
     { name = "jsonschema", specifier = ">=4.26,<5" },
     { name = "mcp", specifier = ">=2.2,<2.3" },
+    { name = "packaging", specifier = ">=26,<27" },
     { name = "pyright", specifier = ">=1.1.404,<2" },
     { name = "pytest", specifier = ">=8.4,<10" },
     { name = "pytest-cov", specifier = ">=6.2,<8" },

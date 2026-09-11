@@ -17,7 +17,7 @@ from .contracts import ContractRegistry, resolve_contained_file
 from .errors import AuthoringError, ContractError
 from .manifest import LoadedManifest, ManifestLoader
 
-ENGINE_REQUIREMENT = "materials-mcp-commons==0.1.0a9"
+ENGINE_REQUIREMENT = "materials-mcp-commons==0.1.0a10"
 DIST_NAME_PATTERN = re.compile(r"^[a-z0-9]+(?:[-.][a-z0-9]+)*$")
 IMPORT_NAME_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 PACKAGE_PATH_PATTERN = re.compile(r"^[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$")
@@ -243,6 +243,11 @@ capability semantics, effects, rights, and schemas are complete.
 A successful package build proves structural conformance to one exact profile.
 It does not prove backend interoperability, security, numerical correctness, or
 scientific validity.
+
+Before distribution, add the license text corresponding to the selected SPDX
+expression and verify rights for every bundled resource. Until the pinned engine
+alpha is published, install a locally built engine wheel first and install this
+workspace with --no-deps as documented in the engine authoring guide.
 """
     schema_readme = """# Schemas
 
@@ -565,7 +570,14 @@ def scaffold_main(argv: Sequence[str] | None = None) -> int:
             cast(Path, args.destination),
         )
     except AuthoringError as error:
-        sys.stderr.write(f"scaffold failed [{error.code}]: {error}\n")
+        next_action = (
+            "Choose a new absolute destination whose parent already exists."
+            if error.code in {"destination-exists", "invalid-destination"}
+            else "Correct the explicit workspace inputs and retry."
+        )
+        sys.stderr.write(
+            f"scaffold failed [{error.code}]: {error}; retryable=true; next_action={next_action}\n"
+        )
         return 2
     sys.stdout.write(f"Created empty authoring workspace: {receipt.destination}\n")
     return 0

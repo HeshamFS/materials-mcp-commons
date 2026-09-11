@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "materials-mcp-commons"
-version = "0.1.0a9"
+version = "0.1.0a10"
 description = "Plugin-agnostic contracts and engine infrastructure for interoperable materials-science capabilities."
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
@@ -28,18 +28,21 @@ classifiers = [
 dependencies = [
   "jsonschema>=4.26,<5",
   "referencing>=0.37,<0.38",
+  "typing-extensions>=4.12,<5",
 ]
 
 [project.optional-dependencies]
 mcp-host = ["mcp>=2.2,<2.3"]
 
 [project.scripts]
+materials-mcp-conformance = "materials_mcp_commons.plugin_conformance:plugin_conformance_main"
 materials-mcp-scaffold = "materials_mcp_commons.authoring:scaffold_main"
 
 [dependency-groups]
 dev = [
   "jsonschema>=4.26,<5",
   "mcp>=2.2,<2.3",
+  "packaging>=26,<27",
   "pyright>=1.1.404,<2",
   "pytest>=8.4,<10",
   "pytest-cov>=6.2,<8",

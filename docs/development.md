@@ -1,6 +1,6 @@
 # Development foundation
 
-The engine uses a minimal Python package foundation. Its base runtime dependencies are `jsonschema` and `referencing`, used for Draft 2020-12 validation and an explicit offline registry. The separately selected `mcp-host` extra provides the official protocol adapter. Python 3.11 is the syntax and static-analysis floor; the supported initial line is Python 3.11 through 3.14.
+The engine uses a minimal Python package foundation. Its base runtime dependencies are `jsonschema`, `referencing`, and `typing-extensions`, used for Draft 2020-12 validation, an explicit offline registry, and closed protocol response declarations across all supported Python versions. The separately selected `mcp-host` extra provides the official protocol adapter. Python 3.11 is the syntax and static-analysis floor; the supported initial line is Python 3.11 through 3.14.
 
 ## Python and contract checks
 
@@ -32,9 +32,18 @@ The production-alpha API lock is regenerated from the actual installed package a
 
 ```console
 uv run python -m tools.freeze_public_api --output public-api.candidate.json
+uv run python -m tools.build_dependency_inventory --output dependency-inventory.candidate.json
 ```
 
-The candidate must be byte-identical to `conformance/public-api.json`; `tests/conformance/test_public_api.py` enforces the same comparison in the supported Python matrix.
+The API candidate must be byte-identical to `conformance/public-api.json`; `tests/conformance/test_public_api.py` enforces the same comparison in the supported Python matrix. The dependency inventory must match the checked-in Windows or Linux Python 3.12 report and contains the complete installed base and MCP-host production graphs with license expressions.
+
+After committing a release candidate, exercise the prior-to-current artifact lifecycle from complete Git history:
+
+```console
+uv run python -m tools.verify_install_lifecycle --output install-lifecycle.candidate.json
+```
+
+This builds the recorded predecessor and current `HEAD`, installs the predecessor wheel, upgrades to the current wheel, checks dependencies, removes it and proves import absence, then repeats installation/removal with the MCP-host extra. The report also records the current wheel and source-distribution hashes.
 
 Its current and frozen milestone suites and committed reproducible reports are documented in [`conformance/`](../conformance/README.md). The runner is public development tooling; it is intentionally outside the installed engine distribution.
 
@@ -49,11 +58,11 @@ uv run pytest tests/runtime/negative_generated/test_mcp_host_rejections.py tests
 
 The positive host tests compose the actual engine-control package and use the official SDK client in process and over a real stdio subprocess. The same stdio fixture has also passed the official independent MCP Inspector CLI 2.6.0: strict tool listing returned the exact four schemas and a real discovery call returned the actual engine-control cards. Recovery creates actual run and policy/audit records, snapshots them through SQLite, restores them into a fresh root, and reopens both stores. Generated failure inputs remain isolated in the negative directory.
 
-The checked-in GitHub Actions workflow declares Windows and Ubuntu jobs across Python 3.11 through 3.14, plus a separate Windows packaging/static/coverage job. Action revisions and uv are pinned. A workflow file is not evidence that hosted CI ran: record the actual run URL and conclusion only after a public remote exists and the workflow has executed. Local Windows 3.11-3.14 and Ubuntu WSL2 Python 3.12 results are maintained separately as dated milestone evidence.
+The checked-in GitHub Actions workflow declares Windows and Ubuntu jobs across Python 3.11 through 3.14, a separate Windows packaging/static/coverage job, two-platform release-lifecycle and license-inventory checks, and a locked production vulnerability audit. Action revisions, uv, and the audit tool are pinned. A workflow file is not evidence that hosted CI ran: record the actual run URL and conclusion only after a public remote exists and the workflow has executed. Local Windows 3.11-3.14 and Ubuntu WSL2 Python 3.12 results are maintained separately as dated milestone evidence.
 
 ## Authoring checks
 
-The installed `materials-mcp-scaffold` command creates a fresh empty scientist workspace from explicit metadata. The typed `PluginPackageBuilder` then constructs a checksum-bound declarative package from complete authored schemas and validates it with the runtime loader. See the [Scientist Kit guide](authoring.md).
+The installed `materials-mcp-scaffold` command creates a fresh empty scientist workspace from explicit metadata. The typed `PluginPackageBuilder` then constructs a checksum-bound declarative package from complete authored schemas and validates it with the runtime loader. The installed `materials-mcp-conformance` command checks a declarative package against one exact caller-supplied local profile without importing package code. See the [Scientist Kit guide](authoring.md).
 
 The test suite reconstructs the actual engine-control package twice and compares every output byte. It also verifies the package report, exact-profile matrix, generated capability reference, and explicit migration assessment:
 
