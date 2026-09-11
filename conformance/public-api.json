@@ -5,7 +5,7 @@
   },
   "contract_version": 1,
   "distribution": "materials-mcp-commons",
-  "distribution_version": "0.1.0a10",
+  "distribution_version": "0.1.0a11",
   "profile_versions": [
     "0.1.0",
     "0.2.0"
@@ -94,18 +94,55 @@
               "title": "_CapabilityCardOutput",
               "type": "object"
             },
+            "_DiscoverSuccess": {
+              "additionalProperties": false,
+              "properties": {
+                "cards": {
+                  "items": {
+                    "$ref": "#/$defs/_CapabilityCardOutput"
+                  },
+                  "title": "Cards",
+                  "type": "array"
+                },
+                "ok": {
+                  "const": true,
+                  "title": "Ok",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "ok",
+                "cards"
+              ],
+              "title": "_DiscoverSuccess",
+              "type": "object"
+            },
             "_ErrorEvidence": {
               "additionalProperties": false,
               "properties": {
                 "kind": {
+                  "enum": [
+                    "input",
+                    "schema",
+                    "run",
+                    "artifact",
+                    "log",
+                    "policy",
+                    "other"
+                  ],
                   "title": "Kind",
                   "type": "string"
                 },
                 "ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Ref",
                   "type": "string"
                 },
                 "summary": {
+                  "maxLength": 4096,
+                  "minLength": 1,
                   "title": "Summary",
                   "type": "string"
                 }
@@ -117,22 +154,64 @@
               "title": "_ErrorEvidence",
               "type": "object"
             },
+            "_FailureOutput": {
+              "additionalProperties": false,
+              "properties": {
+                "error": {
+                  "$ref": "#/$defs/_StructuredError"
+                },
+                "ok": {
+                  "const": false,
+                  "title": "Ok",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "ok",
+                "error"
+              ],
+              "title": "_FailureOutput",
+              "type": "object"
+            },
             "_StructuredError": {
               "additionalProperties": false,
               "properties": {
                 "cause": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Cause",
                   "type": "string"
                 },
                 "code": {
+                  "enum": [
+                    "ACTIVATION_FAILED",
+                    "ASYNC_DISPATCH_REQUIRED",
+                    "AUTHORIZATION_DENIED",
+                    "AUTHORIZATION_RESOLVER_FAILED",
+                    "DISCOVERY_FAILED",
+                    "EFFECT_POLICY_REQUIRED",
+                    "EXECUTION_FAILED",
+                    "HANDLER_FAILED",
+                    "HANDLER_MODE_MISMATCH",
+                    "HANDLER_NOT_BOUND",
+                    "HANDLER_REJECTED",
+                    "INPUT_SCHEMA_REJECTED",
+                    "INSPECTION_FAILED",
+                    "PROFILE_INCOMPATIBLE",
+                    "RESULT_SCHEMA_REJECTED",
+                    "TARGET_UNAVAILABLE"
+                  ],
                   "title": "Code",
                   "type": "string"
                 },
                 "contract": {
-                  "title": "Contract",
+                  "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
                   "type": "string"
                 },
                 "error_ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Error Ref",
                   "type": "string"
                 },
@@ -140,28 +219,46 @@
                   "items": {
                     "$ref": "#/$defs/_ErrorEvidence"
                   },
+                  "maxItems": 64,
+                  "minItems": 1,
                   "title": "Evidence",
                   "type": "array"
                 },
                 "extensions": {
-                  "additionalProperties": true,
+                  "additionalProperties": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "maxProperties": 32,
+                  "propertyNames": {
+                    "format": "uri",
+                    "maxLength": 2048,
+                    "pattern": "^https://[^\\s?#]+(?:/[^\\s?#]*)?$",
+                    "type": "string"
+                  },
                   "title": "Extensions",
                   "type": "object"
                 },
                 "message": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Message",
                   "type": "string"
                 },
                 "next_action": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Next Action",
                   "type": "string"
                 },
                 "occurred_at": {
+                  "format": "date-time",
+                  "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$",
                   "title": "Occurred At",
                   "type": "string"
                 },
                 "profile_version": {
-                  "title": "Profile Version",
+                  "const": "0.2.0",
                   "type": "string"
                 },
                 "retryable": {
@@ -169,10 +266,25 @@
                   "type": "boolean"
                 },
                 "run_ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Run Ref",
                   "type": "string"
                 },
                 "stage": {
+                  "enum": [
+                    "discovery",
+                    "inspection",
+                    "validation",
+                    "planning",
+                    "authorization",
+                    "execution",
+                    "observation",
+                    "retrieval",
+                    "projection",
+                    "internal"
+                  ],
                   "title": "Stage",
                   "type": "string"
                 }
@@ -194,27 +306,15 @@
               "type": "object"
             }
           },
-          "additionalProperties": false,
-          "properties": {
-            "cards": {
-              "items": {
-                "$ref": "#/$defs/_CapabilityCardOutput"
-              },
-              "title": "Cards",
-              "type": "array"
+          "oneOf": [
+            {
+              "$ref": "#/$defs/_DiscoverSuccess"
             },
-            "error": {
-              "$ref": "#/$defs/_StructuredError"
-            },
-            "ok": {
-              "title": "Ok",
-              "type": "boolean"
+            {
+              "$ref": "#/$defs/_FailureOutput"
             }
-          },
-          "required": [
-            "ok"
           ],
-          "title": "_DiscoverOutput",
+          "title": "materials_discoverOutput",
           "type": "object"
         }
       },
@@ -241,14 +341,28 @@
               "additionalProperties": false,
               "properties": {
                 "kind": {
+                  "enum": [
+                    "input",
+                    "schema",
+                    "run",
+                    "artifact",
+                    "log",
+                    "policy",
+                    "other"
+                  ],
                   "title": "Kind",
                   "type": "string"
                 },
                 "ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Ref",
                   "type": "string"
                 },
                 "summary": {
+                  "maxLength": 4096,
+                  "minLength": 1,
                   "title": "Summary",
                   "type": "string"
                 }
@@ -260,22 +374,124 @@
               "title": "_ErrorEvidence",
               "type": "object"
             },
+            "_FailureOutput": {
+              "additionalProperties": false,
+              "properties": {
+                "error": {
+                  "$ref": "#/$defs/_StructuredError"
+                },
+                "ok": {
+                  "const": false,
+                  "title": "Ok",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "ok",
+                "error"
+              ],
+              "title": "_FailureOutput",
+              "type": "object"
+            },
+            "_InspectSuccess": {
+              "additionalProperties": false,
+              "properties": {
+                "capability_id": {
+                  "title": "Capability Id",
+                  "type": "string"
+                },
+                "effect_tier": {
+                  "title": "Effect Tier",
+                  "type": "string"
+                },
+                "error_schema": {
+                  "title": "Error Schema",
+                  "type": "string"
+                },
+                "input_schema": {
+                  "title": "Input Schema",
+                  "type": "string"
+                },
+                "ok": {
+                  "const": true,
+                  "title": "Ok",
+                  "type": "boolean"
+                },
+                "plugin_id": {
+                  "title": "Plugin Id",
+                  "type": "string"
+                },
+                "plugin_version": {
+                  "title": "Plugin Version",
+                  "type": "string"
+                },
+                "registration_ref": {
+                  "title": "Registration Ref",
+                  "type": "string"
+                },
+                "result_schema": {
+                  "title": "Result Schema",
+                  "type": "string"
+                },
+                "supports_async": {
+                  "title": "Supports Async",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "ok",
+                "registration_ref",
+                "plugin_id",
+                "plugin_version",
+                "capability_id",
+                "input_schema",
+                "result_schema",
+                "error_schema",
+                "effect_tier",
+                "supports_async"
+              ],
+              "title": "_InspectSuccess",
+              "type": "object"
+            },
             "_StructuredError": {
               "additionalProperties": false,
               "properties": {
                 "cause": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Cause",
                   "type": "string"
                 },
                 "code": {
+                  "enum": [
+                    "ACTIVATION_FAILED",
+                    "ASYNC_DISPATCH_REQUIRED",
+                    "AUTHORIZATION_DENIED",
+                    "AUTHORIZATION_RESOLVER_FAILED",
+                    "DISCOVERY_FAILED",
+                    "EFFECT_POLICY_REQUIRED",
+                    "EXECUTION_FAILED",
+                    "HANDLER_FAILED",
+                    "HANDLER_MODE_MISMATCH",
+                    "HANDLER_NOT_BOUND",
+                    "HANDLER_REJECTED",
+                    "INPUT_SCHEMA_REJECTED",
+                    "INSPECTION_FAILED",
+                    "PROFILE_INCOMPATIBLE",
+                    "RESULT_SCHEMA_REJECTED",
+                    "TARGET_UNAVAILABLE"
+                  ],
                   "title": "Code",
                   "type": "string"
                 },
                 "contract": {
-                  "title": "Contract",
+                  "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
                   "type": "string"
                 },
                 "error_ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Error Ref",
                   "type": "string"
                 },
@@ -283,28 +499,46 @@
                   "items": {
                     "$ref": "#/$defs/_ErrorEvidence"
                   },
+                  "maxItems": 64,
+                  "minItems": 1,
                   "title": "Evidence",
                   "type": "array"
                 },
                 "extensions": {
-                  "additionalProperties": true,
+                  "additionalProperties": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "maxProperties": 32,
+                  "propertyNames": {
+                    "format": "uri",
+                    "maxLength": 2048,
+                    "pattern": "^https://[^\\s?#]+(?:/[^\\s?#]*)?$",
+                    "type": "string"
+                  },
                   "title": "Extensions",
                   "type": "object"
                 },
                 "message": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Message",
                   "type": "string"
                 },
                 "next_action": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Next Action",
                   "type": "string"
                 },
                 "occurred_at": {
+                  "format": "date-time",
+                  "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$",
                   "title": "Occurred At",
                   "type": "string"
                 },
                 "profile_version": {
-                  "title": "Profile Version",
+                  "const": "0.2.0",
                   "type": "string"
                 },
                 "retryable": {
@@ -312,10 +546,25 @@
                   "type": "boolean"
                 },
                 "run_ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Run Ref",
                   "type": "string"
                 },
                 "stage": {
+                  "enum": [
+                    "discovery",
+                    "inspection",
+                    "validation",
+                    "planning",
+                    "authorization",
+                    "execution",
+                    "observation",
+                    "retrieval",
+                    "projection",
+                    "internal"
+                  ],
                   "title": "Stage",
                   "type": "string"
                 }
@@ -337,56 +586,15 @@
               "type": "object"
             }
           },
-          "additionalProperties": false,
-          "properties": {
-            "capability_id": {
-              "title": "Capability Id",
-              "type": "string"
+          "oneOf": [
+            {
+              "$ref": "#/$defs/_InspectSuccess"
             },
-            "effect_tier": {
-              "title": "Effect Tier",
-              "type": "string"
-            },
-            "error": {
-              "$ref": "#/$defs/_StructuredError"
-            },
-            "error_schema": {
-              "title": "Error Schema",
-              "type": "string"
-            },
-            "input_schema": {
-              "title": "Input Schema",
-              "type": "string"
-            },
-            "ok": {
-              "title": "Ok",
-              "type": "boolean"
-            },
-            "plugin_id": {
-              "title": "Plugin Id",
-              "type": "string"
-            },
-            "plugin_version": {
-              "title": "Plugin Version",
-              "type": "string"
-            },
-            "registration_ref": {
-              "title": "Registration Ref",
-              "type": "string"
-            },
-            "result_schema": {
-              "title": "Result Schema",
-              "type": "string"
-            },
-            "supports_async": {
-              "title": "Supports Async",
-              "type": "boolean"
+            {
+              "$ref": "#/$defs/_FailureOutput"
             }
-          },
-          "required": [
-            "ok"
           ],
-          "title": "_InspectOutput",
+          "title": "materials_inspectOutput",
           "type": "object"
         }
       },
@@ -421,18 +629,72 @@
         "name": "materials_activate",
         "output_schema": {
           "$defs": {
+            "_ActivateSuccess": {
+              "additionalProperties": false,
+              "properties": {
+                "activated_at_turn": {
+                  "title": "Activated At Turn",
+                  "type": "integer"
+                },
+                "activation_ref": {
+                  "title": "Activation Ref",
+                  "type": "string"
+                },
+                "capability_id": {
+                  "title": "Capability Id",
+                  "type": "string"
+                },
+                "expires_at_turn": {
+                  "title": "Expires At Turn",
+                  "type": "integer"
+                },
+                "ok": {
+                  "const": true,
+                  "title": "Ok",
+                  "type": "boolean"
+                },
+                "registration_ref": {
+                  "title": "Registration Ref",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "ok",
+                "activation_ref",
+                "capability_id",
+                "registration_ref",
+                "activated_at_turn",
+                "expires_at_turn"
+              ],
+              "title": "_ActivateSuccess",
+              "type": "object"
+            },
             "_ErrorEvidence": {
               "additionalProperties": false,
               "properties": {
                 "kind": {
+                  "enum": [
+                    "input",
+                    "schema",
+                    "run",
+                    "artifact",
+                    "log",
+                    "policy",
+                    "other"
+                  ],
                   "title": "Kind",
                   "type": "string"
                 },
                 "ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Ref",
                   "type": "string"
                 },
                 "summary": {
+                  "maxLength": 4096,
+                  "minLength": 1,
                   "title": "Summary",
                   "type": "string"
                 }
@@ -444,22 +706,64 @@
               "title": "_ErrorEvidence",
               "type": "object"
             },
+            "_FailureOutput": {
+              "additionalProperties": false,
+              "properties": {
+                "error": {
+                  "$ref": "#/$defs/_StructuredError"
+                },
+                "ok": {
+                  "const": false,
+                  "title": "Ok",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "ok",
+                "error"
+              ],
+              "title": "_FailureOutput",
+              "type": "object"
+            },
             "_StructuredError": {
               "additionalProperties": false,
               "properties": {
                 "cause": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Cause",
                   "type": "string"
                 },
                 "code": {
+                  "enum": [
+                    "ACTIVATION_FAILED",
+                    "ASYNC_DISPATCH_REQUIRED",
+                    "AUTHORIZATION_DENIED",
+                    "AUTHORIZATION_RESOLVER_FAILED",
+                    "DISCOVERY_FAILED",
+                    "EFFECT_POLICY_REQUIRED",
+                    "EXECUTION_FAILED",
+                    "HANDLER_FAILED",
+                    "HANDLER_MODE_MISMATCH",
+                    "HANDLER_NOT_BOUND",
+                    "HANDLER_REJECTED",
+                    "INPUT_SCHEMA_REJECTED",
+                    "INSPECTION_FAILED",
+                    "PROFILE_INCOMPATIBLE",
+                    "RESULT_SCHEMA_REJECTED",
+                    "TARGET_UNAVAILABLE"
+                  ],
                   "title": "Code",
                   "type": "string"
                 },
                 "contract": {
-                  "title": "Contract",
+                  "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
                   "type": "string"
                 },
                 "error_ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Error Ref",
                   "type": "string"
                 },
@@ -467,28 +771,46 @@
                   "items": {
                     "$ref": "#/$defs/_ErrorEvidence"
                   },
+                  "maxItems": 64,
+                  "minItems": 1,
                   "title": "Evidence",
                   "type": "array"
                 },
                 "extensions": {
-                  "additionalProperties": true,
+                  "additionalProperties": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "maxProperties": 32,
+                  "propertyNames": {
+                    "format": "uri",
+                    "maxLength": 2048,
+                    "pattern": "^https://[^\\s?#]+(?:/[^\\s?#]*)?$",
+                    "type": "string"
+                  },
                   "title": "Extensions",
                   "type": "object"
                 },
                 "message": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Message",
                   "type": "string"
                 },
                 "next_action": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Next Action",
                   "type": "string"
                 },
                 "occurred_at": {
+                  "format": "date-time",
+                  "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$",
                   "title": "Occurred At",
                   "type": "string"
                 },
                 "profile_version": {
-                  "title": "Profile Version",
+                  "const": "0.2.0",
                   "type": "string"
                 },
                 "retryable": {
@@ -496,10 +818,25 @@
                   "type": "boolean"
                 },
                 "run_ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Run Ref",
                   "type": "string"
                 },
                 "stage": {
+                  "enum": [
+                    "discovery",
+                    "inspection",
+                    "validation",
+                    "planning",
+                    "authorization",
+                    "execution",
+                    "observation",
+                    "retrieval",
+                    "projection",
+                    "internal"
+                  ],
                   "title": "Stage",
                   "type": "string"
                 }
@@ -521,40 +858,15 @@
               "type": "object"
             }
           },
-          "additionalProperties": false,
-          "properties": {
-            "activated_at_turn": {
-              "title": "Activated At Turn",
-              "type": "integer"
+          "oneOf": [
+            {
+              "$ref": "#/$defs/_ActivateSuccess"
             },
-            "activation_ref": {
-              "title": "Activation Ref",
-              "type": "string"
-            },
-            "capability_id": {
-              "title": "Capability Id",
-              "type": "string"
-            },
-            "error": {
-              "$ref": "#/$defs/_StructuredError"
-            },
-            "expires_at_turn": {
-              "title": "Expires At Turn",
-              "type": "integer"
-            },
-            "ok": {
-              "title": "Ok",
-              "type": "boolean"
-            },
-            "registration_ref": {
-              "title": "Registration Ref",
-              "type": "string"
+            {
+              "$ref": "#/$defs/_FailureOutput"
             }
-          },
-          "required": [
-            "ok"
           ],
-          "title": "_ActivateOutput",
+          "title": "materials_activateOutput",
           "type": "object"
         }
       },
@@ -592,14 +904,28 @@
               "additionalProperties": false,
               "properties": {
                 "kind": {
+                  "enum": [
+                    "input",
+                    "schema",
+                    "run",
+                    "artifact",
+                    "log",
+                    "policy",
+                    "other"
+                  ],
                   "title": "Kind",
                   "type": "string"
                 },
                 "ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Ref",
                   "type": "string"
                 },
                 "summary": {
+                  "maxLength": 4096,
+                  "minLength": 1,
                   "title": "Summary",
                   "type": "string"
                 }
@@ -611,22 +937,85 @@
               "title": "_ErrorEvidence",
               "type": "object"
             },
+            "_ExecuteSuccess": {
+              "additionalProperties": false,
+              "properties": {
+                "ok": {
+                  "const": true,
+                  "title": "Ok",
+                  "type": "boolean"
+                },
+                "result": {
+                  "additionalProperties": true,
+                  "title": "Result",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "ok",
+                "result"
+              ],
+              "title": "_ExecuteSuccess",
+              "type": "object"
+            },
+            "_FailureOutput": {
+              "additionalProperties": false,
+              "properties": {
+                "error": {
+                  "$ref": "#/$defs/_StructuredError"
+                },
+                "ok": {
+                  "const": false,
+                  "title": "Ok",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "ok",
+                "error"
+              ],
+              "title": "_FailureOutput",
+              "type": "object"
+            },
             "_StructuredError": {
               "additionalProperties": false,
               "properties": {
                 "cause": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Cause",
                   "type": "string"
                 },
                 "code": {
+                  "enum": [
+                    "ACTIVATION_FAILED",
+                    "ASYNC_DISPATCH_REQUIRED",
+                    "AUTHORIZATION_DENIED",
+                    "AUTHORIZATION_RESOLVER_FAILED",
+                    "DISCOVERY_FAILED",
+                    "EFFECT_POLICY_REQUIRED",
+                    "EXECUTION_FAILED",
+                    "HANDLER_FAILED",
+                    "HANDLER_MODE_MISMATCH",
+                    "HANDLER_NOT_BOUND",
+                    "HANDLER_REJECTED",
+                    "INPUT_SCHEMA_REJECTED",
+                    "INSPECTION_FAILED",
+                    "PROFILE_INCOMPATIBLE",
+                    "RESULT_SCHEMA_REJECTED",
+                    "TARGET_UNAVAILABLE"
+                  ],
                   "title": "Code",
                   "type": "string"
                 },
                 "contract": {
-                  "title": "Contract",
+                  "const": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
                   "type": "string"
                 },
                 "error_ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Error Ref",
                   "type": "string"
                 },
@@ -634,28 +1023,46 @@
                   "items": {
                     "$ref": "#/$defs/_ErrorEvidence"
                   },
+                  "maxItems": 64,
+                  "minItems": 1,
                   "title": "Evidence",
                   "type": "array"
                 },
                 "extensions": {
-                  "additionalProperties": true,
+                  "additionalProperties": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "maxProperties": 32,
+                  "propertyNames": {
+                    "format": "uri",
+                    "maxLength": 2048,
+                    "pattern": "^https://[^\\s?#]+(?:/[^\\s?#]*)?$",
+                    "type": "string"
+                  },
                   "title": "Extensions",
                   "type": "object"
                 },
                 "message": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Message",
                   "type": "string"
                 },
                 "next_action": {
+                  "maxLength": 16384,
+                  "minLength": 1,
                   "title": "Next Action",
                   "type": "string"
                 },
                 "occurred_at": {
+                  "format": "date-time",
+                  "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](?:\\.[0-9]+)?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$",
                   "title": "Occurred At",
                   "type": "string"
                 },
                 "profile_version": {
-                  "title": "Profile Version",
+                  "const": "0.2.0",
                   "type": "string"
                 },
                 "retryable": {
@@ -663,10 +1070,25 @@
                   "type": "boolean"
                 },
                 "run_ref": {
+                  "format": "uri",
+                  "maxLength": 2048,
+                  "pattern": "^(?:https://[^\\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
                   "title": "Run Ref",
                   "type": "string"
                 },
                 "stage": {
+                  "enum": [
+                    "discovery",
+                    "inspection",
+                    "validation",
+                    "planning",
+                    "authorization",
+                    "execution",
+                    "observation",
+                    "retrieval",
+                    "projection",
+                    "internal"
+                  ],
                   "title": "Stage",
                   "type": "string"
                 }
@@ -688,25 +1110,15 @@
               "type": "object"
             }
           },
-          "additionalProperties": false,
-          "properties": {
-            "error": {
-              "$ref": "#/$defs/_StructuredError"
+          "oneOf": [
+            {
+              "$ref": "#/$defs/_ExecuteSuccess"
             },
-            "ok": {
-              "title": "Ok",
-              "type": "boolean"
-            },
-            "result": {
-              "additionalProperties": true,
-              "title": "Result",
-              "type": "object"
+            {
+              "$ref": "#/$defs/_FailureOutput"
             }
-          },
-          "required": [
-            "ok"
           ],
-          "title": "_ExecuteOutput",
+          "title": "materials_executeOutput",
           "type": "object"
         }
       }
@@ -723,7 +1135,7 @@
       {
         "kind": "constant",
         "name": "ENGINE_REQUIREMENT",
-        "value": "materials-mcp-commons==0.1.0a10"
+        "value": "materials-mcp-commons==0.1.0a11"
       },
       {
         "kind": "constant",
@@ -7681,7 +8093,7 @@
       {
         "kind": "constant",
         "name": "__version__",
-        "value": "0.1.0a10"
+        "value": "0.1.0a11"
       },
       {
         "kind": "function",

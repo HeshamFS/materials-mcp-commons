@@ -8,7 +8,17 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from importlib.metadata import version
-from typing import TYPE_CHECKING, Any, NotRequired, Protocol, cast
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Any,
+    Literal,
+    NotRequired,
+    Protocol,
+    TypeAlias,
+    cast,
+    get_type_hints,
+)
 
 from typing_extensions import TypedDict
 
@@ -42,6 +52,37 @@ PUBLIC_MCP_ERROR_CODES = (
     "TARGET_UNAVAILABLE",
 )
 
+_PublicErrorCode: TypeAlias = Literal[
+    "ACTIVATION_FAILED",
+    "ASYNC_DISPATCH_REQUIRED",
+    "AUTHORIZATION_DENIED",
+    "AUTHORIZATION_RESOLVER_FAILED",
+    "DISCOVERY_FAILED",
+    "EFFECT_POLICY_REQUIRED",
+    "EXECUTION_FAILED",
+    "HANDLER_FAILED",
+    "HANDLER_MODE_MISMATCH",
+    "HANDLER_NOT_BOUND",
+    "HANDLER_REJECTED",
+    "INPUT_SCHEMA_REJECTED",
+    "INSPECTION_FAILED",
+    "PROFILE_INCOMPATIBLE",
+    "RESULT_SCHEMA_REJECTED",
+    "TARGET_UNAVAILABLE",
+]
+_ErrorStage: TypeAlias = Literal[
+    "discovery",
+    "inspection",
+    "validation",
+    "planning",
+    "authorization",
+    "execution",
+    "observation",
+    "retrieval",
+    "projection",
+    "internal",
+]
+
 _TOOL_INPUTS = {
     "materials_discover": frozenset({"query", "limit"}),
     "materials_inspect": frozenset({"capability_id"}),
@@ -50,26 +91,76 @@ _TOOL_INPUTS = {
 }
 
 
+class _JsonSchemaConstraints:
+    """Dependency-free metadata consumed when the optional MCP stack builds schemas."""
+
+    def __init__(self, **keywords: object) -> None:
+        self._keywords = keywords
+
+    def __get_pydantic_json_schema__(self, core_schema: object, handler: Any) -> dict[str, Any]:
+        schema = cast(dict[str, Any], handler(core_schema))
+        schema.update(self._keywords)
+        return schema
+
+
+_AbsoluteReference: TypeAlias = Annotated[
+    str,
+    _JsonSchemaConstraints(
+        format="uri",
+        pattern=r"^(?:https://[^\s]+|urn:[A-Za-z0-9][A-Za-z0-9()+,.:=@;$_!*'%/?#-]*)$",
+        maxLength=2048,
+    ),
+]
+_NonEmptyString: TypeAlias = Annotated[str, _JsonSchemaConstraints(minLength=1, maxLength=4096)]
+_ShortText: TypeAlias = Annotated[str, _JsonSchemaConstraints(minLength=1, maxLength=16384)]
+_OccurredAt: TypeAlias = Annotated[
+    str,
+    _JsonSchemaConstraints(
+        format="date-time",
+        pattern=(
+            r"^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])"
+            r"T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]"
+            r"(?:\.[0-9]+)?(?:Z|[+-](?:[01][0-9]|2[0-3]):[0-5][0-9])$"
+        ),
+    ),
+]
+_Extensions: TypeAlias = Annotated[
+    dict[str, dict[str, object]],
+    _JsonSchemaConstraints(
+        maxProperties=32,
+        propertyNames={
+            "type": "string",
+            "format": "uri",
+            "pattern": r"^https://[^\s?#]+(?:/[^\s?#]*)?$",
+            "maxLength": 2048,
+        },
+    ),
+]
+
+
 class _ErrorEvidence(TypedDict, closed=True):
-    kind: str
-    ref: NotRequired[str]
-    summary: str
+    kind: Literal["input", "schema", "run", "artifact", "log", "policy", "other"]
+    ref: NotRequired[_AbsoluteReference]
+    summary: _NonEmptyString
 
 
 class _StructuredError(TypedDict, closed=True):
-    contract: str
-    profile_version: str
-    error_ref: str
-    run_ref: NotRequired[str]
-    code: str
-    stage: str
-    cause: str
-    message: str
-    evidence: list[_ErrorEvidence]
+    contract: Literal[
+        "https://schemas.autonomouslab.io/materials-mcp/0.1.0/structured-error.schema.json",
+        "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+    ]
+    profile_version: Literal["0.1.0", "0.2.0"]
+    error_ref: _AbsoluteReference
+    run_ref: NotRequired[_AbsoluteReference]
+    code: _PublicErrorCode
+    stage: _ErrorStage
+    cause: _ShortText
+    message: _ShortText
+    evidence: Annotated[list[_ErrorEvidence], _JsonSchemaConstraints(minItems=1, maxItems=64)]
     retryable: bool
-    next_action: str
-    occurred_at: str
-    extensions: NotRequired[dict[str, object]]
+    next_action: _ShortText
+    occurred_at: _OccurredAt
+    extensions: NotRequired[_Extensions]
 
 
 class _CapabilityCardOutput(TypedDict, closed=True):
@@ -80,40 +171,47 @@ class _CapabilityCardOutput(TypedDict, closed=True):
     supports_async: bool
 
 
-class _DiscoverOutput(TypedDict, closed=True):
-    ok: bool
-    cards: NotRequired[list[_CapabilityCardOutput]]
-    error: NotRequired[_StructuredError]
+class _FailureOutput(TypedDict, closed=True):
+    ok: Literal[False]
+    error: _StructuredError
 
 
-class _InspectOutput(TypedDict, closed=True):
-    ok: bool
-    registration_ref: NotRequired[str]
-    plugin_id: NotRequired[str]
-    plugin_version: NotRequired[str]
-    capability_id: NotRequired[str]
-    input_schema: NotRequired[str]
-    result_schema: NotRequired[str]
-    error_schema: NotRequired[str]
-    effect_tier: NotRequired[str]
-    supports_async: NotRequired[bool]
-    error: NotRequired[_StructuredError]
+class _DiscoverSuccess(TypedDict, closed=True):
+    ok: Literal[True]
+    cards: list[_CapabilityCardOutput]
 
 
-class _ActivateOutput(TypedDict, closed=True):
-    ok: bool
-    activation_ref: NotRequired[str]
-    capability_id: NotRequired[str]
-    registration_ref: NotRequired[str]
-    activated_at_turn: NotRequired[int]
-    expires_at_turn: NotRequired[int]
-    error: NotRequired[_StructuredError]
+class _InspectSuccess(TypedDict, closed=True):
+    ok: Literal[True]
+    registration_ref: str
+    plugin_id: str
+    plugin_version: str
+    capability_id: str
+    input_schema: str
+    result_schema: str
+    error_schema: str
+    effect_tier: str
+    supports_async: bool
 
 
-class _ExecuteOutput(TypedDict, closed=True):
-    ok: bool
-    result: NotRequired[dict[str, object]]
-    error: NotRequired[_StructuredError]
+class _ActivateSuccess(TypedDict, closed=True):
+    ok: Literal[True]
+    activation_ref: str
+    capability_id: str
+    registration_ref: str
+    activated_at_turn: int
+    expires_at_turn: int
+
+
+class _ExecuteSuccess(TypedDict, closed=True):
+    ok: Literal[True]
+    result: dict[str, object]
+
+
+_DiscoverOutput: TypeAlias = _DiscoverSuccess | _FailureOutput
+_InspectOutput: TypeAlias = _InspectSuccess | _FailureOutput
+_ActivateOutput: TypeAlias = _ActivateSuccess | _FailureOutput
+_ExecuteOutput: TypeAlias = _ExecuteSuccess | _FailureOutput
 
 
 class AuthorizationResolver(Protocol):
@@ -173,43 +271,49 @@ class EngineMCPHost:
         self._turn_lock = asyncio.Lock()
 
     def _host_failure(
-        self, code: str, operation: OperationName, next_action: str
+        self, code: _PublicErrorCode, operation: OperationName, next_action: str
     ) -> _StructuredError:
         request_ref = self._request_ref_factory()
         occurred_at = (
             self._clock().astimezone(UTC).isoformat(timespec="microseconds").replace("+00:00", "Z")
         )
-        stage = {
-            "discover": "discovery",
-            "inspect": "inspection",
-            "activate": "authorization",
-            "execute": "execution",
-        }[operation]
+        stage = cast(
+            _ErrorStage,
+            {
+                "discover": "discovery",
+                "inspect": "inspection",
+                "activate": "authorization",
+                "execute": "execution",
+            }[operation],
+        )
         digest = hashlib.sha256(
             "\0".join((request_ref, operation, stage, code)).encode("utf-8")
         ).hexdigest()
-        return {
-            "contract": (
-                "https://schemas.autonomouslab.io/materials-mcp/"
-                f"{self._profile_version}/structured-error.schema.json"
-            ),
-            "profile_version": self._profile_version,
-            "error_ref": f"urn:materials-mcp:error:{digest}",
-            "code": code,
-            "stage": stage,
-            "cause": f"The {operation} operation was rejected by the trusted engine boundary.",
-            "message": "The host operation failed closed.",
-            "evidence": [
-                {
-                    "kind": "policy" if operation in {"activate", "execute"} else "other",
-                    "ref": request_ref,
-                    "summary": "The host contained an internal engine failure.",
-                }
-            ],
-            "retryable": False,
-            "next_action": next_action,
-            "occurred_at": occurred_at,
-        }
+        return cast(
+            _StructuredError,
+            {
+                "contract": (
+                    "https://schemas.autonomouslab.io/materials-mcp/"
+                    f"{self._profile_version}/structured-error.schema.json"
+                ),
+                "profile_version": self._profile_version,
+                "error_ref": f"urn:materials-mcp:error:{digest}",
+                "code": code,
+                "stage": stage,
+                "cause": f"The {operation} operation was rejected by the trusted engine boundary.",
+                "message": "The host operation failed closed.",
+                "evidence": [
+                    {
+                        "kind": "policy" if operation in {"activate", "execute"} else "other",
+                        "ref": request_ref,
+                        "summary": "The host contained an internal engine failure.",
+                    }
+                ],
+                "retryable": False,
+                "next_action": next_action,
+                "occurred_at": occurred_at,
+            },
+        )
 
     def _next_request(
         self, registration_ref: str, capability_id: str, payload: dict[str, object]
@@ -450,7 +554,43 @@ def create_mcp_server(host: EngineMCPHost) -> MCPServer[object]:
             "Install the materials-mcp-commons[mcp-host] extra to create an MCP server",
         ) from error
 
+    profile_version = host.health().profile_version
+
     class _ClosedInputMCPServer(MCPServer[object]):
+        def finalize_contracts(self) -> None:
+            """Publish the direct discriminated envelope instead of an SDK union wrapper."""
+            for name in _TOOL_INPUTS:
+                tool = self._tool_manager.get_tool(name)
+                if tool is None or tool.fn_metadata.output_schema is None:
+                    raise HostError("invalid-mcp-tool", f"MCP tool {name} has no output contract")
+                generated = tool.fn_metadata.output_schema
+                result_schema = cast(
+                    dict[str, Any], cast(dict[str, Any], generated["properties"])["result"]
+                )
+                variants = cast(list[dict[str, Any]], result_schema["anyOf"])
+                definitions = cast(dict[str, Any], generated.get("$defs", {}))
+                structured_error = cast(dict[str, Any], definitions["_StructuredError"])
+                error_properties = cast(dict[str, Any], structured_error["properties"])
+                error_properties["profile_version"] = {
+                    "const": profile_version,
+                    "type": "string",
+                }
+                error_properties["contract"] = {
+                    "const": (
+                        "https://schemas.autonomouslab.io/materials-mcp/"
+                        f"{profile_version}/structured-error.schema.json"
+                    ),
+                    "type": "string",
+                }
+                tool.fn_metadata.output_schema = {
+                    "$defs": definitions,
+                    "oneOf": variants,
+                    "title": f"{name}Output",
+                    "type": "object",
+                }
+                tool.fn_metadata.output_model = get_type_hints(tool.fn)["return"]
+                tool.fn_metadata.wrap_output = False
+
         async def list_tools(self) -> list[Any]:
             tools = await super().list_tools()
             for tool in tools:
@@ -496,4 +636,5 @@ def create_mcp_server(host: EngineMCPHost) -> MCPServer[object]:
         description="Execute one exact active capability through the engine policy boundary.",
         structured_output=True,
     )(host.execute)
+    server.finalize_contracts()
     return server

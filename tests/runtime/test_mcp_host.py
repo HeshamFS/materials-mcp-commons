@@ -19,6 +19,7 @@ from materials_mcp_commons import (
     EngineMCPHost,
     LifecycleRegistry,
     LoadedManifest,
+    ManifestLoader,
     OperationEvent,
     OperationObserver,
     create_mcp_server,
@@ -71,7 +72,11 @@ def test_actual_engine_controls_work_through_in_process_mcp(
             for tool in listed.tools:
                 assert tool.input_schema["additionalProperties"] is False
                 assert tool.output_schema is not None
-                assert tool.output_schema["additionalProperties"] is False
+                assert len(tool.output_schema["oneOf"]) == 2
+                definitions = tool.output_schema["$defs"]
+                assert definitions["_FailureOutput"]["additionalProperties"] is False
+                success_name = next(name for name in definitions if name.endswith("Success"))
+                assert definitions[success_name]["additionalProperties"] is False
             execute_tool = next(tool for tool in listed.tools if tool.name == "materials_execute")
             properties = cast(dict[str, object], execute_tool.input_schema["properties"])
             assert set(properties) == {"registration_ref", "capability_id", "payload"}
@@ -146,6 +151,31 @@ def test_actual_engine_controls_work_through_in_process_mcp(
     assert health["registrations"] == 1
     assert health["bindings"] == 2
     assert "owner" not in json.dumps(health, sort_keys=True)
+
+
+def test_advertised_error_contract_tracks_the_exact_host_profile() -> None:
+    public_root = Path(__file__).parents[2]
+    contracts = ContractRegistry.from_directory(public_root / "schemas/0.1.0", "0.1.0")
+    manifest = ManifestLoader(contracts).load(
+        public_root / "tests/runtime/positive-project/engine-lifecycle-profile-0.1.0"
+    )
+    host, _ = _host(manifest, contracts)
+
+    async def exercise() -> None:
+        async with Client(create_mcp_server(host)) as client:
+            listed = await client.list_tools()
+            for tool in listed.tools:
+                output_schema = cast(dict[str, object], tool.output_schema)
+                definitions = cast(dict[str, object], output_schema["$defs"])
+                structured_error = cast(dict[str, object], definitions["_StructuredError"])
+                properties = cast(dict[str, dict[str, object]], structured_error["properties"])
+                assert properties["profile_version"]["const"] == "0.1.0"
+                assert properties["contract"]["const"] == (
+                    "https://schemas.autonomouslab.io/materials-mcp/"
+                    "0.1.0/structured-error.schema.json"
+                )
+
+    asyncio.run(exercise())
 
 
 def test_host_failure_uses_exact_profile_structured_error(

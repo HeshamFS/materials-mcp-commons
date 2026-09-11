@@ -4,13 +4,17 @@ Materials MCP Commons versions the engine distribution and the Materials MCP Pro
 
 ## Engine version
 
-The Python distribution began at `0.1.0a0` under PEP 440. Engine `0.1.0a9` was the first frozen production-alpha API candidate; `0.1.0a10` supersedes it after independent review found open-world protocol schemas and an incomplete host-error envelope. The alpha marker communicates remaining release and scope risk; it does not lower requirements for compatibility review, scientific validity, provenance, security, reproducibility, or real-system evidence.
+The Python distribution began at `0.1.0a0` under PEP 440. Engine `0.1.0a9` was the first frozen production-alpha API candidate. Independent review found open-world protocol schemas and an incomplete host-error envelope, leading to `0.1.0a10`; a second review then found that its advertised output schemas did not enforce complete and mutually exclusive success/error branches. Engine `0.1.0a11` supersedes both incomplete snapshots with discriminated outputs and profile-equivalent structured-error constraints. The alpha marker communicates remaining release and scope risk; it does not lower requirements for compatibility review, scientific validity, provenance, security, reproducibility, or real-system evidence.
 
 The exact supported Python, console, profile, and protocol surfaces are recorded in the [machine-readable API baseline](../conformance/public-api.json) and explained in the [API compatibility guide](api-compatibility.md). Engine and profile versions remain independent.
 
 ### Engine 0.1.0a9 to 0.1.0a10
 
 Authors must update the exact engine pin and regenerate their API/conformance evidence. Embedders must stop sending unknown top-level MCP arguments, handle the complete profile structured-error envelope, and treat the frozen public error-code registry and callable awaitability as compatibility surfaces. Capability-specific nested payload semantics are unchanged. Dispatch payloads above the documented byte, depth, or node ceilings now fail before handler invocation.
+
+### Engine 0.1.0a10 to 0.1.0a11
+
+Authors must update the exact engine pin and regenerate API/conformance evidence again. MCP clients can now validate a direct two-branch output: `ok: true` requires every operation-specific success field and excludes `error`; `ok: false` requires `error` and excludes success fields. The error branch constrains codes to the public registry and carries the profile's bounds for evidence, references, stages, text, timestamps, and extensions. Impossible, incomplete, mixed, or unknown-code envelopes that the a10 advertised schema accepted are rejected by a11.
 
 ## Contract version
 

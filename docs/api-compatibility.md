@@ -1,6 +1,6 @@
 # Production-alpha API compatibility
 
-Engine `0.1.0a10` is the frozen production-alpha API candidate for the later concrete-plugin proof. It supersedes the incomplete `0.1.0a9` snapshot by closing top-level MCP inputs and outputs, publishing the protocol error-code registry, preserving callable awaitability, bounding dispatch payloads, and adding installed conformance. The freeze gives plugin authors and embedders one explicit engine target; it does not mean that a package, network service, or production-alpha release has been published.
+Engine `0.1.0a11` is the frozen production-alpha API candidate for the later concrete-plugin proof. It supersedes the incomplete `0.1.0a9` and `0.1.0a10` snapshots. The former left protocol boundaries open; the latter closed those objects but advertised output shapes that did not require a complete, exclusive success or failure branch. The a11 contract closes top-level MCP inputs, publishes discriminated success/error outputs with the full bounded error shape, freezes the error-code registry and callable awaitability, bounds dispatch payloads, and includes installed conformance. The freeze gives plugin authors and embedders one explicit engine target; it does not mean that a package, network service, or production-alpha release has been published.
 
 ## What is public
 
