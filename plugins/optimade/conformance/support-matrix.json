@@ -1,7 +1,7 @@
 {
   "report_version": 1,
   "observed_on": "2026-09-12",
-  "source_state": "pre-publication public working tree",
+  "source_state": "dated local observations plus immutable-commit hosted runtime evidence",
   "engine": {
     "distribution": "materials-mcp-commons",
     "version": "0.1.0a13",
@@ -111,6 +111,24 @@
       "https://optimade.materialsproject.org/v1",
       "https://nomad-lab.eu/prod/v1/optimade/v1"
     ],
+    "hosted_evidence": {
+      "runtime_commit": "071b341da1766388689be92f74a894444970e493",
+      "push_matrix": {
+        "url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34696749852",
+        "result": "pass"
+      },
+      "manual_live_provider_run": {
+        "url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34696822945",
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34696822945/job/103561618358",
+        "platform": "ubuntu-24.04",
+        "python": "3.14.2",
+        "selected": 21,
+        "passed": 21,
+        "deselected": 48,
+        "upstream_deprecation_warnings": 120,
+        "result": "pass"
+      }
+    },
     "live_evidence": [
       "registry and reviewed index discovery",
       "provider inspection and projection controls",
@@ -127,7 +145,7 @@
       "The offline matrix validates code and contracts without provider access.",
       "The live rows use current real provider responses and are time-bound observations.",
       "Generated provider responses are used only for isolated rejection tests.",
-      "Hosted GitHub Actions evidence remains pending until this source is committed and pushed.",
+      "Hosted push and manual live-provider evidence is bound to the immutable runtime commit recorded above.",
       "Canonical plugin schema paths and their core profile 0.2.0 dependencies are source identifiers in this milestone, not a claim of hosted publication.",
       "The trust ceiling is Verified; no human review or Validated claim is required or made."
     ]

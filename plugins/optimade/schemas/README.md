@@ -5,7 +5,7 @@ are rooted at:
 
 `https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/`
 
-The identifiers are frozen source identifiers in this pre-publication tree;
+The identifiers are frozen source identifiers in this pre-package-publication tree;
 this plugin line and its required core profile `0.2.0` are not claimed as
 deployed at the canonical host in this milestone. Runtime validation resolves
 the checked local package resources and does not depend on network schema
