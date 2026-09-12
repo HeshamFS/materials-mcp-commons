@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/get-input.schema.json",
+  "title": "Exact OPTIMADE record input",
+  "description": "One supported provider/database record identity and a bounded requested projection; the capability fixes the entry type.",
+  "type": "object",
+  "required": ["provider_id", "database_id", "entry_id", "response_fields", "include"],
+  "properties": {
+    "provider_id": {
+      "enum": ["mp", "nmd"]
+    },
+    "database_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,127}$",
+      "maxLength": 128
+    },
+    "entry_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "response_fields": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(?:[a-z][a-z0-9_]{0,127}|_[a-z0-9]+_[a-z0-9_]+)$",
+        "maxLength": 128
+      }
+    },
+    "include": {
+      "type": "array",
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["structures", "references"]
+      }
+    },
+    "expected_immutable_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    }
+  },
+  "additionalProperties": false
+}

@@ -5,7 +5,7 @@
   },
   "contract_version": 1,
   "distribution": "materials-mcp-commons",
-  "distribution_version": "0.1.0a12",
+  "distribution_version": "0.1.0a13",
   "profile_versions": [
     "0.1.0",
     "0.2.0"
@@ -1133,7 +1133,7 @@
       {
         "kind": "constant",
         "name": "ENGINE_REQUIREMENT",
-        "value": "materials-mcp-commons==0.1.0a12"
+        "value": "materials-mcp-commons==0.1.0a13"
       },
       {
         "kind": "constant",
@@ -8136,7 +8136,7 @@
       {
         "kind": "constant",
         "name": "__version__",
-        "value": "0.1.0a12"
+        "value": "0.1.0a13"
       },
       {
         "kind": "function",

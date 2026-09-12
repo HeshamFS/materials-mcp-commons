@@ -486,60 +486,71 @@ class EngineMCPHost:
                 request = self._next_request(registration_ref, capability_id, payload)
                 policy = None
                 authorization = None
-                if effect_tier != "R0" and self._authorization_resolver is not None:
-                    try:
-                        resolved = cast(object, self._authorization_resolver(request, target))
-                        if not isinstance(resolved, tuple):
-                            raise TypeError("authorization resolver returned invalid types")
-                        resolved_values = cast(tuple[object, ...], resolved)
-                        if len(resolved_values) != 2:
-                            raise TypeError("authorization resolver returned invalid types")
-                        policy_value, authorization_value = resolved_values
-                        if not isinstance(policy_value, PolicySnapshot) or not isinstance(
-                            authorization_value, AuthorizationReceipt
-                        ):
-                            raise TypeError("authorization resolver returned invalid types")
-                        policy, authorization = policy_value, authorization_value
-                    except PolicyError:
-                        self._observe(
-                            started,
-                            operation="execute",
-                            outcome="failure",
-                            capability_id=capability_id,
-                            effect_tier=effect_tier,
-                            error_code="authorization-denied",
-                        )
-                        return {
-                            "ok": False,
-                            "error": self._host_failure(
-                                "AUTHORIZATION_DENIED",
-                                "execute",
-                                "Create and consume a new exact authorization grant.",
-                            ),
-                        }
-                    except Exception:
-                        self._observe(
-                            started,
-                            operation="execute",
-                            outcome="failure",
-                            capability_id=capability_id,
-                            effect_tier=effect_tier,
-                            error_code="authorization-resolver-failed",
-                        )
-                        return {
-                            "ok": False,
-                            "error": self._host_failure(
-                                "AUTHORIZATION_RESOLVER_FAILED",
-                                "execute",
-                                (
-                                    "Inspect private operator diagnostics and repair the trusted "
-                                    "resolver."
+                try:
+                    target = self._lifecycle.resolve_active(
+                        capability_id,
+                        registration_ref,
+                        current_turn=request.current_turn,
+                    ).detail
+                except CommonsError:
+                    # Preserve the dispatcher's stable structured failure while ensuring
+                    # an unavailable target cannot trigger a stateful authorization resolver.
+                    outcome = await self._dispatcher.dispatch_async(request)
+                else:
+                    if effect_tier != "R0" and self._authorization_resolver is not None:
+                        try:
+                            resolved = cast(object, self._authorization_resolver(request, target))
+                            if not isinstance(resolved, tuple):
+                                raise TypeError("authorization resolver returned invalid types")
+                            resolved_values = cast(tuple[object, ...], resolved)
+                            if len(resolved_values) != 2:
+                                raise TypeError("authorization resolver returned invalid types")
+                            policy_value, authorization_value = resolved_values
+                            if not isinstance(policy_value, PolicySnapshot) or not isinstance(
+                                authorization_value, AuthorizationReceipt
+                            ):
+                                raise TypeError("authorization resolver returned invalid types")
+                            policy, authorization = policy_value, authorization_value
+                        except PolicyError:
+                            self._observe(
+                                started,
+                                operation="execute",
+                                outcome="failure",
+                                capability_id=capability_id,
+                                effect_tier=effect_tier,
+                                error_code="authorization-denied",
+                            )
+                            return {
+                                "ok": False,
+                                "error": self._host_failure(
+                                    "AUTHORIZATION_DENIED",
+                                    "execute",
+                                    "Create and consume a new exact authorization grant.",
                                 ),
-                            ),
-                        }
-                outcome = await self._dispatcher.dispatch_async(
-                    request, policy=policy, authorization=authorization
-                )
+                            }
+                        except Exception:
+                            self._observe(
+                                started,
+                                operation="execute",
+                                outcome="failure",
+                                capability_id=capability_id,
+                                effect_tier=effect_tier,
+                                error_code="authorization-resolver-failed",
+                            )
+                            return {
+                                "ok": False,
+                                "error": self._host_failure(
+                                    "AUTHORIZATION_RESOLVER_FAILED",
+                                    "execute",
+                                    (
+                                        "Inspect private operator diagnostics and repair the "
+                                        "trusted resolver."
+                                    ),
+                                ),
+                            }
+                    outcome = await self._dispatcher.dispatch_async(
+                        request, policy=policy, authorization=authorization
+                    )
             if isinstance(outcome, DispatchFailure):
                 document = outcome.to_document()
                 code = cast(str, document["code"])

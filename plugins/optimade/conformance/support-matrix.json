@@ -1,0 +1,135 @@
+{
+  "report_version": 1,
+  "observed_on": "2026-09-12",
+  "source_state": "pre-publication public working tree",
+  "engine": {
+    "distribution": "materials-mcp-commons",
+    "version": "0.1.0a13",
+    "windows_python_3_12": {
+      "result": "pass",
+      "passed": 154,
+      "branch_coverage_percent": 84
+    }
+  },
+  "integration": {
+    "distribution": "materials-mcp-optimade",
+    "version": "0.1.0a1",
+    "profile_version": "0.2.0",
+    "providers": [
+      "mp",
+      "nmd"
+    ],
+    "offline_matrix": [
+      {
+        "os": "windows-11",
+        "python": "3.11",
+        "passed": 47,
+        "skipped": 1,
+        "live_deselected": 21,
+        "result": "pass"
+      },
+      {
+        "os": "windows-11",
+        "python": "3.12",
+        "passed": 48,
+        "skipped": 0,
+        "live_deselected": 21,
+        "result": "pass"
+      },
+      {
+        "os": "windows-11",
+        "python": "3.13",
+        "passed": 47,
+        "skipped": 1,
+        "live_deselected": 21,
+        "result": "pass"
+      },
+      {
+        "os": "windows-11",
+        "python": "3.14",
+        "passed": 47,
+        "skipped": 1,
+        "live_deselected": 21,
+        "result": "pass"
+      },
+      {
+        "os": "ubuntu-24.04-wsl2",
+        "python": "3.11",
+        "passed": 47,
+        "skipped": 1,
+        "live_deselected": 21,
+        "result": "pass"
+      },
+      {
+        "os": "ubuntu-24.04-wsl2",
+        "python": "3.12",
+        "passed": 48,
+        "skipped": 0,
+        "live_deselected": 21,
+        "result": "pass"
+      },
+      {
+        "os": "ubuntu-24.04-wsl2",
+        "python": "3.13",
+        "passed": 47,
+        "skipped": 1,
+        "live_deselected": 21,
+        "result": "pass"
+      },
+      {
+        "os": "ubuntu-24.04-wsl2",
+        "python": "3.14",
+        "passed": 47,
+        "skipped": 1,
+        "live_deselected": 21,
+        "result": "pass"
+      }
+    ],
+    "live_matrix": [
+      {
+        "os": "windows-11",
+        "python": "3.12",
+        "passed": 69,
+        "skipped": 0,
+        "upstream_deprecation_warnings": 120,
+        "branch_coverage_percent": 75,
+        "result": "pass"
+      },
+      {
+        "os": "ubuntu-24.04-wsl2",
+        "python": "3.14",
+        "passed": 68,
+        "skipped": 1,
+        "skip_reason": "the dependency inventory is intentionally pinned to Python 3.12",
+        "upstream_deprecation_warnings": 120,
+        "branch_coverage_percent": 70,
+        "result": "pass"
+      }
+    ],
+    "live_authorities": [
+      "https://providers.optimade.org/v1/links",
+      "https://optimade.materialsproject.org/v1",
+      "https://nomad-lab.eu/prod/v1/optimade/v1"
+    ],
+    "live_evidence": [
+      "registry and reviewed index discovery",
+      "provider inspection and projection controls",
+      "two-provider structure and reference federation",
+      "exact Materials Project and NOMAD structure retrieval",
+      "exact Materials Project reference retrieval",
+      "immutable identity mismatch rejection",
+      "byte-identical rights-cleared NOMAD JSON export",
+      "rights-cleared NOMAD CIF export parsed by Gemmi 0.7.5",
+      "R0 and R1 execution through the engine dispatcher",
+      "R0 and R1 execution through a separate stdio MCP subprocess"
+    ],
+    "interpretation": [
+      "The offline matrix validates code and contracts without provider access.",
+      "The live rows use current real provider responses and are time-bound observations.",
+      "Generated provider responses are used only for isolated rejection tests.",
+      "Hosted GitHub Actions evidence remains pending until this source is committed and pushed.",
+      "Canonical plugin schema paths and their core profile 0.2.0 dependencies are source identifiers in this milestone, not a claim of hosted publication.",
+      "The trust ceiling is Verified; no human review or Validated claim is required or made."
+    ]
+  }
+}

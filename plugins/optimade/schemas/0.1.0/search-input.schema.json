@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-input.schema.json",
+  "title": "Bounded federated OPTIMADE search input",
+  "description": "An explicit provider subset, complete OPTIMADE 1.2 filter, bounded field projection, sorting, relationships, pagination, and total-result budget.",
+  "type": "object",
+  "required": [
+    "providers",
+    "filter",
+    "response_fields",
+    "sort",
+    "include",
+    "page_limit",
+    "max_pages_per_provider",
+    "max_results"
+  ],
+  "properties": {
+    "providers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["mp", "nmd"]
+      }
+    },
+    "filter": {
+      "type": "string",
+      "maxLength": 4096
+    },
+    "response_fields": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(?:[a-z][a-z0-9_]{0,127}|_[a-z0-9]+_[a-z0-9_]+)$",
+        "maxLength": 128
+      }
+    },
+    "sort": {
+      "type": "array",
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^-?(?:[a-z][a-z0-9_]{0,127}|_[a-z0-9]+_[a-z0-9_]+)$",
+        "maxLength": 129
+      }
+    },
+    "include": {
+      "type": "array",
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["structures", "references"]
+      }
+    },
+    "page_limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 50
+    },
+    "max_pages_per_provider": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "max_results": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "continuation": {
+      "type": "object",
+      "maxProperties": 2,
+      "properties": {
+        "mp": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,2048}$",
+          "maxLength": 2048
+        },
+        "nmd": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,2048}$",
+          "maxLength": 2048
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"providers": {"minItems": 2}},
+        "required": ["providers"]
+      },
+      "then": {"properties": {"max_results": {"minimum": 2}}}
+    }
+  ],
+  "additionalProperties": false
+}

@@ -26,7 +26,7 @@ The first release is intended to be a research-grade production alpha with a del
 - Generic effect, permission, plan, provenance, and policy enforcement
 - Production packaging, observability, recovery, and host interoperability
 
-The engine is implemented and gated before concrete plugins are selected or named. Later plugins are separately packaged and must not become dependencies or special cases in the engine core. The final plugin phase uses only real authorized systems and provenance-traceable data. Mocked scientific backends and fabricated scientific results are not accepted as implementation or release evidence.
+The engine was implemented and gated before the first concrete integration was selected. Concrete plugins are separately packaged and must not become dependencies or special cases in the engine core. The active first proof is the separate full OPTIMADE integration under [`plugins/optimade/`](plugins/optimade/); it uses only real providers and provenance-traceable data. Mocked scientific backends and fabricated scientific results are not accepted as implementation or release evidence.
 
 ## Documentation
 
@@ -48,9 +48,10 @@ The repository now contains:
 - an optional official-SDK MCP adapter with four bounded tools, trusted host-side identity/authorization injection, and real in-process/stdio protocol tests;
 - metadata-only operational events, bounded health metrics, and integrity-checked non-overwriting SQLite state snapshots/restores;
 - one registered real positive scientific record, its lossless successor migration and bounded compact projection, and an isolated generated-negative rejection corpus; and
-- an independently deployable Cloudflare Worker boundary for the canonical schema hostname.
+- an independently deployable Cloudflare Worker boundary for the canonical schema hostname; and
+- the separately packaged, exact-profile OPTIMADE integration contract, with seven bounded capabilities and no provider coupling in the engine.
 
-Start with the [runtime guide](docs/runtime.md), [production-alpha API compatibility guide](docs/api-compatibility.md), [support boundary](docs/support.md), [MCP host guide](docs/mcp-host.md), [operations runbook](docs/operations-runbook.md), [state recovery guide](docs/state-recovery.md), [threat model](docs/threat-model.md), [Scientist Kit authoring guide](docs/authoring.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Effectful dispatch is available only through the exact policy boundary; remote scheduling, network-host authentication, and concrete integrations are not implemented yet.
+Start with the [runtime guide](docs/runtime.md), [production-alpha API compatibility guide](docs/api-compatibility.md), [support boundary](docs/support.md), [MCP host guide](docs/mcp-host.md), [operations runbook](docs/operations-runbook.md), [state recovery guide](docs/state-recovery.md), [threat model](docs/threat-model.md), [Scientist Kit authoring guide](docs/authoring.md), [contract guide](docs/contracts.md), [versioning policy](docs/versioning.md), [scientific evidence policy](docs/scientific-evidence.md), and [schema-hosting guide](docs/schema-hosting.md). Effectful dispatch is available only through the exact policy boundary; remote scheduling and network-host authentication are not implemented. The OPTIMADE integration's checked [support matrix](plugins/optimade/conformance/support-matrix.json) records passing local Windows and Ubuntu offline and real-provider gates. Hosted GitHub evidence remains pending until this source is committed and pushed; no release or `Validated` claim is made.
 
 ## Author and maintainer
 

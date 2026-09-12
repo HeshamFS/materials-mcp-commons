@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-list-result.schema.json",
+  "title": "OPTIMADE provider catalog result",
+  "description": "A bounded snapshot of the official registry and reviewed executable provider resolutions.",
+  "type": "object",
+  "required": ["contract", "profile_version", "retrieved_at", "registry", "providers", "warnings"],
+  "properties": {
+    "contract": {
+      "const": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-list-result.schema.json"
+    },
+    "profile_version": {
+      "const": "0.2.0"
+    },
+    "retrieved_at": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+    },
+    "registry": {
+      "type": "object",
+      "required": [
+        "uri",
+        "api_version",
+        "response_sha256",
+        "data_returned",
+        "more_data_available"
+      ],
+      "properties": {
+        "uri": {
+          "const": "https://providers.optimade.org/v1/links"
+        },
+        "api_version": {
+          "type": "string",
+          "pattern": "^1\\.[0-9]+\\.[0-9]+$",
+          "maxLength": 32
+        },
+        "response_sha256": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+        },
+        "data_returned": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "more_data_available": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "providers": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "provider_id",
+          "name",
+          "description",
+          "registry_link_type",
+          "index_base_url",
+          "support_status",
+          "warnings"
+        ],
+        "properties": {
+          "provider_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+            "maxLength": 64
+          },
+          "database_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,127}$",
+            "maxLength": 128
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "registry_link_type": {
+            "enum": ["external", "root", "child", "providers"]
+          },
+          "index_base_url": {
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https://[^\\s]+$",
+                "maxLength": 2048
+              },
+              {"type": "null"}
+            ]
+          },
+          "api_base_url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://[^\\s]+$",
+            "maxLength": 2048
+          },
+          "homepage": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://[^\\s]+$",
+            "maxLength": 2048
+          },
+          "support_status": {
+            "enum": ["supported", "registry-only", "rejected"]
+          },
+          "index_response_sha256": {
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+          },
+          "warnings": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "support_status": {
+                  "const": "supported"
+                }
+              },
+              "required": ["support_status"]
+            },
+            "then": {
+              "required": ["database_id", "api_base_url", "index_response_sha256"]
+            }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1024
+      }
+    }
+  },
+  "additionalProperties": false
+}

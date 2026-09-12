@@ -1,0 +1,27 @@
+{
+  "engine_wheel_sha256": "fa1a82e4c783ed9f386d7a1cbff90be74539461e264ab391677881a77c4367e6",
+  "platform": "win32",
+  "plugin": {
+    "sdist_members": 65,
+    "sdist_sha256": "b7b06a969a0875157ba02bb13065cd745c49dd4b727024103fbeb98156a911ad",
+    "version": "0.1.0a1",
+    "wheel_members": 28,
+    "wheel_sha256": "dd72117c3d4c20a1b8b4e3ec48d86e9e8ba0e095cb0998ab4be353a028ab2f0c"
+  },
+  "python": "3.12",
+  "report_version": 1,
+  "result": "pass",
+  "steps": [
+    "two-byte-identical-builds",
+    "safe-wheel-and-sdist-members",
+    "clean-default-install",
+    "default-install-excludes-mcp",
+    "dependency-check",
+    "uninstall-preserves-engine",
+    "clean-host-extra-install",
+    "host-entry-point-help",
+    "dependency-check",
+    "uninstall-and-import-absence"
+  ],
+  "uv": "0.9.18"
+}

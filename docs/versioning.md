@@ -4,7 +4,7 @@ Materials MCP Commons versions the engine distribution and the Materials MCP Pro
 
 ## Engine version
 
-The Python distribution began at `0.1.0a0` under PEP 440. Engine `0.1.0a9` was the first frozen production-alpha API candidate. Independent review found open-world protocol schemas and an incomplete host-error envelope, leading to `0.1.0a10`; a second review then found that its advertised output schemas did not enforce complete and mutually exclusive success/error branches, leading to `0.1.0a11`. Adversarial review of a11 found two receipt-redemption defects at the effectful dispatch boundary. Engine `0.1.0a12` supersedes those incomplete snapshots with exact durable receipt binding and atomic at-most-once redemption. The alpha marker communicates remaining release and scope risk; it does not lower requirements for compatibility review, scientific validity, provenance, security, reproducibility, or real-system evidence.
+The Python distribution began at `0.1.0a0` under PEP 440. Engine `0.1.0a9` was the first frozen production-alpha API candidate. Independent review found open-world protocol schemas and an incomplete host-error envelope, leading to `0.1.0a10`; a second review then found incomplete discriminated outputs, leading to `0.1.0a11`. Adversarial review produced a12's exact durable receipt binding and atomic at-most-once redemption. Full-integration review then found that inactive host calls could reach a stateful authorization resolver before dispatch rejected the missing lease. Engine `0.1.0a13` supersedes a12 by moving live exact activation ahead of resolver invocation while preserving the public API shape and error registry. The alpha marker communicates remaining release and scope risk; it does not lower requirements for compatibility review, scientific validity, provenance, security, reproducibility, or real-system evidence.
 
 The exact supported Python, console, profile, and protocol surfaces are recorded in the [machine-readable API baseline](../conformance/public-api.json) and explained in the [API compatibility guide](api-compatibility.md). Engine and profile versions remain independent.
 
@@ -19,6 +19,10 @@ Authors must update the exact engine pin and regenerate API/conformance evidence
 ### Engine 0.1.0a11 to 0.1.0a12
 
 Authors must update the exact engine pin and regenerate API/conformance evidence. Effectful dispatch now atomically redeems an exact durable receipt once; caller-modified receipt fields and receipt replay fail closed. `PolicyEngine.verify_receipt` remains non-redeeming while retaining denial auditing, and the additive `redeem_receipt` method is the dispatch authorization boundary. Policy database schema 2 transactionally migrates schema-1 stores and closes previously consumed receipts because their execution history cannot be proven. Recovery can create, inspect, and restore schema-1 policy snapshots and migrates them on first open. The MCP execute success envelope now permits any JSON root under `result`; Decimal and other values that cannot preserve their validated JSON type on the MCP wire are rejected with the existing structured result-schema error.
+
+### Engine 0.1.0a12 to 0.1.0a13
+
+Authors must update the exact engine pin and regenerate API/conformance evidence. The MCP host now resolves a live exact activation at the request turn before invoking any authorization resolver. Missing, expired, or mismatched activations still return the dispatcher's stable `TARGET_UNAVAILABLE` structured error, but can no longer reserve quota or consume a grant. Authorization that has already been consumed for a live target retains a12's at-most-once and non-refund semantics. Exported names, signatures, MCP schemas, console mappings, profile support, and policy/state formats are otherwise unchanged.
 
 ## Contract version
 

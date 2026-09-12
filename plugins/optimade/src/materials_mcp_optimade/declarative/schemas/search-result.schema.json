@@ -1,0 +1,448 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-result.schema.json",
+  "title": "Bounded federated OPTIMADE search result",
+  "description": "A zero-capable, provider-grouped result with explicit partial failure, selected-field omissions, namespaced properties, pagination state, rights, citations, and response hashes.",
+  "type": "object",
+  "$defs": {
+    "boundedValue": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "boolean"},
+        {"type": "number"},
+        {"type": "string", "maxLength": 4096},
+        {
+          "type": "array",
+          "maxItems": 256,
+          "items": {"$ref": "#/$defs/boundedValue"}
+        },
+        {
+          "type": "object",
+          "maxProperties": 64,
+          "propertyNames": {"type": "string", "maxLength": 128},
+          "additionalProperties": {"$ref": "#/$defs/boundedValue"}
+        }
+      ]
+    },
+    "providerMessage": {
+      "type": "object",
+      "required": ["title", "detail"],
+      "properties": {
+        "code": {"type": "string", "minLength": 1, "maxLength": 128},
+        "http_status": {"type": "integer", "minimum": 0, "maximum": 599},
+        "title": {"type": "string", "minLength": 1, "maxLength": 512},
+        "detail": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "retryable": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "rightsRecord": {
+      "type": "object",
+      "required": [
+        "basis",
+        "identifier",
+        "terms_uri",
+        "terms_sha256",
+        "review_status",
+        "redistribution",
+        "attribution",
+        "reviewed_at",
+        "expires_at"
+      ],
+      "properties": {
+        "basis": {"enum": ["license", "public-domain", "access-only"]},
+        "identifier": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#spdxExpression"
+        },
+        "terms_uri": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+        },
+        "terms_sha256": {
+          "oneOf": [
+            {
+              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+            },
+            {"type": "null"}
+          ]
+        },
+        "review_status": {"enum": ["reviewed", "unavailable"]},
+        "redistribution": {"enum": ["permitted", "not-permitted", "unknown"]},
+        "attribution": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "reviewed_at": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+        },
+        "expires_at": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"review_status": {"const": "reviewed"}},
+            "required": ["review_status"]
+          },
+          "then": {
+            "properties": {
+              "terms_sha256": {
+                "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"review_status": {"const": "unavailable"}},
+            "required": ["review_status"]
+          },
+          "then": {
+            "properties": {
+              "basis": {"const": "access-only"},
+              "identifier": {"const": "NOASSERTION"},
+              "terms_sha256": {"type": "null"},
+              "redistribution": {"const": "unknown"}
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "contract",
+    "profile_version",
+    "entry_type",
+    "status",
+    "produced_at",
+    "query",
+    "providers",
+    "hits",
+    "total_returned",
+    "more_data_available",
+    "continuation",
+    "citations",
+    "warnings"
+  ],
+  "properties": {
+    "contract": {
+      "const": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-result.schema.json"
+    },
+    "profile_version": {"const": "0.2.0"},
+    "entry_type": {"enum": ["structures", "references"]},
+    "status": {"enum": ["complete", "partial"]},
+    "produced_at": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+    },
+    "query": {
+      "type": "object",
+      "required": [
+        "providers",
+        "filter",
+        "response_fields",
+        "sort",
+        "include",
+        "page_limit",
+        "max_pages_per_provider",
+        "max_results"
+      ],
+      "properties": {
+        "providers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {"enum": ["mp", "nmd"]}
+        },
+        "filter": {"type": "string", "maxLength": 4096},
+        "response_fields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^(?:[a-z][a-z0-9_]{0,127}|_[a-z0-9]+_[a-z0-9_]+)$",
+            "maxLength": 128
+          }
+        },
+        "sort": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^-?(?:[a-z][a-z0-9_]{0,127}|_[a-z0-9]+_[a-z0-9_]+)$",
+            "maxLength": 129
+          }
+        },
+        "include": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {"enum": ["structures", "references"]}
+        },
+        "page_limit": {"type": "integer", "minimum": 1, "maximum": 50},
+        "max_pages_per_provider": {"type": "integer", "minimum": 1, "maximum": 5},
+        "max_results": {"type": "integer", "minimum": 1, "maximum": 100}
+      },
+      "additionalProperties": false
+    },
+    "providers": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "provider_id",
+          "database_id",
+          "api_base_url",
+          "api_version",
+          "outcome",
+          "pages_returned",
+          "records_returned",
+          "data_available",
+          "more_data_available",
+          "request_uris",
+          "response_sha256",
+          "rights",
+          "citation_ref",
+          "warnings"
+        ],
+        "properties": {
+          "provider_id": {"enum": ["mp", "nmd"]},
+          "database_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{0,127}$",
+            "maxLength": 128
+          },
+          "api_base_url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://[^\\s]+$",
+            "maxLength": 2048
+          },
+          "api_version": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^1\\.[0-9]+\\.[0-9]+$",
+                "maxLength": 32
+              },
+              {"type": "null"}
+            ]
+          },
+          "implementation_name": {"type": "string", "minLength": 1, "maxLength": 512},
+          "implementation_version": {"type": "string", "minLength": 1, "maxLength": 128},
+          "outcome": {"enum": ["success", "empty", "failed"]},
+          "pages_returned": {"type": "integer", "minimum": 0, "maximum": 5},
+          "records_returned": {"type": "integer", "minimum": 0, "maximum": 100},
+          "data_available": {
+            "oneOf": [
+              {"type": "integer", "minimum": 0},
+              {"type": "null"}
+            ]
+          },
+          "more_data_available": {"type": "boolean"},
+          "request_uris": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://[^\\s]+$",
+              "maxLength": 8192
+            }
+          },
+          "response_sha256": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+            }
+          },
+          "rights": {"$ref": "#/$defs/rightsRecord"},
+          "citation_ref": {
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+          },
+          "next_cursor": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,2048}$",
+            "maxLength": 2048
+          },
+          "warnings": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {"$ref": "#/$defs/providerMessage"}
+          },
+          "failure": {"$ref": "#/$defs/providerMessage"}
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {"outcome": {"const": "failed"}},
+              "required": ["outcome"]
+            },
+            "then": {"required": ["failure"]}
+          },
+          {
+            "if": {
+              "properties": {"outcome": {"enum": ["success", "empty"]}},
+              "required": ["outcome"]
+            },
+            "then": {
+              "properties": {
+                "api_version": {
+                  "type": "string",
+                  "pattern": "^1\\.[0-9]+\\.[0-9]+$",
+                  "maxLength": 32
+                }
+              }
+            }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "hits": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "required": [
+          "identity",
+          "standard_attributes",
+          "namespaced_attributes",
+          "relationships",
+          "included",
+          "selected_field_count",
+          "returned_selected_field_count",
+          "omitted_selected_field_count",
+          "unrequested_field_count",
+          "source_uri",
+          "source_response_sha256",
+          "page_index",
+          "resource_index",
+          "retrieved_at",
+          "rights",
+          "citation_refs",
+          "warnings"
+        ],
+        "properties": {
+          "identity": {
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/record-identity.extension.schema.json"
+          },
+          "standard_attributes": {
+            "type": "object",
+            "maxProperties": 32,
+            "propertyNames": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$",
+              "maxLength": 128
+            },
+            "additionalProperties": {"$ref": "#/$defs/boundedValue"}
+          },
+          "namespaced_attributes": {
+            "type": "object",
+            "maxProperties": 32,
+            "propertyNames": {
+              "type": "string",
+              "pattern": "^_[a-z0-9]+_[a-z0-9_]+$",
+              "maxLength": 128
+            },
+            "additionalProperties": {"$ref": "#/$defs/boundedValue"}
+          },
+          "relationships": {
+            "type": "object",
+            "maxProperties": 8,
+            "propertyNames": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,127}$",
+              "maxLength": 128
+            },
+            "additionalProperties": {"$ref": "#/$defs/boundedValue"}
+          },
+          "included": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {"$ref": "#/$defs/boundedValue"}
+          },
+          "selected_field_count": {"type": "integer", "minimum": 1, "maximum": 32},
+          "returned_selected_field_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32
+          },
+          "omitted_selected_field_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32
+          },
+          "unrequested_field_count": {"type": "integer", "minimum": 0},
+          "source_uri": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://[^\\s]+$",
+            "maxLength": 8192
+          },
+          "source_response_sha256": {
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+          },
+          "page_index": {"type": "integer", "minimum": 0, "maximum": 4},
+          "resource_index": {"type": "integer", "minimum": 0, "maximum": 49},
+          "retrieved_at": {
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+          },
+          "rights": {"$ref": "#/$defs/rightsRecord"},
+          "citation_refs": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "maxItems": 16,
+            "items": {"type": "string", "minLength": 1, "maxLength": 1024}
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "total_returned": {"type": "integer", "minimum": 0, "maximum": 100},
+    "more_data_available": {"type": "boolean"},
+    "continuation": {
+      "type": "object",
+      "maxProperties": 2,
+      "properties": {
+        "mp": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,2048}$",
+          "maxLength": 2048
+        },
+        "nmd": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,2048}$",
+          "maxLength": 2048
+        }
+      },
+      "additionalProperties": false
+    },
+    "citations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/citation.schema.json"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {"type": "string", "minLength": 1, "maxLength": 1024}
+    }
+  },
+  "additionalProperties": false
+}

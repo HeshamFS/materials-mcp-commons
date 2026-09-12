@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-list-input.schema.json",
+  "title": "List OPTIMADE providers input",
+  "description": "Bounded request for the official registry plus reviewed supported-provider resolution.",
+  "type": "object",
+  "required": ["include_registry_only", "registry_entry_limit"],
+  "properties": {
+    "include_registry_only": {
+      "type": "boolean",
+      "description": "Include descriptive registry entries outside the executable provider allowlist."
+    },
+    "registry_entry_limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    }
+  },
+  "additionalProperties": false
+}

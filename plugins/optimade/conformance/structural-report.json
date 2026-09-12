@@ -1,0 +1,212 @@
+{
+  "capabilities": [
+    {
+      "capability_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/providers/list",
+      "description": "Read the official registry and resolve only reviewed supported provider index entries without querying registry-only databases.",
+      "effect": {
+        "approval_required": false,
+        "category": "read-only",
+        "description": "Performs bounded HTTPS reads of the official registry and reviewed provider index endpoints without persistence.",
+        "plan_required": false,
+        "strong_confirmation_required": false,
+        "tier": "R0"
+      },
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "input_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-list-input.schema.json",
+      "result_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-list-result.schema.json",
+      "supports_async": false,
+      "title": "List OPTIMADE providers"
+    },
+    {
+      "capability_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/providers/inspect",
+      "description": "Inspect versions, base info, structures/references entry info, implementation metadata, limits, and current rights state for one supported provider.",
+      "effect": {
+        "approval_required": false,
+        "category": "read-only",
+        "description": "Performs bounded HTTPS metadata reads from one fixed reviewed provider without persistence.",
+        "plan_required": false,
+        "strong_confirmation_required": false,
+        "tier": "R0"
+      },
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "input_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-inspect-input.schema.json",
+      "result_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-inspect-result.schema.json",
+      "supports_async": false,
+      "title": "Inspect an OPTIMADE provider"
+    },
+    {
+      "capability_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/structures/search",
+      "description": "Run one validated OPTIMADE 1.2 filter across an explicit supported-provider subset with bounded fields, pages, results, and honest partial failure.",
+      "effect": {
+        "approval_required": false,
+        "category": "read-only",
+        "description": "Performs bounded concurrent HTTPS reads from explicitly selected supported providers without persistence.",
+        "plan_required": false,
+        "strong_confirmation_required": false,
+        "tier": "R0"
+      },
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "input_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-input.schema.json",
+      "result_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-result.schema.json",
+      "supports_async": false,
+      "title": "Search OPTIMADE structures"
+    },
+    {
+      "capability_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/structures/get",
+      "description": "Retrieve exactly one structure by reviewed provider, database, and entry identity and map it to one provenance-complete core ResultBundle.",
+      "effect": {
+        "approval_required": false,
+        "category": "read-only",
+        "description": "Performs one bounded HTTPS record read from one fixed reviewed provider without persistence.",
+        "plan_required": false,
+        "strong_confirmation_required": false,
+        "tier": "R0"
+      },
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "input_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/get-input.schema.json",
+      "result_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/result-bundle.schema.json",
+      "supports_async": false,
+      "title": "Get one OPTIMADE structure"
+    },
+    {
+      "capability_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/references/search",
+      "description": "Run one validated OPTIMADE 1.2 filter over references across an explicit supported-provider subset with bounded projection and partial-failure reporting.",
+      "effect": {
+        "approval_required": false,
+        "category": "read-only",
+        "description": "Performs bounded concurrent HTTPS reads from explicitly selected supported providers without persistence.",
+        "plan_required": false,
+        "strong_confirmation_required": false,
+        "tier": "R0"
+      },
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "input_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-input.schema.json",
+      "result_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-result.schema.json",
+      "supports_async": false,
+      "title": "Search OPTIMADE references"
+    },
+    {
+      "capability_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/references/get",
+      "description": "Retrieve exactly one reference by reviewed provider, database, and entry identity and map it to one provenance-complete core ResultBundle.",
+      "effect": {
+        "approval_required": false,
+        "category": "read-only",
+        "description": "Performs one bounded HTTPS record read from one fixed reviewed provider without persistence.",
+        "plan_required": false,
+        "strong_confirmation_required": false,
+        "tier": "R0"
+      },
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "input_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/get-input.schema.json",
+      "result_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/result-bundle.schema.json",
+      "supports_async": false,
+      "title": "Get one OPTIMADE reference"
+    },
+    {
+      "capability_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/records/export",
+      "description": "Persist one freshly retrieved exact record as checksummed native JSON or a supported scientific export only when current provider rights allow it.",
+      "effect": {
+        "approval_required": false,
+        "category": "bounded-local",
+        "description": "Writes one bounded artifact beneath an engine-authorized local path after an independent current-rights check.",
+        "plan_required": false,
+        "strong_confirmation_required": false,
+        "tier": "R1"
+      },
+      "error_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/structured-error.schema.json",
+      "input_schema": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/export-input.schema.json",
+      "result_schema": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/artifact.schema.json",
+      "supports_async": false,
+      "title": "Export one OPTIMADE record"
+    }
+  ],
+  "checks": [
+    "strict-contained-manifest",
+    "exact-profile-contract",
+    "schema-byte-integrity",
+    "offline-reference-resolution",
+    "capability-schema-role-binding",
+    "registered-extension-validation",
+    "deterministic-registration-identity"
+  ],
+  "limitations": [
+    "No plugin implementation code or backend was loaded or executed.",
+    "This report does not establish security, interoperability, or scientific validity."
+  ],
+  "plugin": {
+    "description": "Bounded, rights-aware OPTIMADE 1.2 federation over reviewed live materials databases with explicit provenance, partial failure, and local export effects.",
+    "license_expression": "Apache-2.0",
+    "manifest_sha256": "14750d2d1e63e038ce3105e06aacb551560cde2aca42bbe95e77288710816ce9",
+    "name": "Materials MCP OPTIMADE",
+    "plugin_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade",
+    "plugin_version": "0.1.0-alpha.1",
+    "publisher_name": "Hesham Salama",
+    "registration_ref": "urn:materials-mcp:registration:abac8076c0c16949262ed3adb0e8771c7b1a2cf24a8b04ff4aeb4bb8fa8da80c"
+  },
+  "profile_version": "0.2.0",
+  "report_version": 1,
+  "result": "pass",
+  "schema_resources": [
+    {
+      "path": "schemas/provider-list-input.schema.json",
+      "role": "input",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-list-input.schema.json",
+      "sha256": "aa6b51a10d1a4b83657236119f93c92dbdcf360104cbf71e3b7d08b769418867"
+    },
+    {
+      "path": "schemas/provider-list-result.schema.json",
+      "role": "result",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-list-result.schema.json",
+      "sha256": "b895c4d405400b0fbd3a70967d13c1c5414cab8f4732b10afa989b4b0126fd93"
+    },
+    {
+      "path": "schemas/provider-inspect-input.schema.json",
+      "role": "input",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-inspect-input.schema.json",
+      "sha256": "df2e35ffcb8fbfbb4803913e7cb17ddfee2ceed7b1ee03c8e1bef9e605d5f8fe"
+    },
+    {
+      "path": "schemas/provider-inspect-result.schema.json",
+      "role": "result",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-inspect-result.schema.json",
+      "sha256": "894db8394099d871090e176b334dca5a9a6e0563bdf4f65b123a40c09aa9c7a6"
+    },
+    {
+      "path": "schemas/search-input.schema.json",
+      "role": "input",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-input.schema.json",
+      "sha256": "039cd48988e67a78e3522c1ae0e5a2ba9be67a164e2d6586f15139fbc9b3a049"
+    },
+    {
+      "path": "schemas/search-result.schema.json",
+      "role": "result",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-result.schema.json",
+      "sha256": "ebefc42da102f7c600d32cd63f030514294bcecd4faea7a8a8d1d9072fe610c5"
+    },
+    {
+      "path": "schemas/get-input.schema.json",
+      "role": "input",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/get-input.schema.json",
+      "sha256": "791ce8c47a985029deb9d523b272c24432fac40c884ac5134838c5c0e4c64cee"
+    },
+    {
+      "path": "schemas/export-input.schema.json",
+      "role": "input",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/export-input.schema.json",
+      "sha256": "43d6f51bfebcd597d078ce207070e64cc3c300caf5c887d98b00b42c9046dc0f"
+    },
+    {
+      "path": "schemas/record-identity.extension.schema.json",
+      "role": "extension",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/record-identity.extension.schema.json",
+      "sha256": "feb21c7b9e0ebf9a2612148539165e8eb1777e7e0b80c469a43a6346ebad254f"
+    },
+    {
+      "path": "schemas/export-provenance.extension.schema.json",
+      "role": "extension",
+      "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/export-provenance.extension.schema.json",
+      "sha256": "a67cbcf5769cf1f740c37d49632dde38e525aa679d49afcc38b0e16a9cc1d552"
+    }
+  ],
+  "scope": "exact-profile-declarative-only"
+}

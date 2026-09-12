@@ -1,0 +1,27 @@
+{
+  "engine_wheel_sha256": "ea66288bf03786e8dd47b66c761f045f78ba54438fc4ebb6057f3053a1cc20d1",
+  "platform": "linux",
+  "plugin": {
+    "sdist_members": 65,
+    "sdist_sha256": "97edb5b13e1a1849ace8420a0729569916f25835d8324510fb8402a08a2be993",
+    "version": "0.1.0a1",
+    "wheel_members": 28,
+    "wheel_sha256": "b65f4cc73ca639c7a7575435a49ce71baeb6bdf0464fc820f955b6c23e4e402d"
+  },
+  "python": "3.12",
+  "report_version": 1,
+  "result": "pass",
+  "steps": [
+    "two-byte-identical-builds",
+    "safe-wheel-and-sdist-members",
+    "clean-default-install",
+    "default-install-excludes-mcp",
+    "dependency-check",
+    "uninstall-preserves-engine",
+    "clean-host-extra-install",
+    "host-entry-point-help",
+    "dependency-check",
+    "uninstall-and-import-absence"
+  ],
+  "uv": "0.9.18"
+}

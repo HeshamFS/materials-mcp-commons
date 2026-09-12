@@ -46,4 +46,4 @@ No concrete scientific or provider plugin is part of the engine support declarat
 
 ## Evidence status
 
-The checked-in workflow and local reports are reproducibility inputs, not self-certifying claims. A release record must identify the immutable commit, successful hosted workflow run, exact host and SDK versions, artifact hashes, and qualified independent review. Until every required gate is recorded, the repository remains an unreleased alpha candidate.
+The checked-in workflow and local reports are reproducibility inputs, not self-certifying claims. A release record must identify the immutable commit, successful hosted workflow run, exact host and SDK versions, artifact hashes, and the review evidence required by the accepted milestone gate. The current gate requires no human review and no such review is claimed. Until every accepted gate is recorded, the repository remains an unreleased alpha candidate.

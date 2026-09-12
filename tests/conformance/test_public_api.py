@@ -151,7 +151,7 @@ def test_frozen_python_surface_records_awaitability() -> None:
 def test_frozen_surface_identifies_release_profiles_and_console_command() -> None:
     contract = _contract()
     assert contract["distribution"] == "materials-mcp-commons"
-    assert contract["distribution_version"] == "0.1.0a12"
+    assert contract["distribution_version"] == "0.1.0a13"
     assert contract["stability"] == "production-alpha-plugin-proof"
     assert contract["profile_versions"] == ["0.1.0", "0.2.0"]
     assert contract["console_scripts"] == {

@@ -1,6 +1,6 @@
-# External production-alpha review protocol
+# Optional independent review protocol
 
-M5 requires evidence from a qualified reviewer who did not build the candidate. Automated checks and separate AI-agent reviews are useful internal evidence, but they do not satisfy this external-human gate.
+An independent person may use this protocol to contribute supplemental engine and authoring feedback. It is not a production-alpha gate. Automated checks and explicitly labeled AI-agent critiques are different evidence types and must never be described as human review.
 
 ## Reviewer and candidate identity
 
@@ -23,4 +23,4 @@ The reviewer must work from a clean archive or public clone, not the builder's w
 
 For each step, record pass/fail, elapsed time, commands used, observed output, required assistance, ambiguity, and any security or scientific-trust concern. A pass requires no undisclosed local dependency or builder intervention. Every failure must retain its exact error, retryability, corrective next action, and whether the reviewer could recover using public documentation alone.
 
-The filled record must identify unresolved findings and the reviewer's explicit recommendation: accept M5, accept with named conditions, or reject. Acceptance does not authorize selecting or implementing a concrete plugin; that remains a separate user decision after all M5 gates pass.
+The filled record should identify unresolved findings and the reviewer's explicit recommendation. Record it as supplemental dated evidence, not as proof that automated, host, security, scientific, rights, or reproducibility checks passed. The current no-human review path is capped at `Verified`; `Validated` retains its separate domain-approval meaning.

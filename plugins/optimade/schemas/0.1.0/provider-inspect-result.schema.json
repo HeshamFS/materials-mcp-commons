@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-inspect-result.schema.json",
+  "title": "OPTIMADE provider inspection result",
+  "description": "Version negotiation, implementation metadata, bounded entry-property definitions, endpoint behavior, and expiring rights state for one supported provider.",
+  "type": "object",
+  "$defs": {
+    "boundedValue": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "boolean"},
+        {"type": "number"},
+        {"type": "string", "maxLength": 4096},
+        {
+          "type": "array",
+          "maxItems": 128,
+          "items": {"$ref": "#/$defs/boundedValue"}
+        },
+        {
+          "type": "object",
+          "maxProperties": 64,
+          "propertyNames": {"type": "string", "maxLength": 128},
+          "additionalProperties": {"$ref": "#/$defs/boundedValue"}
+        }
+      ]
+    },
+    "rightsRecord": {
+      "type": "object",
+      "required": [
+        "basis",
+        "identifier",
+        "terms_uri",
+        "terms_sha256",
+        "review_status",
+        "redistribution",
+        "attribution",
+        "reviewed_at",
+        "expires_at"
+      ],
+      "properties": {
+        "basis": {"enum": ["license", "public-domain", "access-only"]},
+        "identifier": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#spdxExpression"
+        },
+        "terms_uri": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+        },
+        "terms_sha256": {
+          "oneOf": [
+            {
+              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+            },
+            {"type": "null"}
+          ]
+        },
+        "review_status": {"enum": ["reviewed", "unavailable"]},
+        "redistribution": {"enum": ["permitted", "not-permitted", "unknown"]},
+        "attribution": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "reviewed_at": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+        },
+        "expires_at": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+        },
+        "api_license": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"review_status": {"const": "reviewed"}},
+            "required": ["review_status"]
+          },
+          "then": {
+            "properties": {
+              "terms_sha256": {
+                "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {"review_status": {"const": "unavailable"}},
+            "required": ["review_status"]
+          },
+          "then": {
+            "properties": {
+              "basis": {"const": "access-only"},
+              "identifier": {"const": "NOASSERTION"},
+              "terms_sha256": {"type": "null"},
+              "redistribution": {"const": "unknown"}
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "contract",
+    "profile_version",
+    "provider_id",
+    "database_id",
+    "index_base_url",
+    "api_base_url",
+    "retrieved_at",
+    "negotiation",
+    "implementation",
+    "entry_types",
+    "rights",
+    "warnings"
+  ],
+  "properties": {
+    "contract": {
+      "const": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-inspect-result.schema.json"
+    },
+    "profile_version": {"const": "0.2.0"},
+    "provider_id": {"enum": ["mp", "nmd"]},
+    "database_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,127}$",
+      "maxLength": 128
+    },
+    "index_base_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^\\s]+$",
+      "maxLength": 2048
+    },
+    "api_base_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^\\s]+$",
+      "maxLength": 2048
+    },
+    "retrieved_at": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+    },
+    "negotiation": {
+      "type": "object",
+      "required": [
+        "reported_api_version",
+        "selected_api_version",
+        "versions_endpoint",
+        "supported"
+      ],
+      "properties": {
+        "reported_api_version": {
+          "type": "string",
+          "pattern": "^1\\.[0-9]+\\.[0-9]+$",
+          "maxLength": 32
+        },
+        "selected_api_version": {"const": "1.2.0"},
+        "versions_endpoint": {
+          "type": "object",
+          "required": ["outcome", "http_status", "advertised_versions"],
+          "properties": {
+            "outcome": {"enum": ["success", "unsupported", "failed"]},
+            "http_status": {"type": "integer", "minimum": 0, "maximum": 599},
+            "advertised_versions": {
+              "type": "array",
+              "maxItems": 32,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^v?[0-9]+(?:\\.[0-9]+(?:\\.[0-9]+)?)?$",
+                "maxLength": 32
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "supported": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "implementation": {
+      "type": "object",
+      "required": ["name", "version", "source_url"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 512},
+        "version": {"type": "string", "minLength": 1, "maxLength": 128},
+        "source_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://[^\\s]+$",
+          "maxLength": 2048
+        }
+      },
+      "additionalProperties": false
+    },
+    "entry_types": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "entry_type",
+          "endpoint_status",
+          "property_count",
+          "returned_property_count",
+          "omitted_property_count",
+          "properties",
+          "response_sha256",
+          "warnings"
+        ],
+        "properties": {
+          "entry_type": {"enum": ["structures", "references"]},
+          "endpoint_status": {"type": "integer", "minimum": 100, "maximum": 599},
+          "property_count": {"type": "integer", "minimum": 0},
+          "returned_property_count": {"type": "integer", "minimum": 0, "maximum": 128},
+          "omitted_property_count": {"type": "integer", "minimum": 0},
+          "properties": {
+            "type": "array",
+            "maxItems": 128,
+            "items": {
+              "type": "object",
+              "required": ["name", "definition"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[a-z_][a-z0-9_]{0,127}$",
+                  "maxLength": 128
+                },
+                "definition": {"$ref": "#/$defs/boundedValue"}
+              },
+              "additionalProperties": false
+            }
+          },
+          "response_sha256": {
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+          },
+          "warnings": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {"type": "string", "minLength": 1, "maxLength": 1024}
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "rights": {"$ref": "#/$defs/rightsRecord"},
+    "warnings": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {"type": "string", "minLength": 1, "maxLength": 1024}
+    }
+  },
+  "additionalProperties": false
+}

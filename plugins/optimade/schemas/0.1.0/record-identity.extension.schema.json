@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/record-identity.extension.schema.json",
+  "title": "OPTIMADE composite record identity",
+  "description": "Frozen provider, database, endpoint, entry-type, entry, and optional immutable identity for one non-merged OPTIMADE record.",
+  "type": "object",
+  "required": [
+    "composite_ref",
+    "provider_id",
+    "database_id",
+    "base_url",
+    "entry_type",
+    "entry_id"
+  ],
+  "properties": {
+    "composite_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+    },
+    "provider_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,63}$",
+      "maxLength": 64
+    },
+    "database_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,127}$",
+      "maxLength": 128
+    },
+    "base_url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^\\s?#]+(?:/[^\\s?#]*)?/?$",
+      "maxLength": 2048
+    },
+    "entry_type": {
+      "enum": ["structures", "references"]
+    },
+    "entry_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "immutable_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    }
+  },
+  "additionalProperties": false
+}

@@ -7,6 +7,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import cast
 
+import pytest
 from mcp.client import Client
 
 from materials_mcp_commons import (
@@ -32,6 +33,65 @@ from materials_mcp_commons.lifecycle import CapabilityDetail
 
 NOW = datetime(2026, 9, 12, 9, 0, tzinfo=UTC)
 OWNER_REF = "urn:materials-mcp:owner:generated-host-authorization"
+
+
+@pytest.mark.parametrize("activation_state", ["inactive", "expired"])
+def test_generated_unavailable_effect_never_reaches_authorization_resolver(
+    activation_state: str,
+    loaded_manifest: LoadedManifest,
+    contract_registry: ContractRegistry,
+) -> None:
+    changed = replace(
+        loaded_manifest.capabilities[0],
+        effect=Effect(
+            "R1",
+            "bounded-local",
+            "Generated effect used only to verify pre-authorization activation.",
+            False,
+            False,
+            False,
+        ),
+    )
+    manifest = replace(
+        loaded_manifest,
+        capabilities=(changed, *loaded_manifest.capabilities[1:]),
+    )
+    lifecycle = LifecycleRegistry()
+    registration = lifecycle.register(manifest)
+    if activation_state == "expired":
+        lifecycle.activate(DISCOVER_CAPABILITY_ID, current_turn=0, lease_turns=1)
+    dispatcher = Dispatcher(lifecycle, contract_registry)
+    resolver_calls = 0
+    handler_calls = 0
+
+    def handler(_: HandlerRequest) -> object:
+        nonlocal handler_calls
+        handler_calls += 1
+        return {"cards": []}
+
+    def resolver(
+        request: DispatchRequest, target: CapabilityDetail
+    ) -> tuple[PolicySnapshot, AuthorizationReceipt]:
+        del request, target
+        nonlocal resolver_calls
+        resolver_calls += 1
+        raise AssertionError("inactive target reached authorization")
+
+    dispatcher.bind(registration.registration_ref, DISCOVER_CAPABILITY_ID, handler)
+    host = EngineMCPHost(
+        lifecycle,
+        dispatcher,
+        owner_ref=OWNER_REF,
+        authorization_resolver=resolver,
+        clock=lambda: NOW,
+        request_ref_factory=lambda: f"urn:materials-mcp:request:generated-host-{activation_state}",
+    )
+
+    result = asyncio.run(host.execute(registration.registration_ref, DISCOVER_CAPABILITY_ID, {}))
+    error = cast(dict[str, object], result.get("error"))
+    assert error["code"] == "TARGET_UNAVAILABLE"
+    assert resolver_calls == 0
+    assert handler_calls == 0
 
 
 def test_generated_host_authorization_success_replay_and_resolver_failure_are_contained(
@@ -178,6 +238,7 @@ def test_generated_host_authorization_success_replay_and_resolver_failure_are_co
             dispatcher,
             owner_ref=OWNER_REF,
             authorization_resolver=broken_resolver,
+            initial_turn=2,
             clock=lambda: NOW,
             request_ref_factory=lambda: "urn:materials-mcp:request:generated-host-broken",
         )
@@ -200,6 +261,7 @@ def test_generated_host_authorization_success_replay_and_resolver_failure_are_co
             dispatcher,
             owner_ref=OWNER_REF,
             authorization_resolver=denied_resolver,
+            initial_turn=3,
             clock=lambda: NOW,
             request_ref_factory=lambda: "urn:materials-mcp:request:generated-host-denied",
         )

@@ -27,7 +27,7 @@
         "license": "Apache-2.0",
         "name": "materials-mcp-commons",
         "relationship": "root",
-        "version": "0.1.0a12"
+        "version": "0.1.0a13"
       },
       {
         "license": "MIT",
@@ -125,7 +125,7 @@
         "license": "Apache-2.0",
         "name": "materials-mcp-commons",
         "relationship": "root",
-        "version": "0.1.0a12"
+        "version": "0.1.0a13"
       },
       {
         "license": "MIT",
@@ -226,5 +226,5 @@
     ]
   },
   "source": "installed distribution metadata resolved by the checked-in uv lock",
-  "uv_lock_sha256": "36305f5d8f59d90f7ec747de7b4e40bb82e0496ecc33a958314b522613d5b9fa"
+  "uv_lock_sha256": "80d4d266844d5db62c00cefd89386399a9552e4c7a07755a858a9f84285ad1b2"
 }

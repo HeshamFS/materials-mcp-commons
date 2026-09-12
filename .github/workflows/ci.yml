@@ -1,8 +1,11 @@
-name: Engine checks
+name: Engine and integration checks
 
 on:
   push:
   pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
 
 permissions:
   contents: read
@@ -105,3 +108,138 @@ jobs:
         run: uv export --locked --no-dev --extra mcp-host --no-emit-project --output-file audit-requirements.txt
       - name: Audit the exact production host graph
         run: uvx --from pip-audit==2.9.0 pip-audit --requirement audit-requirements.txt
+
+  optimade-python-matrix:
+    name: OPTIMADE / ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+    defaults:
+      run:
+        working-directory: plugins/optimade
+    steps:
+      - name: Check out public repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.9.18"
+          enable-cache: true
+      - name: Sync exact plugin environment
+        run: uv sync --locked --all-groups --all-extras --python ${{ matrix.python }}
+      - name: Run offline integration suite
+        run: uv run --locked --python ${{ matrix.python }} pytest --no-cov -m "not live"
+
+  optimade-static-and-contracts:
+    name: OPTIMADE static and contract checks
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: plugins/optimade
+    steps:
+      - name: Check out public repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Install pinned uv and Python
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.9.18"
+          python-version: "3.12"
+          enable-cache: true
+      - name: Sync exact plugin environment
+        run: uv sync --locked --all-groups --all-extras
+      - name: Check lock, formatting, lint, and types
+        run: |
+          uv lock --check
+          uv run ruff format --check src tests tools
+          uv run ruff check src tests tools
+          uv run pyright src tests tools
+      - name: Run suite with branch coverage
+        run: uv run pytest -m "not live"
+      - name: Regenerate deterministic structural evidence
+        run: |
+          uv run python -m tools.build_conformance report --output conformance/structural-report.json
+          uv run python -m tools.build_conformance reference --output conformance/capabilities.md
+          git diff --exit-code -- conformance/structural-report.json conformance/capabilities.md
+
+  optimade-release-lifecycle:
+    name: OPTIMADE release lifecycle / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: windows
+    defaults:
+      run:
+        working-directory: plugins/optimade
+    steps:
+      - name: Check out complete public history
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+      - name: Install pinned uv and Python
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.9.18"
+          python-version: "3.12"
+          enable-cache: true
+      - name: Sync exact release-verification environment
+        run: uv sync --locked --all-groups --all-extras
+      - name: Regenerate platform release evidence
+        run: |
+          uv run python -m tools.build_dependency_inventory --output conformance/dependency-inventory-${{ matrix.platform }}-py312.json
+          uv run python -m tools.verify_install_lifecycle --output conformance/install-lifecycle-${{ matrix.platform }}-py312.json
+          git diff --exit-code -- conformance/dependency-inventory-${{ matrix.platform }}-py312.json conformance/install-lifecycle-${{ matrix.platform }}-py312.json
+
+  optimade-vulnerability-audit:
+    name: OPTIMADE locked host vulnerability audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: plugins/optimade
+    steps:
+      - name: Check out public repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.9.18"
+          enable-cache: true
+      - name: Export exact locked host graph
+        run: uv export --locked --no-dev --extra mcp-host --no-emit-project --no-emit-local --output-file audit-requirements.txt
+      - name: Audit exact locked host graph
+        run: uvx --from pip-audit==2.9.0 pip-audit --requirement audit-requirements.txt
+
+  optimade-live-providers:
+    name: OPTIMADE scheduled live-provider evidence
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: plugins/optimade
+    env:
+      MATERIALS_MCP_LIVE: "1"
+    steps:
+      - name: Check out public repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Install pinned uv and Python
+        uses: astral-sh/setup-uv@94527f2e458b27549849d47d273a16bec83a01e9 # v7
+        with:
+          version: "0.9.18"
+          python-version: "3.14"
+          enable-cache: true
+      - name: Sync exact plugin environment
+        run: uv sync --locked --all-groups --all-extras --python 3.14
+      - name: Exercise fixed real providers and stdio host
+        run: uv run --locked --python 3.14 pytest --no-cov -m live

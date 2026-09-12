@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/export-provenance.extension.schema.json",
+  "title": "OPTIMADE export provenance extension",
+  "description": "Complete source, rights, transformation, and request evidence for one rights-gated local export.",
+  "type": "object",
+  "required": [
+    "request_ref",
+    "provider_id",
+    "database_id",
+    "entry_type",
+    "entry_id",
+    "format",
+    "destination",
+    "requested_at",
+    "retrieved_at",
+    "exported_at",
+    "source",
+    "rights",
+    "transformation",
+    "citation_refs"
+  ],
+  "properties": {
+    "request_ref": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+    },
+    "provider_id": {"enum": ["mp", "nmd"]},
+    "database_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,127}$",
+      "maxLength": 128
+    },
+    "entry_type": {"enum": ["structures", "references"]},
+    "entry_id": {"type": "string", "minLength": 1, "maxLength": 512},
+    "format": {"enum": ["optimade-json", "cif"]},
+    "destination": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$",
+      "maxLength": 512
+    },
+    "requested_at": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+    },
+    "retrieved_at": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+    },
+    "exported_at": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+    },
+    "source": {
+      "type": "object",
+      "required": ["uri", "media_type", "size_bytes", "sha256", "api_version", "projection"],
+      "properties": {
+        "uri": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+        },
+        "media_type": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#mediaType"
+        },
+        "size_bytes": {"type": "integer", "minimum": 1, "maximum": 4194304},
+        "sha256": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+        },
+        "api_version": {
+          "type": "string",
+          "pattern": "^1\\.2\\.(?:0|[1-9][0-9]*)$",
+          "maxLength": 32
+        },
+        "projection": {
+          "oneOf": [
+            {"const": "complete"},
+            {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 16,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "pattern": "^(?:[a-z][a-z0-9_]{0,127}|_[a-z0-9]+_[a-z0-9_]+)$",
+                "maxLength": 128
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "rights": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-inspect-result.schema.json#/$defs/rightsRecord"
+    },
+    "transformation": {
+      "type": "object",
+      "required": ["operation", "implementation", "version", "notes"],
+      "properties": {
+        "operation": {"enum": ["byte-copy", "optimade-cartesian-to-cif"]},
+        "implementation": {"const": "materials-mcp-optimade"},
+        "version": {"const": "1"},
+        "notes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {"type": "string", "minLength": 1, "maxLength": 1024}
+        }
+      },
+      "additionalProperties": false
+    },
+    "citation_refs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
+      }
+    }
+  },
+  "additionalProperties": false
+}

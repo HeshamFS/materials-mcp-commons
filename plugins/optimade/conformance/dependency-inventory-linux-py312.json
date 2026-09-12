@@ -1,0 +1,154 @@
+{
+  "inventory_version": 1,
+  "machine": "x86_64",
+  "packages": [
+    {
+      "license": "MIT",
+      "name": "annotated-types",
+      "relationship": "transitive",
+      "version": "0.8.0"
+    },
+    {
+      "license": "MIT",
+      "name": "attrs",
+      "relationship": "transitive",
+      "version": "26.1.0"
+    },
+    {
+      "license": "MPL-2.0",
+      "name": "certifi",
+      "relationship": "transitive",
+      "version": "2026.7.22"
+    },
+    {
+      "license": "MIT",
+      "name": "charset-normalizer",
+      "relationship": "transitive",
+      "version": "3.5.1"
+    },
+    {
+      "license": "ISC",
+      "name": "dnspython",
+      "relationship": "transitive",
+      "version": "2.8.0"
+    },
+    {
+      "license": "Unlicense",
+      "name": "email-validator",
+      "relationship": "transitive",
+      "version": "2.3.0"
+    },
+    {
+      "license": "BSD-3-Clause",
+      "name": "idna",
+      "relationship": "transitive",
+      "version": "3.19"
+    },
+    {
+      "license": "MIT",
+      "name": "jsonschema",
+      "relationship": "transitive",
+      "version": "4.26.0"
+    },
+    {
+      "license": "MIT",
+      "name": "jsonschema-specifications",
+      "relationship": "transitive",
+      "version": "2025.9.1"
+    },
+    {
+      "license": "MIT",
+      "name": "lark",
+      "relationship": "transitive",
+      "version": "1.3.1"
+    },
+    {
+      "license": "Apache-2.0",
+      "name": "materials-mcp-commons",
+      "relationship": "direct",
+      "version": "0.1.0a13"
+    },
+    {
+      "license": "Apache-2.0",
+      "name": "materials-mcp-optimade",
+      "relationship": "root",
+      "version": "0.1.0a1"
+    },
+    {
+      "license": "MIT",
+      "name": "optimade",
+      "relationship": "direct",
+      "version": "1.5.0"
+    },
+    {
+      "license": "MIT",
+      "name": "pydantic",
+      "relationship": "transitive",
+      "version": "2.13.5"
+    },
+    {
+      "license": "MIT",
+      "name": "pydantic-core",
+      "relationship": "transitive",
+      "version": "2.46.5"
+    },
+    {
+      "license": "MIT",
+      "name": "pydantic-settings",
+      "relationship": "transitive",
+      "version": "2.15.0"
+    },
+    {
+      "license": "BSD-3-Clause",
+      "name": "python-dotenv",
+      "relationship": "transitive",
+      "version": "1.2.3"
+    },
+    {
+      "license": "MIT",
+      "name": "pyyaml",
+      "relationship": "transitive",
+      "version": "6.0.3"
+    },
+    {
+      "license": "MIT",
+      "name": "referencing",
+      "relationship": "transitive",
+      "version": "0.37.0"
+    },
+    {
+      "license": "Apache-2.0",
+      "name": "requests",
+      "relationship": "transitive",
+      "version": "2.34.2"
+    },
+    {
+      "license": "MIT",
+      "name": "rpds-py",
+      "relationship": "transitive",
+      "version": "2026.6.3"
+    },
+    {
+      "license": "PSF-2.0",
+      "name": "typing-extensions",
+      "relationship": "transitive",
+      "version": "4.16.0"
+    },
+    {
+      "license": "MIT",
+      "name": "typing-inspection",
+      "relationship": "transitive",
+      "version": "0.4.4"
+    },
+    {
+      "license": "MIT",
+      "name": "urllib3",
+      "relationship": "transitive",
+      "version": "2.7.0"
+    }
+  ],
+  "platform": "linux",
+  "python": "3.12",
+  "source": "installed distribution metadata resolved by the checked-in uv lock",
+  "uv_lock_sha256": "9e04a44f9d4d773b80f86aa1dae2ac3233460b1cb674a9785a02d7fc19056e18"
+}

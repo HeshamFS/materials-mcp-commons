@@ -494,7 +494,7 @@ wheels = [
 
 [[package]]
 name = "materials-mcp-commons"
-version = "0.1.0a12"
+version = "0.1.0a13"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },

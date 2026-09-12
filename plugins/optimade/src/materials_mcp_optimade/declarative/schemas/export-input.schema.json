@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/export-input.schema.json",
+  "title": "Rights-gated OPTIMADE record export input",
+  "description": "One exact supported record, export representation, safe relative destination, and optional response precondition for bounded R1 persistence.",
+  "type": "object",
+  "required": [
+    "provider_id",
+    "database_id",
+    "entry_type",
+    "entry_id",
+    "format",
+    "destination",
+    "overwrite"
+  ],
+  "properties": {
+    "provider_id": {
+      "enum": ["mp", "nmd"]
+    },
+    "database_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,127}$",
+      "maxLength": 128
+    },
+    "entry_type": {
+      "enum": ["structures", "references"]
+    },
+    "entry_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "format": {
+      "enum": ["optimade-json", "cif"]
+    },
+    "destination": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\)[A-Za-z0-9._-]+(?:/[A-Za-z0-9._-]+)*$",
+      "maxLength": 512
+    },
+    "overwrite": {
+      "const": false
+    },
+    "expected_response_sha256": {
+      "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "format": {
+            "const": "cif"
+          }
+        },
+        "required": ["format"]
+      },
+      "then": {
+        "properties": {
+          "entry_type": {
+            "const": "structures"
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}
