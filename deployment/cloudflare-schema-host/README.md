@@ -44,4 +44,10 @@ delimiters and traversal, and the unaffected apex site. Adding a source
 directory does not publish it; each new exact version needs its own clean
 deployment and live-parity evidence.
 
+Capture the apex body digest immediately before deployment, then run the
+checked live verifier afterward with the full deployment commit and captured
+digest. Invoke `node verify-live.mjs` directly so argument forwarding is
+identical across npm shell configurations. The accepted invocation shapes are documented in
+[`../../docs/schema-hosting.md`](../../docs/schema-hosting.md).
+
 Wrangler is pinned in `package-lock.json`; update it deliberately and repeat local plus live verification before deployment.

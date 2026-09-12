@@ -83,7 +83,9 @@ Cloudflare normalizes percent-encoding of RFC 3986 unreserved characters before 
 Deployment requires the domain owner's authenticated Cloudflare account:
 
 ```console
+node verify-live.mjs --capture-apex --output <internal-before-report.json>
 npm run deploy
+node verify-live.mjs --commit <full-public-commit> --apex-sha256 <captured-digest> --output <internal-live-report.json>
 ```
 
 After deployment:

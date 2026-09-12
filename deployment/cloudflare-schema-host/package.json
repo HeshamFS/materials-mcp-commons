@@ -9,6 +9,7 @@
   "scripts": {
     "prepare-assets": "node prepare-assets.mjs",
     "test": "node --test test/*.test.mjs",
+    "verify-live": "node verify-live.mjs",
     "precheck": "npm run test",
     "check": "npm run prepare-assets",
     "postcheck": "wrangler deploy --dry-run --outdir ../../.worker-dist",
