@@ -3,7 +3,7 @@
   "platform": "win32",
   "plugin": {
     "sdist_members": 65,
-    "sdist_sha256": "b7b06a969a0875157ba02bb13065cd745c49dd4b727024103fbeb98156a911ad",
+    "sdist_sha256": "323f3a1c0b926c00bea5432793d2d7960155b188c71e304b488bae5248a49076",
     "version": "0.1.0a1",
     "wheel_members": 28,
     "wheel_sha256": "dd72117c3d4c20a1b8b4e3ec48d86e9e8ba0e095cb0998ab4be353a028ab2f0c"

@@ -7,6 +7,11 @@ committed at
 Its generator traverses only production requirements, fails when a dependency
 is absent, and fails when it cannot derive a bounded license expression.
 
+Release lifecycle evidence builds the engine and integration only from a safe
+`git archive HEAD` extraction. This keeps line endings, package members, and
+artifact hashes tied to the committed public source instead of an ambient
+working-tree representation.
+
 The direct runtime boundary is deliberately small:
 
 - `materials-mcp-commons==0.1.0a13` under Apache-2.0; and

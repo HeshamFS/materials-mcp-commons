@@ -64,6 +64,32 @@ def _safe_member(name: str) -> None:
         raise InstallLifecycleError("Artifact contains internal or transient material")
 
 
+def _extract_git_archive(reference: str, destination: Path) -> None:
+    archive = destination.parent / "public-source.tar"
+    with archive.open("wb") as handle:
+        completed = subprocess.run(
+            ["git", "archive", "--format=tar", reference],
+            cwd=PUBLIC_ROOT,
+            check=False,
+            stdout=handle,
+            stderr=subprocess.PIPE,
+        )
+    if completed.returncode:
+        raise InstallLifecycleError(completed.stderr.decode("utf-8", errors="replace").strip())
+
+    destination.mkdir()
+    resolved = destination.resolve()
+    with tarfile.open(archive) as package:
+        for member in package.getmembers():
+            _safe_member(member.name)
+            target = (destination / member.name).resolve()
+            if resolved not in target.parents and target != resolved:
+                raise InstallLifecycleError("Git archive contains an unsafe path")
+            if member.issym() or member.islnk():
+                raise InstallLifecycleError("Git archive contains an unsupported link")
+        package.extractall(destination, filter="data")
+
+
 def _inspect_artifacts(wheel: Path, sdist: Path) -> tuple[int, int]:
     with zipfile.ZipFile(wheel) as archive:
         wheel_names = archive.namelist()
@@ -134,9 +160,12 @@ def verify_install_lifecycle(uv: str) -> dict[str, object]:
         raise InstallLifecycleError(f"Expected uv {UV_VERSION}, found {actual_uv}")
     with tempfile.TemporaryDirectory(prefix="materials-mcp-optimade-lifecycle-") as raw:
         work = Path(raw)
-        engine_wheel, _ = _build(PUBLIC_ROOT, work / "engine-dist", uv)
-        first_wheel, first_sdist = _build(PLUGIN_ROOT, work / "plugin-dist-first", uv)
-        second_wheel, second_sdist = _build(PLUGIN_ROOT, work / "plugin-dist-second", uv)
+        public_source = work / "public-source"
+        _extract_git_archive("HEAD", public_source)
+        plugin_source = public_source / "plugins" / "optimade"
+        engine_wheel, _ = _build(public_source, work / "engine-dist", uv)
+        first_wheel, first_sdist = _build(plugin_source, work / "plugin-dist-first", uv)
+        second_wheel, second_sdist = _build(plugin_source, work / "plugin-dist-second", uv)
         if (_sha256(first_wheel), _sha256(first_sdist)) != (
             _sha256(second_wheel),
             _sha256(second_sdist),
