@@ -8,7 +8,7 @@ from __future__ import annotations
 import http.client
 import socket
 import time
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from typing import Any, ClassVar, cast
 
 import pytest
@@ -144,7 +144,9 @@ def test_dns_resolution_requests_ipv4_only(monkeypatch: pytest.MonkeyPatch) -> N
 class _NegativeStatusConnection:
     statuses: ClassVar[list[int]] = []
     requests: ClassVar[list[tuple[str, str]]] = []
+    getresponse_calls: ClassVar[int] = 0
     request_delay: ClassVar[float] = 0.0
+    request_clock: ClassVar[Callable[[float], None] | None] = None
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         del args, kwargs
@@ -153,9 +155,15 @@ class _NegativeStatusConnection:
     def request(self, method: str, target: str, *, headers: Mapping[str, str]) -> None:
         del headers
         self.requests.append((method, target))
-        time.sleep(self.request_delay)
+        # Class access keeps an injected function unbound; instance access would bind `self`.
+        request_clock = type(self).request_clock
+        if request_clock is None:
+            time.sleep(self.request_delay)
+        else:
+            request_clock(self.request_delay)
 
     def getresponse(self) -> http.client.HTTPResponse:
+        type(self).getresponse_calls += 1
         status = self.statuses.pop(0)
         response = _NegativeResponse(
             status=status,
@@ -177,7 +185,9 @@ def _negative_status_transport(
 ) -> BoundedHttpsTransport:
     _NegativeStatusConnection.statuses = list(statuses)
     _NegativeStatusConnection.requests = []
+    _NegativeStatusConnection.getresponse_calls = 0
     _NegativeStatusConnection.request_delay = 0.0
+    _NegativeStatusConnection.request_clock = None
 
     def approved_dns(endpoint: TrustedEndpoint, *, timeout: float) -> tuple[str, ...]:
         del endpoint, timeout
@@ -223,6 +233,15 @@ def test_retryable_status_uses_exactly_the_configured_attempt_bound(
 def test_request_header_phase_cannot_escape_the_total_deadline(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    clock = [0.0]
+
+    def monotonic() -> float:
+        return clock[0]
+
+    def advance(seconds: float) -> None:
+        clock[0] += seconds
+
+    monkeypatch.setattr(transport_module.time, "monotonic", monotonic)
     transport = _negative_status_transport(
         monkeypatch,
         [200],
@@ -230,9 +249,42 @@ def test_request_header_phase_cannot_escape_the_total_deadline(
         read_timeout=0.01,
         total_timeout=0.02,
     )
-    _NegativeStatusConnection.request_delay = 0.03
+    monkeypatch.setattr(_NegativeStatusConnection, "request_delay", 0.02)
+    monkeypatch.setattr(_NegativeStatusConnection, "request_clock", advance)
 
     with pytest.raises(TransportError) as captured:
         transport.get(TrustedEndpoint.from_url("https://providers.optimade.org"), "/v1/links")
     assert captured.value.code == "request-timeout"
     assert _NegativeStatusConnection.requests == [("GET", "/v1/links")]
+    assert _NegativeStatusConnection.getresponse_calls == 0
+
+
+def test_request_header_phase_inside_the_total_deadline_reaches_response(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    clock = [0.0]
+
+    def monotonic() -> float:
+        return clock[0]
+
+    def advance(seconds: float) -> None:
+        clock[0] += seconds
+
+    monkeypatch.setattr(transport_module.time, "monotonic", monotonic)
+    transport = _negative_status_transport(
+        monkeypatch,
+        [200],
+        connect_timeout=0.01,
+        read_timeout=0.01,
+        total_timeout=0.02,
+    )
+    monkeypatch.setattr(_NegativeStatusConnection, "request_delay", 0.019)
+    monkeypatch.setattr(_NegativeStatusConnection, "request_clock", advance)
+
+    response = transport.get(
+        TrustedEndpoint.from_url("https://providers.optimade.org"), "/v1/links"
+    )
+
+    assert response.status == 200
+    assert _NegativeStatusConnection.requests == [("GET", "/v1/links")]
+    assert _NegativeStatusConnection.getresponse_calls == 1

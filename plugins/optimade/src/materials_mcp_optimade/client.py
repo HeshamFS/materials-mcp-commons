@@ -1978,6 +1978,14 @@ class OptimadeClient:
         payload: Mapping[str, object],
     ) -> dict[str, object]:
         request = _SearchRequest.from_payload(payload)
+        query_digest = request.query_digest(entry_type)
+        for provider_id, token in request.continuation.items():
+            _decode_cursor(
+                token,
+                provider_id=provider_id,
+                entry_type=entry_type,
+                query_digest=query_digest,
+            )
         encoding = _search_encoding(self._transport)
 
         def token_counter(text: str) -> int:

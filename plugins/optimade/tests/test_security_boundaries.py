@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from materials_mcp_optimade import PROVIDERS, OptimadeClient, OptimadeExporter
+from materials_mcp_optimade import client as client_module
 from materials_mcp_optimade.errors import ExportError, ProviderProtocolError, TransportError
 from materials_mcp_optimade.transport import (
     HttpResponse,
@@ -132,7 +133,14 @@ def test_runtime_source_does_not_authorize_upstream_http_clients() -> None:
         assert "import optimade.client" not in source
 
 
-def test_invalid_filter_and_continuation_fail_before_provider_execution() -> None:
+def test_invalid_filter_and_continuation_fail_before_external_retrieval(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unexpected_tokenizer_load(*args: object, **kwargs: object) -> None:
+        del args, kwargs
+        raise AssertionError("invalid input reached external tokenizer retrieval")
+
+    monkeypatch.setattr(client_module, "_search_encoding", unexpected_tokenizer_load)
     client = OptimadeClient()
     base: dict[str, object] = {
         "providers": ["mp"],
