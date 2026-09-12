@@ -1,7 +1,7 @@
 {
   "report_version": 1,
   "observed_on": "2026-09-12",
-  "source_state": "current local observations; hosted evidence for this revision pending",
+  "source_state": "local observations plus immutable hosted evidence for runtime commit 31475c41b7436f893c2845676ef04f73c7a68918 and schema deployment commit 082980ae75a1d559cf294167182dc7b3b8af6944",
   "engine": {
     "distribution": "materials-mcp-commons",
     "version": "0.1.0a13",
@@ -21,19 +21,75 @@
     ],
     "offline_matrix": [
       {
-        "os": "windows-11",
-        "python": "3.12",
+        "os": "github-actions/ubuntu-latest",
+        "python": "3.11",
         "passed": 62,
-        "skipped": 0,
+        "skipped": 1,
         "live_deselected": 29,
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718890910/job/103620960276",
         "result": "pass"
       },
       {
-        "os": "ubuntu-24.04-wsl2",
+        "os": "github-actions/ubuntu-latest",
         "python": "3.12",
-        "passed": 62,
+        "passed": 63,
         "skipped": 0,
         "live_deselected": 29,
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718890910/job/103620960260",
+        "result": "pass"
+      },
+      {
+        "os": "github-actions/ubuntu-latest",
+        "python": "3.13",
+        "passed": 62,
+        "skipped": 1,
+        "live_deselected": 29,
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718890910/job/103620960405",
+        "result": "pass"
+      },
+      {
+        "os": "github-actions/ubuntu-latest",
+        "python": "3.14",
+        "passed": 62,
+        "skipped": 1,
+        "live_deselected": 29,
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718890910/job/103620960203",
+        "result": "pass"
+      },
+      {
+        "os": "github-actions/windows-latest",
+        "python": "3.11",
+        "passed": 62,
+        "skipped": 1,
+        "live_deselected": 29,
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718890910/job/103620960312",
+        "result": "pass"
+      },
+      {
+        "os": "github-actions/windows-latest",
+        "python": "3.12",
+        "passed": 63,
+        "skipped": 0,
+        "live_deselected": 29,
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718890910/job/103620960286",
+        "result": "pass"
+      },
+      {
+        "os": "github-actions/windows-latest",
+        "python": "3.13",
+        "passed": 62,
+        "skipped": 1,
+        "live_deselected": 29,
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718890910/job/103620960139",
+        "result": "pass"
+      },
+      {
+        "os": "github-actions/windows-latest",
+        "python": "3.14",
+        "passed": 62,
+        "skipped": 1,
+        "live_deselected": 29,
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718890910/job/103620960209",
         "result": "pass"
       }
     ],
@@ -41,8 +97,9 @@
       {
         "os": "windows-11",
         "python": "3.12",
-        "passed": 91,
+        "passed": 92,
         "skipped": 0,
+        "live_selected": 29,
         "upstream_deprecation_warnings": 138,
         "branch_coverage_percent": 80,
         "result": "pass"
@@ -50,10 +107,20 @@
       {
         "os": "ubuntu-24.04-wsl2",
         "python": "3.12",
-        "passed": 91,
+        "passed": 92,
         "skipped": 0,
+        "live_selected": 29,
         "upstream_deprecation_warnings": 138,
         "branch_coverage_percent": 76,
+        "result": "pass"
+      },
+      {
+        "os": "github-actions/ubuntu-latest",
+        "python": "3.14.2",
+        "passed": 29,
+        "offline_deselected": 63,
+        "upstream_deprecation_warnings": 138,
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718906178/job/103621000560",
         "result": "pass"
       }
     ],
@@ -62,7 +129,33 @@
       "https://optimade.materialsproject.org/v1",
       "https://nomad-lab.eu/prod/v1/optimade/v1"
     ],
-    "hosted_evidence": {"status": "pending-current-revision"},
+    "hosted_evidence": {
+      "runtime_commit": "31475c41b7436f893c2845676ef04f73c7a68918",
+      "push_matrix": {
+        "status": "pass",
+        "run_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718890910"
+      },
+      "manual_live_provider_run": {
+        "status": "pass",
+        "run_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718906178",
+        "job_url": "https://github.com/HeshamFS/materials-mcp-commons/actions/runs/34718906178/job/103621000560",
+        "python": "3.14.2",
+        "passed": 29,
+        "offline_deselected": 63,
+        "upstream_deprecation_warnings": 138
+      }
+    },
+    "schema_host_evidence": {
+      "status": "pass",
+      "deployment_commit": "082980ae75a1d559cf294167182dc7b3b8af6944",
+      "worker": "materials-mcp-schema-host",
+      "worker_version_id": "0f2c2eb1-2778-4ea0-a5ba-e309bb9b322d",
+      "core_resources_verified": 37,
+      "plugin_resources_verified": 10,
+      "core_index_url": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/schema-index.json",
+      "plugin_schema_url": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-result.schema.json",
+      "apex_unchanged": true
+    },
     "live_evidence": [
       "registry and reviewed index discovery",
       "provider inspection and projection controls",
@@ -79,11 +172,12 @@
       "identified-tokenizer context-budget checks for search and exact projection"
     ],
     "interpretation": [
-      "The offline matrix validates code and contracts without provider access.",
-      "The live rows use current real provider responses and are time-bound observations.",
+      "The offline matrix is bound to the immutable runtime commit and validates code and contracts without provider access.",
+      "The local and hosted live rows use real provider responses and are time-bound observations.",
       "Generated provider responses are used only for isolated rejection tests.",
-      "Hosted push and manual live-provider evidence will be bound to an immutable current-revision commit before this evidence set is final.",
-      "Canonical plugin schema paths and their core profile 0.2.0 dependencies are source identifiers in this milestone, not a claim of hosted publication.",
+      "The hosted push matrix and manual live-provider job both pass on the same immutable runtime commit.",
+      "The canonical plugin schemas and their core profile 0.2.0 dependencies are live and byte-identical to deployment commit 082980ae75a1d559cf294167182dc7b3b8af6944.",
+      "No package registry publication or release tag is claimed.",
       "The trust ceiling is Verified; no human review or Validated claim is required or made."
     ]
   }
