@@ -7,7 +7,7 @@ This generated reference reports exact declarative structure only. It does not l
 - Profile version: `0.2.0`
 - Publisher: Hesham Salama
 - License expression: `Apache-2.0`
-- Manifest SHA-256: `14750d2d1e63e038ce3105e06aacb551560cde2aca42bbe95e77288710816ce9`
+- Manifest SHA-256: `1618b63a3f6d8ffb11b8eb26887bf15db123c1a9f72d2064372b7c466ffa9246`
 
 ## List OPTIMADE providers
 
@@ -41,7 +41,7 @@ Inspect versions, base info, structures/references entry info, implementation me
 
 ## Search OPTIMADE structures
 
-Run one validated OPTIMADE 1.2 filter across an explicit supported-provider subset with bounded fields, pages, results, and honest partial failure.
+Run one validated OPTIMADE 1.2 filter across an explicit supported-provider subset with bounded fields, pages, results, honest partial failure, exact context measurement, and continuation or exact retrieval for omitted hits.
 
 - Capability ID: `https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/structures/search`
 - Effect tier: `R0`
@@ -71,7 +71,7 @@ Retrieve exactly one structure by reviewed provider, database, and entry identit
 
 ## Search OPTIMADE references
 
-Run one validated OPTIMADE 1.2 filter over references across an explicit supported-provider subset with bounded projection and partial-failure reporting.
+Run one validated OPTIMADE 1.2 filter over references across an explicit supported-provider subset with bounded projection, partial-failure reporting, and context-safe continuation or exact retrieval for omitted hits.
 
 - Capability ID: `https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/references/search`
 - Effect tier: `R0`

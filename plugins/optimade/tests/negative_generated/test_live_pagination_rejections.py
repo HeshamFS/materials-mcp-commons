@@ -50,6 +50,15 @@ class _RepeatFirstLiveResponse(BoundedHttpsTransport):
         expected_statuses: frozenset[int] = frozenset({200}),
         max_bytes: int = DEFAULT_MAX_RESPONSE_BYTES,
     ) -> HttpResponse:
+        if endpoint.hostname == "openaipublic.blob.core.windows.net":
+            return super().get(
+                endpoint,
+                relative_path,
+                query=query,
+                accepted_content_types=accepted_content_types,
+                expected_statuses=expected_statuses,
+                max_bytes=max_bytes,
+            )
         if self._first_response is None:
             self._first_response = super().get(
                 endpoint,

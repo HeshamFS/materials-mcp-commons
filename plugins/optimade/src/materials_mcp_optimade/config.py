@@ -55,6 +55,20 @@ class RightsRecord:
             "expires_at": _wire_time(self.expires_at),
         }
 
+    def to_search_document(self) -> dict[str, object]:
+        """Return the decision-complete rights subset that fits federated search."""
+
+        return {
+            "basis": self.basis,
+            "identifier": self.identifier,
+            "terms_uri": self.terms_uri,
+            "terms_sha256": self.terms_sha256,
+            "review_status": self.review_status,
+            "redistribution": self.redistribution,
+            "reviewed_at": _wire_time(self.reviewed_at),
+            "expires_at": _wire_time(self.expires_at),
+        }
+
 
 @dataclass(frozen=True)
 class CitationRecord:

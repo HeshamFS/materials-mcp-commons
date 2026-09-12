@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-input.schema.json",
   "title": "Bounded federated OPTIMADE search input",
-  "description": "An explicit provider subset, complete OPTIMADE 1.2 filter, bounded field projection, sorting, relationships, pagination, and total-result budget.",
+  "description": "An explicit provider subset, complete OPTIMADE 1.2 filter, bounded field projection, sorting, relationships, pagination, and total-result budget. Before any provider request, its compact canonical query form must fit 500 o200k_base tokens and 3072 UTF-8 bytes. The result binds the exact query and entry type by SHA-256 instead of repeating provider-controlled query text in the inline result envelope.",
   "type": "object",
   "required": [
     "providers",

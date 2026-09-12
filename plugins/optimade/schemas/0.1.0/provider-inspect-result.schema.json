@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-inspect-result.schema.json",
   "title": "OPTIMADE provider inspection result",
-  "description": "Version negotiation, implementation metadata, bounded entry-property definitions, endpoint behavior, and expiring rights state for one supported provider.",
+  "description": "Version negotiation, implementation metadata, dispatch-bounded whole entry-property definitions with explicit omission counts, endpoint behavior, and expiring rights state for one supported provider.",
   "type": "object",
   "$defs": {
     "boundedValue": {

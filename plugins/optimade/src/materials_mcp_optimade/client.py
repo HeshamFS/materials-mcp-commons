@@ -9,13 +9,15 @@ import json
 import math
 import platform
 import re
-from collections.abc import Mapping, Sequence
+import threading
+from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from importlib.metadata import version as distribution_version
 from typing import Any, Literal, cast
 
+from materials_mcp_commons import MAX_DISPATCH_PAYLOAD_BYTES, MAX_DISPATCH_PAYLOAD_NODES
 from optimade.filterparser import LarkParser  # pyright: ignore[reportMissingTypeStubs]
 from optimade.models import (  # pyright: ignore[reportMissingTypeStubs]
     EntryInfoResponse,
@@ -27,9 +29,11 @@ from optimade.models import (  # pyright: ignore[reportMissingTypeStubs]
     StructureResponseOne,
 )
 from pydantic import ValidationError
+from tiktoken import Encoding
 
 from .config import PROVIDERS, REGISTRY_BASE_URL, REGISTRY_LINKS_URL, ProviderConfig
 from .contracts import (
+    CAPABILITY_IDS,
     OPTIMADE_BASELINE_VERSION,
     OPTIMADE_CONTRACT_LINE,
     PROFILE_VERSION,
@@ -53,6 +57,31 @@ _NAMESPACED_PROPERTY_PATTERN = re.compile(r"^_[a-z0-9]+_[a-z0-9_]+$")
 _STANDARD_PROPERTY_PATTERN = re.compile(r"^[a-z][a-z0-9_]{0,127}$")
 _TOKEN_PATTERN = re.compile(r"^[A-Za-z0-9_-]{1,2048}$")
 _IDENTITY_FIELDS = frozenset({"id", "type", "immutable_id"})
+_SEARCH_TOKENIZER_REF = "https://github.com/openai/tiktoken/tree/0.14.0#o200k_base"
+_SEARCH_TOKENIZER_VERSION = "0.14.0"
+_SEARCH_TOKENIZER_BASE_URL = "https://openaipublic.blob.core.windows.net/encodings"
+_SEARCH_TOKENIZER_SHA256 = "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d"
+_SEARCH_TOKEN_LIMIT = 1500
+_SEARCH_UTF8_BYTE_LIMIT = 8192
+_SEARCH_QUERY_TOKEN_LIMIT = 500
+_SEARCH_QUERY_UTF8_BYTE_LIMIT = 3072
+_SEARCH_PATTERN = "|".join(
+    [
+        r"[^\r\n\p{L}\p{N}]?[\p{Lu}\p{Lt}\p{Lm}\p{Lo}\p{M}]*[\p{Ll}\p{Lm}\p{Lo}\p{M}]+(?i:'s|'t|'re|'ve|'m|'ll|'d)?",
+        r"[^\r\n\p{L}\p{N}]?[\p{Lu}\p{Lt}\p{Lm}\p{Lo}\p{M}]+[\p{Ll}\p{Lm}\p{Lo}\p{M}]*(?i:'s|'t|'re|'ve|'m|'ll|'d)?",
+        r"\p{N}{1,3}",
+        r" ?[^\s\p{L}\p{N}]+[\r\n/]*",
+        r"\s*[\r\n]+",
+        r"\s+(?!\S)",
+        r"\s+",
+    ]
+)
+_PROVIDER_WARNING_LIMIT = 8
+_HIT_WARNING_LIMIT = 16
+_DISPATCH_BYTE_TARGET = 60 * 1024
+_DISPATCH_NODE_TARGET = 3_800
+_SEARCH_ENCODING_LOCK = threading.Lock()
+_search_encoding_cache: Encoding | None = None
 _DIMENSIONLESS_SCALARS = frozenset(
     {"nelements", "nsites", "nperiodic_dimensions", "space_group_it_number", "year"}
 )
@@ -71,8 +100,19 @@ def _array(value: object, name: str) -> list[object]:
     return cast(list[object], value)
 
 
-def _text(value: object, name: str, *, minimum: int = 1, maximum: int = 4096) -> str:
-    if type(value) is not str or not minimum <= len(value) <= maximum:
+def _text(
+    value: object,
+    name: str,
+    *,
+    minimum: int = 1,
+    maximum: int = 4096,
+    max_utf8_bytes: int | None = None,
+) -> str:
+    if (
+        type(value) is not str
+        or not minimum <= len(value) <= maximum
+        or (max_utf8_bytes is not None and len(value.encode("utf-8")) > max_utf8_bytes)
+    ):
         raise ProviderProtocolError("provider-shape", f"Provider {name} is invalid")
     return value
 
@@ -86,16 +126,47 @@ def _validate_model(model: object, document: dict[str, object], label: str) -> N
         ) from error
 
 
-def _provider_messages(meta: Mapping[str, object], page_index: int) -> list[dict[str, object]]:
+def _provider_warning_text(value: object, name: str, *, limit: int, missing: str) -> str:
+    if value is None or value == "":
+        return missing
+    if type(value) is not str:
+        raise ProviderProtocolError("provider-shape", f"Provider {name} is invalid")
+    text = value
+    if len(text) <= limit:
+        return text
+    digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    return f"Provider {name} omitted from inline context; sha256={digest}"
+
+
+def _provider_implementation_document(name: str, version: str) -> dict[str, str]:
+    canonical = json.dumps(
+        {"name": name, "version": version},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return {"implementation_metadata_sha256": hashlib.sha256(canonical).hexdigest()}
+
+
+def _provider_messages(
+    meta: Mapping[str, object], page_index: int
+) -> tuple[list[dict[str, object]], int]:
     raw_messages = meta.get("warnings")
     if raw_messages is None:
-        return []
+        return [], 0
     messages = _array(raw_messages, "search warnings")
     projected: list[dict[str, object]] = []
-    for raw in messages[:31]:
+    for raw in messages[: _PROVIDER_WARNING_LIMIT - 1]:
         message = _object(raw, "search warning")
-        title = _text(message.get("title"), "warning title", maximum=512)
-        detail = _text(message.get("detail"), "warning detail", maximum=2000)
+        title = _provider_warning_text(
+            message.get("title"), "warning title", limit=128, missing="Provider warning"
+        )
+        detail = _provider_warning_text(
+            message.get("detail"),
+            "warning detail",
+            limit=256,
+            missing="Provider supplied no warning detail.",
+        )
         item: dict[str, object] = {
             "title": title,
             "detail": f"Page {page_index + 1}: {detail}",
@@ -109,17 +180,128 @@ def _provider_messages(meta: Mapping[str, object], page_index: int) -> list[dict
             if 0 <= numeric_status <= 599:
                 item["http_status"] = numeric_status
         projected.append(item)
-    if len(messages) > 31:
-        projected.append(
-            {
-                "title": "Provider warnings truncated",
-                "detail": (
-                    f"Page {page_index + 1}: {len(messages) - 31} additional provider warnings "
-                    "were omitted by the 32-message bound."
-                ),
-            }
+    return projected, max(0, len(messages) - len(projected))
+
+
+def _finalize_provider_messages(
+    projected: list[dict[str, object]], omitted: int
+) -> list[dict[str, object]]:
+    if omitted <= 0:
+        return projected
+    return [
+        *projected[: _PROVIDER_WARNING_LIMIT - 1],
+        {
+            "title": "Provider warnings omitted",
+            "detail": (
+                f"{omitted} additional provider warning(s) were omitted from inline context; "
+                "their complete source pages remain bound by response_sha256."
+            ),
+        },
+    ]
+
+
+def _bounded_hit_warnings(warnings: list[str]) -> list[str]:
+    if len(warnings) <= _HIT_WARNING_LIMIT:
+        return warnings
+    retained = warnings[: _HIT_WARNING_LIMIT - 1]
+    retained.append(
+        f"{len(warnings) - len(retained)} additional projection warning(s) were omitted."
+    )
+    return retained
+
+
+def _compact_provider_warning_context(provider: dict[str, object]) -> bool:
+    warnings = cast(list[dict[str, object]], provider["warnings"])
+    if not warnings:
+        return False
+    observed = cast(int, provider["warning_records_observed"])
+    provider["warnings"] = []
+    provider["warning_records_omitted"] = observed
+    return True
+
+
+def _compact_failed_provider_context(provider: dict[str, object]) -> bool:
+    if provider["outcome"] != "failed":
+        return False
+    return provider.pop("implementation_metadata_sha256", None) is not None
+
+
+def _page_evidence_sha256(response_hashes: Sequence[str], retrieval_times: Sequence[str]) -> str:
+    if len(response_hashes) != len(retrieval_times):
+        raise ProviderProtocolError(
+            "context-measurement", "Provider page evidence arrays are not aligned"
         )
-    return projected
+    evidence = [
+        {"response_sha256": digest, "retrieved_at": retrieved_at}
+        for digest, retrieved_at in zip(response_hashes, retrieval_times, strict=True)
+    ]
+    encoded = json.dumps(evidence, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _compact_provider_page_evidence(provider: dict[str, object]) -> bool:
+    response_hashes = cast(list[str], provider["response_sha256"])
+    retrieval_times = cast(list[str], provider["retrieved_at"])
+    if not response_hashes:
+        return False
+    provider["page_evidence_commitment"] = {
+        "count": len(response_hashes),
+        "sha256": _page_evidence_sha256(response_hashes, retrieval_times),
+    }
+    provider["response_sha256"] = []
+    provider["retrieved_at"] = []
+    return True
+
+
+def _search_encoding(transport: BoundedHttpsTransport) -> Encoding:
+    global _search_encoding_cache
+    if _search_encoding_cache is not None:
+        return _search_encoding_cache
+    installed_version = distribution_version("tiktoken")
+    if installed_version != _SEARCH_TOKENIZER_VERSION:
+        raise ProviderProtocolError(
+            "context-tokenizer-mismatch",
+            "Installed tiktoken does not match the declared context tokenizer version",
+        )
+    with _SEARCH_ENCODING_LOCK:
+        if _search_encoding_cache is not None:
+            return _search_encoding_cache
+        endpoint = TrustedEndpoint.from_url(_SEARCH_TOKENIZER_BASE_URL)
+        response = transport.get(
+            endpoint,
+            "/o200k_base.tiktoken",
+            accepted_content_types=frozenset({"application/octet-stream", "text/plain"}),
+            max_bytes=4 * 1024 * 1024,
+        )
+        if response.sha256 != _SEARCH_TOKENIZER_SHA256:
+            raise ProviderProtocolError(
+                "context-tokenizer-integrity",
+                "Context tokenizer data failed its exact SHA-256 check",
+            )
+        try:
+            ranks = {
+                base64.b64decode(token): int(rank)
+                for line in response.body.splitlines()
+                for token, rank in [line.split()]
+            }
+        except (ValueError, TypeError) as error:
+            raise ProviderProtocolError(
+                "context-tokenizer-integrity",
+                "Context tokenizer data has invalid rank syntax",
+            ) from error
+        _search_encoding_cache = Encoding(
+            name="o200k_base",
+            pat_str=_SEARCH_PATTERN,
+            mergeable_ranks=ranks,
+            special_tokens={"<|endoftext|>": 199999, "<|endofprompt|>": 200018},
+        )
+        return _search_encoding_cache
+
+
+def _encoding_token_count(encoding: Encoding, text: str) -> int:
+    """Count arbitrary JSON text without treating tokenizer sentinels as control input."""
+
+    return len(encoding.encode(text, disallowed_special=()))
 
 
 def _normalized_base(value: str) -> str:
@@ -168,6 +350,156 @@ def _bounded_value(value: object, *, depth: int = 0) -> tuple[object, bool]:
     return f"Unsupported provider value of type {type(value).__name__} omitted", True
 
 
+def _json_node_count(value: object) -> int:
+    if type(value) is dict:
+        return 1 + sum(_json_node_count(item) for item in cast(dict[str, object], value).values())
+    if type(value) is list:
+        return 1 + sum(_json_node_count(item) for item in cast(list[object], value))
+    return 1
+
+
+def _dispatch_metrics(document: Mapping[str, object]) -> tuple[int, int]:
+    encoded = json.dumps(document, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    return len(encoded), _json_node_count(document)
+
+
+def _within_dispatch_target(document: Mapping[str, object]) -> bool:
+    encoded_bytes, nodes = _dispatch_metrics(document)
+    return encoded_bytes <= _DISPATCH_BYTE_TARGET and nodes <= _DISPATCH_NODE_TARGET
+
+
+def _assert_within_engine_dispatch(document: Mapping[str, object], label: str) -> None:
+    encoded_bytes, nodes = _dispatch_metrics(document)
+    if encoded_bytes > MAX_DISPATCH_PAYLOAD_BYTES or nodes > MAX_DISPATCH_PAYLOAD_NODES:
+        raise ProviderProtocolError(
+            "dispatch-budget-exceeded",
+            f"Bounded {label} result cannot fit the engine dispatch envelope",
+        )
+
+
+def _replace_prefixed_warning(warnings: list[str], prefix: str, message: str) -> None:
+    warnings[:] = [warning for warning in warnings if not warning.startswith(prefix)]
+    warnings.append(message)
+
+
+def _bounded_provider_list_result(document: dict[str, object]) -> dict[str, object]:
+    providers = cast(list[dict[str, object]], document["providers"])
+    registry = cast(dict[str, object], document["registry"])
+    warnings = cast(list[str], document["warnings"])
+    omitted = 0
+    while not _within_dispatch_target(document):
+        if not providers:
+            raise ProviderProtocolError(
+                "dispatch-budget-exceeded",
+                "Provider-list metadata cannot fit the engine dispatch envelope",
+            )
+        providers.pop()
+        omitted += 1
+        registry["data_returned"] = len(providers)
+        registry["more_data_available"] = True
+        _replace_prefixed_warning(
+            warnings,
+            "Provider-list dispatch bound omitted ",
+            (
+                f"Provider-list dispatch bound omitted {omitted} whole registry record(s); "
+                "increase registry_entry_offset by data_returned to retrieve the next window."
+            ),
+        )
+    _assert_within_engine_dispatch(document, "provider-list")
+    return document
+
+
+def _bounded_provider_inspection_result(document: dict[str, object]) -> dict[str, object]:
+    entry_types = cast(list[dict[str, object]], document["entry_types"])
+    omitted_by_type = {cast(str, item["entry_type"]): 0 for item in entry_types}
+    while not _within_dispatch_target(document):
+        candidates = [item for item in entry_types if cast(list[object], item["properties"])]
+        if not candidates:
+            raise ProviderProtocolError(
+                "dispatch-budget-exceeded",
+                "Provider-inspection metadata cannot fit the engine dispatch envelope",
+            )
+        selected = max(candidates, key=lambda item: len(cast(list[object], item["properties"])))
+        cast(list[object], selected["properties"]).pop()
+        entry_type = cast(str, selected["entry_type"])
+        omitted_by_type[entry_type] += 1
+        selected["returned_property_count"] = len(cast(list[object], selected["properties"]))
+        selected["omitted_property_count"] = cast(int, selected["omitted_property_count"]) + 1
+        _replace_prefixed_warning(
+            cast(list[str], selected["warnings"]),
+            "Engine dispatch bound omitted ",
+            (
+                f"Engine dispatch bound omitted {omitted_by_type[entry_type]} additional whole "
+                "property definition(s); lower property_limit to retrieve a bounded prefix."
+            ),
+        )
+    _assert_within_engine_dispatch(document, "provider-inspection")
+    return document
+
+
+def _bounded_result_bundle(document: dict[str, object]) -> dict[str, object]:
+    properties = cast(list[dict[str, object]], document["properties"])
+    provenance = cast(dict[str, object], document["provenance"])
+    sources = cast(list[dict[str, object]], provenance["sources"])
+    transformations = cast(list[dict[str, object]], sources[0]["transformations"])
+    warnings = cast(list[str], document["warnings"])
+    omitted = 0
+    warnings_compacted = False
+    while not _within_dispatch_target(document):
+        if not warnings_compacted and warnings:
+            warnings_compacted = True
+            bounded_warnings = [
+                warning
+                if len(warning.encode("utf-8")) <= 512
+                else (
+                    "Projection warning omitted from inline context; sha256="
+                    f"{hashlib.sha256(warning.encode('utf-8')).hexdigest()}"
+                )
+                for warning in warnings
+            ]
+            protected = [
+                warning
+                for warning in bounded_warnings
+                if warning.startswith("Applicable provider terms ")
+                or warning.startswith("The provider rights review ")
+            ]
+            retained = list(dict.fromkeys([*bounded_warnings[:2], *protected]))
+            compacted_count = len(bounded_warnings) - len(retained)
+            compacted = [*retained]
+            if compacted_count:
+                compacted.append(
+                    f"{compacted_count} additional projection warning(s) were compacted to keep "
+                    "the result inside the engine dispatch envelope."
+                )
+            if compacted != warnings:
+                warnings[:] = compacted
+                continue
+        if properties:
+            property_index = len(properties) - 1
+            properties.pop()
+            target = f"/properties/{property_index}/value"
+            transformations[:] = [
+                item for item in transformations if item.get("target_pointer") != target
+            ]
+            omitted += 1
+            document["status"] = "partial"
+            _replace_prefixed_warning(
+                warnings,
+                "Engine dispatch bound omitted ",
+                (
+                    f"Engine dispatch bound omitted {omitted} whole inline scientific "
+                    "property record(s); the checksummed source artifact retains the values."
+                ),
+            )
+            continue
+        raise ProviderProtocolError(
+            "dispatch-budget-exceeded",
+            "Exact-record metadata cannot fit the engine dispatch envelope",
+        )
+    _assert_within_engine_dispatch(document, "exact-record")
+    return document
+
+
 def _input_sequence(value: object, name: str) -> tuple[object, ...]:
     if not isinstance(value, (list, tuple)):
         raise ProviderProtocolError("input-shape", f"Input {name} must be an array")
@@ -204,6 +536,20 @@ class _SearchRequest:
 
     @classmethod
     def from_payload(cls, payload: Mapping[str, object]) -> _SearchRequest:
+        required_keys = {
+            "providers",
+            "filter",
+            "response_fields",
+            "sort",
+            "include",
+            "page_limit",
+            "max_pages_per_provider",
+            "max_results",
+        }
+        if not required_keys.issubset(payload) or set(payload) - (required_keys | {"continuation"}):
+            raise ProviderProtocolError(
+                "input-shape", "Search input keys do not match the exact contract"
+            )
         providers_raw = _input_strings(payload.get("providers"), "providers", minimum=1, maximum=2)
         if any(provider not in PROVIDERS for provider in providers_raw):
             raise ProviderProtocolError(
@@ -293,7 +639,9 @@ class _SearchRequest:
 
     def query_digest(self, entry_type: str) -> str:
         payload = {"entry_type": entry_type, **self.query_document()}
-        encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        encoded = json.dumps(
+            payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
         return hashlib.sha256(encoded).hexdigest()
 
 
@@ -308,6 +656,13 @@ class ExactRecordRequest:
 
     @classmethod
     def from_payload(cls, payload: Mapping[str, object]) -> ExactRecordRequest:
+        required_keys = {"provider_id", "database_id", "entry_id", "response_fields", "include"}
+        if not required_keys.issubset(payload) or set(payload) - (
+            required_keys | {"expected_immutable_id"}
+        ):
+            raise ProviderProtocolError(
+                "input-shape", "Exact-record input keys do not match the exact contract"
+            )
         provider_id = payload.get("provider_id")
         if type(provider_id) is not str or provider_id not in PROVIDERS:
             raise ProviderProtocolError(
@@ -353,6 +708,7 @@ class ExactRecordRequest:
 class _ProviderSearch:
     provider: dict[str, object]
     hits: list[dict[str, object]]
+    starting_offset: int
     cursor: str | None
 
 
@@ -398,6 +754,78 @@ def _decode_cursor(
             "continuation-invalid", "Continuation does not bind this exact bounded query"
         )
     return offset
+
+
+def _search_wire_text(document: Mapping[str, object]) -> str:
+    try:
+        return json.dumps(
+            document,
+            ensure_ascii=False,
+            allow_nan=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+    except (TypeError, ValueError) as error:
+        raise ProviderProtocolError(
+            "context-measurement", "Search projection is not strict JSON"
+        ) from error
+
+
+def _measure_search_context(
+    document: dict[str, object], token_counter: Callable[[str], int]
+) -> tuple[int, int]:
+    context = cast(dict[str, object], document["context"])
+    previous: tuple[int, int] | None = None
+    for _ in range(8):
+        text = _search_wire_text(document)
+        current = (token_counter(text), len(text.encode("utf-8")))
+        context["observed_tokens"] = current[0]
+        context["observed_utf8_bytes"] = current[1]
+        if current == previous:
+            return current
+        previous = current
+    raise ProviderProtocolError(
+        "context-measurement", "Search projection measurement did not stabilize"
+    )
+
+
+def _assert_search_query_context(
+    request: _SearchRequest, token_counter: Callable[[str], int]
+) -> None:
+    encoded = json.dumps(
+        request.query_document(), sort_keys=True, ensure_ascii=False, separators=(",", ":")
+    )
+    if (
+        token_counter(encoded) > _SEARCH_QUERY_TOKEN_LIMIT
+        or len(encoded.encode("utf-8")) > _SEARCH_QUERY_UTF8_BYTE_LIMIT
+    ):
+        raise ProviderProtocolError(
+            "input-context-budget",
+            "Search query metadata cannot fit the bounded result context",
+        )
+
+
+def _deferred_search_hit(
+    hit: Mapping[str, object], entry_type: Literal["structures", "references"]
+) -> dict[str, object]:
+    identity = cast(dict[str, object], hit["identity"])
+    exact_input: dict[str, object] = {
+        "provider_id": identity["provider_id"],
+        "database_id": identity["database_id"],
+        "entry_id": identity["entry_id"],
+        "response_fields": ["id"],
+        "include": [],
+    }
+    immutable_id = identity.get("immutable_id")
+    if immutable_id is not None:
+        exact_input["expected_immutable_id"] = immutable_id
+    capability_name = "structures_get" if entry_type == "structures" else "references_get"
+    return {
+        "composite_ref": identity["composite_ref"],
+        "reason": "record-exceeds-remaining-inline-context",
+        "exact_capability_id": CAPABILITY_IDS[capability_name],
+        "exact_input": exact_input,
+    }
 
 
 def _composite_identity(
@@ -505,13 +933,18 @@ class OptimadeClient:
     def list_providers(self, payload: Mapping[str, object] | None = None) -> dict[str, object]:
         include_registry_only = True
         registry_entry_limit = 100
+        registry_entry_offset = 0
         if payload is not None:
-            if set(payload) != {"include_registry_only", "registry_entry_limit"}:
+            required = {"include_registry_only", "registry_entry_limit"}
+            if not required.issubset(payload) or set(payload) - (
+                required | {"registry_entry_offset"}
+            ):
                 raise ProviderProtocolError(
                     "input-shape", "Provider list input fields do not match the contract"
                 )
             include_value = payload.get("include_registry_only")
             limit_value = payload.get("registry_entry_limit")
+            offset_value = payload.get("registry_entry_offset", 0)
             if type(include_value) is not bool:
                 raise ProviderProtocolError(
                     "input-shape", "Provider registry-only selection must be boolean"
@@ -520,8 +953,13 @@ class OptimadeClient:
                 raise ProviderProtocolError(
                     "input-shape", "Provider registry entry limit is invalid"
                 )
+            if type(offset_value) is not int or not 0 <= offset_value <= 2_147_483_647:
+                raise ProviderProtocolError(
+                    "input-shape", "Provider registry entry offset is invalid"
+                )
             include_registry_only = include_value
             registry_entry_limit = limit_value
+            registry_entry_offset = offset_value
         response, document = self._links(self._registry)
         meta = _object(document.get("meta"), "links metadata")
         api_version = _text(meta.get("api_version"), "registry API version", maximum=32)
@@ -615,8 +1053,10 @@ class OptimadeClient:
             if include_registry_only
             else [item for item in providers if item["provider_id"] in PROVIDERS]
         )
-        selected_providers = eligible[:registry_entry_limit]
-        locally_truncated = len(eligible) > len(selected_providers)
+        selected_providers = eligible[
+            registry_entry_offset : registry_entry_offset + registry_entry_limit
+        ]
+        locally_truncated = registry_entry_offset + len(selected_providers) < len(eligible)
         more = upstream_more or locally_truncated
         if upstream_more:
             result_warnings.append(
@@ -626,7 +1066,7 @@ class OptimadeClient:
             result_warnings.append(
                 "Registry entries were explicitly truncated by registry_entry_limit."
             )
-        return {
+        result: dict[str, object] = {
             "contract": f"{SCHEMA_BASE}provider-list-result.schema.json",
             "profile_version": PROFILE_VERSION,
             "retrieved_at": _wire_time(response),
@@ -634,12 +1074,14 @@ class OptimadeClient:
                 "uri": REGISTRY_LINKS_URL,
                 "api_version": api_version,
                 "response_sha256": response.sha256,
+                "requested_offset": registry_entry_offset,
                 "data_returned": len(selected_providers),
                 "more_data_available": more,
             },
             "providers": selected_providers,
             "warnings": result_warnings,
         }
+        return _bounded_provider_list_result(result)
 
     def _versions(self, config: ProviderConfig) -> dict[str, object]:
         endpoint = self._api_endpoints[config.provider_id]
@@ -828,7 +1270,7 @@ class OptimadeClient:
                 "Applicable terms were unavailable for review; access conveys no "
                 "redistribution permission."
             )
-        return {
+        result: dict[str, object] = {
             "contract": f"{SCHEMA_BASE}provider-inspect-result.schema.json",
             "profile_version": PROFILE_VERSION,
             "provider_id": config.provider_id,
@@ -861,6 +1303,7 @@ class OptimadeClient:
             "rights": config.rights.to_document(),
             "warnings": warnings,
         }
+        return _bounded_provider_inspection_result(result)
 
     def _project_included(
         self,
@@ -907,11 +1350,10 @@ class OptimadeClient:
         resource: dict[str, object],
         included: list[object],
         request: _SearchRequest,
-        response: HttpResponse,
         page_index: int,
         resource_index: int,
     ) -> dict[str, object]:
-        entry_id = _text(resource.get("id"), "entry ID", maximum=512)
+        entry_id = _text(resource.get("id"), "entry ID", maximum=512, max_utf8_bytes=512)
         resource_type = _text(resource.get("type"), "entry type", maximum=128)
         if resource_type != entry_type:
             raise ProviderProtocolError(
@@ -921,7 +1363,12 @@ class OptimadeClient:
         attributes = _object(attributes_value, "entry attributes")
         immutable_value = attributes.get("immutable_id")
         immutable_id = (
-            _text(immutable_value, "immutable ID", maximum=512)
+            _text(
+                immutable_value,
+                "immutable ID",
+                maximum=512,
+                max_utf8_bytes=512,
+            )
             if immutable_value is not None
             else None
         )
@@ -959,7 +1406,10 @@ class OptimadeClient:
         relationships: dict[str, object] = {}
         for name, value in sorted(relationships_raw.items())[:8]:
             if _STANDARD_PROPERTY_PATTERN.fullmatch(name) is None:
-                warnings.append(f"Relationship {name!r} was omitted because its name is invalid.")
+                digest = hashlib.sha256(name.encode("utf-8")).hexdigest()
+                warnings.append(
+                    f"Relationship with an invalid name was omitted; name_sha256={digest}."
+                )
                 continue
             bounded, changed = _bounded_value(value)
             relationships[name] = bounded
@@ -988,14 +1438,9 @@ class OptimadeClient:
             "returned_selected_field_count": returned,
             "omitted_selected_field_count": len(request.response_fields) - returned,
             "unrequested_field_count": unrequested,
-            "source_uri": response.request_uri,
-            "source_response_sha256": response.sha256,
             "page_index": page_index,
             "resource_index": resource_index,
-            "retrieved_at": _wire_time(response),
-            "rights": config.rights.to_document(),
-            "citation_refs": [config.citation.citation_ref],
-            "warnings": warnings,
+            "warnings": _bounded_hit_warnings(warnings),
         }
 
     def _search_parameters(
@@ -1026,15 +1471,18 @@ class OptimadeClient:
         config: ProviderConfig,
         request: _SearchRequest,
         entry_type: str,
+        starting_offset: int,
         offset: int,
-        request_uris: list[str],
         response_hashes: list[str],
+        retrieval_times: list[str],
         hits: list[dict[str, object]],
         pages_returned: int,
         data_available: int | None,
         api_version: str | None,
         implementation: tuple[str, str] | None,
         provider_warnings: list[dict[str, object]],
+        provider_warnings_observed: int,
+        provider_warnings_omitted: int,
         error: ProviderProtocolError | TransportError,
     ) -> _ProviderSearch:
         retryable = isinstance(error, TransportError) and error.retryable
@@ -1062,18 +1510,23 @@ class OptimadeClient:
             "records_returned": len(hits),
             "data_available": data_available,
             "more_data_available": True,
-            "request_uris": request_uris,
             "response_sha256": response_hashes,
-            "rights": config.rights.to_document(),
+            "retrieved_at": retrieval_times,
+            "rights": config.rights.to_search_document(),
             "citation_ref": config.citation.citation_ref,
-            "next_cursor": cursor,
-            "warnings": provider_warnings,
+            "warning_records_observed": provider_warnings_observed,
+            "warning_records_omitted": provider_warnings_omitted,
+            "warnings": _finalize_provider_messages(provider_warnings, provider_warnings_omitted),
             "failure": failure,
         }
         if implementation is not None:
-            provider["implementation_name"] = implementation[0]
-            provider["implementation_version"] = implementation[1]
-        return _ProviderSearch(provider=provider, hits=hits, cursor=cursor)
+            provider.update(_provider_implementation_document(*implementation))
+        return _ProviderSearch(
+            provider=provider,
+            hits=hits,
+            starting_offset=starting_offset,
+            cursor=cursor,
+        )
 
     def _search_provider(
         self,
@@ -1095,10 +1548,13 @@ class OptimadeClient:
             if token is not None
             else 0
         )
+        starting_offset = offset
         hits: list[dict[str, object]] = []
-        request_uris: list[str] = []
         response_hashes: list[str] = []
+        retrieval_times: list[str] = []
         provider_warnings: list[dict[str, object]] = []
+        provider_warnings_observed = 0
+        provider_warnings_omitted = 0
         seen_records: set[tuple[str, str]] = set()
         data_available: int | None = None
         api_version: str | None = None
@@ -1111,8 +1567,6 @@ class OptimadeClient:
                 break
             page_limit = min(request.page_limit, remaining)
             parameters = self._search_parameters(request, page_limit=page_limit, page_offset=offset)
-            _, request_uri = endpoint.request_target(f"/v1/{entry_type}", parameters)
-            request_uris.append(request_uri)
             try:
                 response = self._transport.get(
                     endpoint,
@@ -1125,6 +1579,8 @@ class OptimadeClient:
                         "pagination-loop",
                         "Provider repeated an identical response for a new page offset",
                     )
+                response_hashes.append(response.sha256)
+                retrieval_times.append(_wire_time(response))
                 document = decode_json_object(response)
                 model = (
                     StructureResponseMany if entry_type == "structures" else ReferenceResponseMany
@@ -1202,38 +1658,25 @@ class OptimadeClient:
                             resource=resource,
                             included=included,
                             request=request,
-                            response=response,
                             page_index=page_index,
                             resource_index=resource_index,
                         )
                     )
-                if available_value is not None and available_value < offset + len(page_hits):
+                hits.extend(page_hits)
+                offset += len(records)
+                if available_value is not None and available_value < offset:
                     raise ProviderProtocolError(
                         "pagination-inconsistent",
                         "Provider data-available count is smaller than returned records",
                     )
-                hits.extend(page_hits)
-                response_hashes.append(response.sha256)
-                page_messages = _provider_messages(meta, page_index)
-                remaining_message_slots = 32 - len(provider_warnings)
-                if len(page_messages) <= remaining_message_slots:
-                    provider_warnings.extend(page_messages[:remaining_message_slots])
-                elif remaining_message_slots > 0:
-                    provider_warnings.extend(page_messages[: remaining_message_slots - 1])
-                    provider_warnings.append(
-                        {
-                            "title": "Provider warnings truncated",
-                            "detail": (
-                                "Additional provider warnings were omitted by the call bound."
-                            ),
-                        }
-                    )
-                elif provider_warnings:
-                    provider_warnings[-1] = {
-                        "title": "Provider warnings truncated",
-                        "detail": "Additional provider warnings were omitted by the call bound.",
-                    }
-                offset += len(records)
+                page_messages, page_omitted = _provider_messages(meta, page_index)
+                provider_warnings_observed += len(page_messages) + page_omitted
+                remaining_message_slots = _PROVIDER_WARNING_LIMIT - 1 - len(provider_warnings)
+                retained_messages = page_messages[:remaining_message_slots]
+                provider_warnings.extend(retained_messages)
+                provider_warnings_omitted += (
+                    page_omitted + len(page_messages) - len(retained_messages)
+                )
                 more_data_available = more_value
                 if not more_value:
                     break
@@ -1247,15 +1690,18 @@ class OptimadeClient:
                     config=config,
                     request=request,
                     entry_type=entry_type,
+                    starting_offset=starting_offset,
                     offset=offset,
-                    request_uris=request_uris,
                     response_hashes=response_hashes,
+                    retrieval_times=retrieval_times,
                     hits=hits,
                     pages_returned=len(response_hashes),
                     data_available=data_available,
                     api_version=api_version,
                     implementation=implementation,
                     provider_warnings=provider_warnings,
+                    provider_warnings_observed=provider_warnings_observed,
+                    provider_warnings_omitted=provider_warnings_omitted,
                     error=error,
                 )
         cursor = (
@@ -1273,18 +1719,258 @@ class OptimadeClient:
             "records_returned": len(hits),
             "data_available": data_available,
             "more_data_available": more_data_available,
-            "request_uris": request_uris,
             "response_sha256": response_hashes,
-            "rights": config.rights.to_document(),
+            "retrieved_at": retrieval_times,
+            "rights": config.rights.to_search_document(),
             "citation_ref": config.citation.citation_ref,
-            "warnings": provider_warnings,
+            "warning_records_observed": provider_warnings_observed,
+            "warning_records_omitted": provider_warnings_omitted,
+            "warnings": _finalize_provider_messages(provider_warnings, provider_warnings_omitted),
         }
         if implementation is not None:
-            provider["implementation_name"] = implementation[0]
-            provider["implementation_version"] = implementation[1]
-        if cursor is not None:
-            provider["next_cursor"] = cursor
-        return _ProviderSearch(provider=provider, hits=hits, cursor=cursor)
+            provider.update(_provider_implementation_document(*implementation))
+        return _ProviderSearch(
+            provider=provider,
+            hits=hits,
+            starting_offset=starting_offset,
+            cursor=cursor,
+        )
+
+    def _bounded_search_result(
+        self,
+        *,
+        entry_type: Literal["structures", "references"],
+        request: _SearchRequest,
+        results: list[_ProviderSearch],
+        token_counter: Callable[[str], int],
+    ) -> dict[str, object]:
+        providers = [result.provider for result in results]
+        hits = [hit for result in results for hit in result.hits]
+        failed = [
+            cast(str, provider["provider_id"])
+            for provider in providers
+            if provider["outcome"] == "failed"
+        ]
+        base_warnings: list[str] = []
+        document: dict[str, object] = {
+            "contract": f"{SCHEMA_BASE}search-result.schema.json",
+            "profile_version": PROFILE_VERSION,
+            "entry_type": entry_type,
+            "status": "partial" if failed else "complete",
+            "produced_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+            "query": {"sha256": request.query_digest(entry_type)},
+            "providers": providers,
+            "hits": hits,
+            "deferred_hits": [],
+            "total_returned": len(hits),
+            "more_data_available": False,
+            "continuation": {},
+            "citation_refs": list(
+                dict.fromkeys(PROVIDERS[item].citation.citation_ref for item in request.providers)
+            ),
+            "transformation": "selected-field-projection",
+            "context": {
+                "tokenizer_ref": _SEARCH_TOKENIZER_REF,
+                "token_limit": _SEARCH_TOKEN_LIMIT,
+                "observed_tokens": 0,
+                "utf8_byte_limit": _SEARCH_UTF8_BYTE_LIMIT,
+                "observed_utf8_bytes": 0,
+                "omitted_hits": 0,
+                "deferred_hits": 0,
+            },
+            "warnings": base_warnings,
+        }
+        original_hits = hits.copy()
+        fetched_hits = len(original_hits)
+        deferred_hits = cast(list[dict[str, object]], document["deferred_hits"])
+        excluded_providers: set[str] = set()
+        warning_context_compacted = False
+        page_evidence_compacted = False
+        failed_provider_context_compacted = False
+
+        def refresh() -> None:
+            retained_by_provider = {provider_id: 0 for provider_id in request.providers}
+            for hit in hits:
+                identity = cast(dict[str, object], hit["identity"])
+                provider_id = cast(str, identity["provider_id"])
+                retained_by_provider[provider_id] += 1
+            deferred_by_provider = {provider_id: 0 for provider_id in request.providers}
+            for item in deferred_hits:
+                exact_input = cast(dict[str, object], item["exact_input"])
+                provider_id = cast(str, exact_input["provider_id"])
+                deferred_by_provider[provider_id] += 1
+            continuation: dict[str, str] = {}
+            for index, result in enumerate(results):
+                provider_id = request.providers[index]
+                retained = retained_by_provider[provider_id]
+                deferred = deferred_by_provider[provider_id]
+                progressed = retained + deferred
+                result.provider["records_returned"] = retained
+                cursor = result.cursor
+                if progressed < len(result.hits):
+                    cursor = _encode_cursor(
+                        provider_id,
+                        entry_type,
+                        result.starting_offset + progressed,
+                        request.query_digest(entry_type),
+                    )
+                result.provider["more_data_available"] = cursor is not None
+                if cursor is not None:
+                    continuation[provider_id] = cursor
+            omitted = fetched_hits - len(hits)
+            context = cast(dict[str, object], document["context"])
+            context["omitted_hits"] = omitted
+            context["deferred_hits"] = len(deferred_hits)
+            document["total_returned"] = len(hits)
+            document["continuation"] = continuation
+            document["more_data_available"] = any(
+                cast(bool, provider["more_data_available"]) for provider in providers
+            )
+            document["warnings"] = [
+                *base_warnings,
+                *(
+                    [f"{omitted - len(deferred_hits)} hit(s) omitted; use continuation."]
+                    if omitted > len(deferred_hits)
+                    else []
+                ),
+                *(
+                    [f"{len(deferred_hits)} hit(s) deferred; use deferred_hits exact_input."]
+                    if deferred_hits
+                    else []
+                ),
+            ]
+
+        removed_hits: list[dict[str, object]] = []
+        while True:
+            refresh()
+            tokens, utf8_bytes = _measure_search_context(document, token_counter)
+            if (
+                tokens <= _SEARCH_TOKEN_LIMIT
+                and utf8_bytes <= _SEARCH_UTF8_BYTE_LIMIT
+                and (hits or not removed_hits)
+            ):
+                return document
+            if not warning_context_compacted:
+                warning_context_compacted = True
+                compacted = [_compact_provider_warning_context(provider) for provider in providers]
+                if any(compacted):
+                    continue
+            if not page_evidence_compacted:
+                page_evidence_compacted = True
+                compacted = [_compact_provider_page_evidence(provider) for provider in providers]
+                if any(compacted):
+                    continue
+            if not failed_provider_context_compacted:
+                failed_provider_context_compacted = True
+                compacted = [_compact_failed_provider_context(provider) for provider in providers]
+                if any(compacted):
+                    continue
+            if not hits:
+                if tokens > _SEARCH_TOKEN_LIMIT or utf8_bytes > _SEARCH_UTF8_BYTE_LIMIT:
+                    raise ProviderProtocolError(
+                        "context-budget-exceeded",
+                        "Search metadata cannot fit the exact inline context budget",
+                    )
+                descriptor_trials: list[tuple[_ProviderSearch, dict[str, object], int, int]] = []
+                for result in results:
+                    provider_id = cast(str, result.provider["provider_id"])
+                    if provider_id in excluded_providers or not result.hits:
+                        continue
+                    descriptor = _deferred_search_hit(result.hits[0], entry_type)
+                    deferred_hits.append(descriptor)
+                    refresh()
+                    descriptor_tokens, descriptor_bytes = _measure_search_context(
+                        document, token_counter
+                    )
+                    deferred_hits.clear()
+                    descriptor_trials.append(
+                        (result, descriptor, descriptor_tokens, descriptor_bytes)
+                    )
+                fitting = [
+                    trial
+                    for trial in descriptor_trials
+                    if trial[2] <= _SEARCH_TOKEN_LIMIT and trial[3] <= _SEARCH_UTF8_BYTE_LIMIT
+                ]
+                failing = [trial for trial in descriptor_trials if trial not in fitting]
+                if fitting and not failing:
+                    selected = min(
+                        fitting,
+                        key=lambda trial: (
+                            trial[0].starting_offset,
+                            cast(str, trial[0].provider["provider_id"]),
+                        ),
+                    )
+                    deferred_hits.append(selected[1])
+                    refresh()
+                    _measure_search_context(document, token_counter)
+                    return document
+                if not descriptor_trials:
+                    removed_hits.clear()
+                    continue
+                isolated = max(
+                    failing or descriptor_trials,
+                    key=lambda trial: (trial[2], trial[3]),
+                )
+                isolated_result = isolated[0]
+                provider = isolated_result.provider
+                provider_id = cast(str, provider["provider_id"])
+                if provider["outcome"] != "failed":
+                    provider["outcome"] = "failed"
+                    provider["failure"] = {
+                        "code": "record-identity-context",
+                        "http_status": 0,
+                        "title": "Record identity exceeds context",
+                        "detail": (
+                            "A provider record identity cannot fit the inline context budget."
+                        ),
+                        "retryable": False,
+                    }
+                provider.pop("implementation_metadata_sha256", None)
+                excluded_providers.add(provider_id)
+                document["status"] = "partial"
+                hits[:] = [
+                    hit
+                    for hit in original_hits
+                    if cast(str, cast(dict[str, object], hit["identity"])["provider_id"])
+                    not in excluded_providers
+                ]
+                deferred_hits.clear()
+                removed_hits.clear()
+                continue
+            retained_counts: dict[str, int] = {}
+            for hit in hits:
+                identity = cast(dict[str, object], hit["identity"])
+                provider_id = cast(str, identity["provider_id"])
+                retained_counts[provider_id] = retained_counts.get(provider_id, 0) + 1
+            largest = max(retained_counts.values())
+            candidates = [
+                provider_id
+                for provider_id, retained in retained_counts.items()
+                if retained == largest
+            ]
+            starting_offsets = {
+                request.providers[index]: result.starting_offset
+                for index, result in enumerate(results)
+            }
+            outcomes = {
+                cast(str, result.provider["provider_id"]): result.provider["outcome"]
+                for result in results
+            }
+            provider_to_remove = max(
+                candidates,
+                key=lambda provider_id: (
+                    outcomes[provider_id] == "failed",
+                    starting_offsets[provider_id],
+                    request.providers.index(provider_id),
+                ),
+            )
+            remove_index = next(
+                index
+                for index in range(len(hits) - 1, -1, -1)
+                if cast(str, cast(dict[str, object], hits[index]["identity"])["provider_id"])
+                == provider_to_remove
+            )
+            removed_hits.append(hits.pop(remove_index))
 
     def search(
         self,
@@ -1292,6 +1978,12 @@ class OptimadeClient:
         payload: Mapping[str, object],
     ) -> dict[str, object]:
         request = _SearchRequest.from_payload(payload)
+        encoding = _search_encoding(self._transport)
+
+        def token_counter(text: str) -> int:
+            return _encoding_token_count(encoding, text)
+
+        _assert_search_query_context(request, token_counter)
         count = len(request.providers)
         base_quota, remainder = divmod(request.max_results, count)
         quotas = [base_quota + (1 if index < remainder else 0) for index in range(count)]
@@ -1307,39 +1999,12 @@ class OptimadeClient:
                 for index, provider_id in enumerate(request.providers)
             ]
             results = [future.result() for future in futures]
-        providers = [result.provider for result in results]
-        hits = [hit for result in results for hit in result.hits]
-        continuation = {
-            request.providers[index]: result.cursor
-            for index, result in enumerate(results)
-            if result.cursor is not None
-        }
-        failed = [
-            cast(str, provider["provider_id"])
-            for provider in providers
-            if provider["outcome"] == "failed"
-        ]
-        warnings = [
-            f"Provider {provider_id} failed; its bounded failure is preserved separately."
-            for provider_id in failed
-        ]
-        return {
-            "contract": f"{SCHEMA_BASE}search-result.schema.json",
-            "profile_version": PROFILE_VERSION,
-            "entry_type": entry_type,
-            "status": "partial" if failed else "complete",
-            "produced_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
-            "query": request.query_document(),
-            "providers": providers,
-            "hits": hits,
-            "total_returned": len(hits),
-            "more_data_available": any(
-                cast(bool, provider["more_data_available"]) for provider in providers
-            ),
-            "continuation": continuation,
-            "citations": [PROVIDERS[item].citation.to_document() for item in request.providers],
-            "warnings": warnings,
-        }
+        return self._bounded_search_result(
+            entry_type=entry_type,
+            request=request,
+            results=results,
+            token_counter=token_counter,
+        )
 
     def search_structures(self, payload: Mapping[str, object]) -> dict[str, object]:
         return self.search("structures", payload)
@@ -1491,7 +2156,7 @@ class OptimadeClient:
         media_type = response.headers.get("content-type", "application/vnd.api+json").split(
             ";", maxsplit=1
         )[0]
-        return {
+        result: dict[str, object] = {
             "contract": (
                 "https://schemas.autonomouslab.io/materials-mcp/0.2.0/result-bundle.schema.json"
             ),
@@ -1596,6 +2261,7 @@ class OptimadeClient:
             "citations": [config.citation.to_document()],
             "warnings": warnings,
         }
+        return _bounded_result_bundle(result)
 
     def fetch_exact_record(
         self,

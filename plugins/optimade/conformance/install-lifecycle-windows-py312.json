@@ -2,11 +2,11 @@
   "engine_wheel_sha256": "5fcde5945e33d63a7a6bdf6541c7af036fea79f6b1db107ec0cda1d1feaedb01",
   "platform": "win32",
   "plugin": {
-    "sdist_members": 65,
-    "sdist_sha256": "d43c5ba76866a51052fedb6a221416c2ad86fbe2fa0ba4d7b65f0ef265c2be66",
+    "sdist_members": 66,
+    "sdist_sha256": "6aeb6cd144d2bd3284a250d5961a8d470c2293dfc032becfff6e702397519876",
     "version": "0.1.0a1",
     "wheel_members": 28,
-    "wheel_sha256": "dd72117c3d4c20a1b8b4e3ec48d86e9e8ba0e095cb0998ab4be353a028ab2f0c"
+    "wheel_sha256": "bb54a403764ed51621f51d7cdd137e5cc7ec362773ab7864e8da8e6bbce0c029"
   },
   "python": "3.12",
   "report_version": 1,

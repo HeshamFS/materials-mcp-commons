@@ -25,13 +25,27 @@ infer redistribution rights from public reachability or protocol conformance.
 
 Searches use a plugin-owned result contract that permits honest zero matches and
 explicit partial provider failure. Exact retrieval returns one core
-`ResultBundle`; export returns one core `Artifact`.
+`ResultBundle`; export returns one core `Artifact`. Registry listing, provider
+inspection, and exact retrieval remove only whole repeatable records when
+necessary to stay below the engine dispatch envelope, declare the omission,
+and preserve source hashes and exact-retrieval inputs. Registry-list tails are
+retrievable through the optional `registry_entry_offset`; search page evidence
+that cannot remain inline is retained as a documented, recomputable ordered
+SHA-256 commitment rather than silently discarded. Search results always retain
+provider implementation metadata as a fixed-size SHA-256 commitment; bounded text
+values remain available through provider inspection.
 
 ## Development boundary
 
 `optimade==1.5.0` supplies the consortium's 1.2 filter parser and response data
-models. The upstream multi-provider client and its cache/request defaults are not
-used. Network authority stays in project-owned HTTPS code with fixed provider
+models. `tiktoken==0.14.0` supplies the exact identified `o200k_base` measurement
+used to enforce the inline search-result budget. One successful load of the
+exact merge ranks is retained per process after a bounded retrieval from their
+fixed upstream URL and SHA-256 verification; failed loads remain bounded and
+can be retried by a later call. The ranks are never written to a local cache.
+The upstream multi-provider
+client and its cache/request defaults are not used. Network authority stays in
+project-owned HTTPS code with fixed provider
 configuration, DNS/address verification, no ambient credentials or proxies, no
 scheme downgrade, IPv4-only public-address pinning (which excludes NAT64
 translation ambiguity), bounded responses, and bounded retry/pagination.

@@ -36,7 +36,7 @@
     },
     {
       "capability_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/structures/search",
-      "description": "Run one validated OPTIMADE 1.2 filter across an explicit supported-provider subset with bounded fields, pages, results, and honest partial failure.",
+      "description": "Run one validated OPTIMADE 1.2 filter across an explicit supported-provider subset with bounded fields, pages, results, honest partial failure, exact context measurement, and continuation or exact retrieval for omitted hits.",
       "effect": {
         "approval_required": false,
         "category": "read-only",
@@ -70,7 +70,7 @@
     },
     {
       "capability_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/references/search",
-      "description": "Run one validated OPTIMADE 1.2 filter over references across an explicit supported-provider subset with bounded projection and partial-failure reporting.",
+      "description": "Run one validated OPTIMADE 1.2 filter over references across an explicit supported-provider subset with bounded projection, partial-failure reporting, and context-safe continuation or exact retrieval for omitted hits.",
       "effect": {
         "approval_required": false,
         "category": "read-only",
@@ -136,12 +136,12 @@
   "plugin": {
     "description": "Bounded, rights-aware OPTIMADE 1.2 federation over reviewed live materials databases with explicit provenance, partial failure, and local export effects.",
     "license_expression": "Apache-2.0",
-    "manifest_sha256": "14750d2d1e63e038ce3105e06aacb551560cde2aca42bbe95e77288710816ce9",
+    "manifest_sha256": "1618b63a3f6d8ffb11b8eb26887bf15db123c1a9f72d2064372b7c466ffa9246",
     "name": "Materials MCP OPTIMADE",
     "plugin_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade",
     "plugin_version": "0.1.0-alpha.1",
     "publisher_name": "Hesham Salama",
-    "registration_ref": "urn:materials-mcp:registration:abac8076c0c16949262ed3adb0e8771c7b1a2cf24a8b04ff4aeb4bb8fa8da80c"
+    "registration_ref": "urn:materials-mcp:registration:bda6ba7af0360dfbb6035530e594b6b9d5c5ccac0fdde9fc74c7aa802569a486"
   },
   "profile_version": "0.2.0",
   "report_version": 1,
@@ -151,13 +151,13 @@
       "path": "schemas/provider-list-input.schema.json",
       "role": "input",
       "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-list-input.schema.json",
-      "sha256": "aa6b51a10d1a4b83657236119f93c92dbdcf360104cbf71e3b7d08b769418867"
+      "sha256": "c74ca15fb370bdac8c86dc1832dac9768173fa6c2d49678c146e0a904b5ebd7e"
     },
     {
       "path": "schemas/provider-list-result.schema.json",
       "role": "result",
       "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-list-result.schema.json",
-      "sha256": "b895c4d405400b0fbd3a70967d13c1c5414cab8f4732b10afa989b4b0126fd93"
+      "sha256": "4f9d41c35f1112859dbf2c6a524824bf715cfffdb36ed072f13e7547055bc003"
     },
     {
       "path": "schemas/provider-inspect-input.schema.json",
@@ -169,19 +169,19 @@
       "path": "schemas/provider-inspect-result.schema.json",
       "role": "result",
       "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/provider-inspect-result.schema.json",
-      "sha256": "894db8394099d871090e176b334dca5a9a6e0563bdf4f65b123a40c09aa9c7a6"
+      "sha256": "e163085720acdba64d60889283b79fc083e8e8ac929570fc6c19e87d8926d6fd"
     },
     {
       "path": "schemas/search-input.schema.json",
       "role": "input",
       "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-input.schema.json",
-      "sha256": "039cd48988e67a78e3522c1ae0e5a2ba9be67a164e2d6586f15139fbc9b3a049"
+      "sha256": "125ec5956a81aea3403dab034f3ddf984b741b44c258219a26027904825b1fd4"
     },
     {
       "path": "schemas/search-result.schema.json",
       "role": "result",
       "schema_id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-result.schema.json",
-      "sha256": "ebefc42da102f7c600d32cd63f030514294bcecd4faea7a8a8d1d9072fe610c5"
+      "sha256": "f596a21f5a6fdb2652de65f75061895f26c4971e1101074684be9f2651240c9a"
     },
     {
       "path": "schemas/get-input.schema.json",

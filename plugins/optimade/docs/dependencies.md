@@ -15,13 +15,23 @@ working-tree representation.
 The direct runtime boundary is deliberately small:
 
 - `materials-mcp-commons==0.1.0a13` under Apache-2.0; and
-- `optimade==1.5.0` under MIT.
+- `optimade==1.5.0` under MIT; and
+- `tiktoken==0.14.0` under MIT for exact `o200k_base` context measurement.
+
+The exact `o200k_base` merge-rank data remains at
+<https://openaipublic.blob.core.windows.net/encodings/o200k_base.tiktoken> and
+is checked against SHA-256
+`446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d`
+before use. It is fetched once per process through the project's bounded HTTPS
+transport, held only in memory, and never loaded through `requests`, proxy
+configuration, or a mutable machine cache. The integration does not redistribute
+the merge-rank data.
 
 The optional `mcp-host` extra adds `mcp>=2.2,<2.3` for the standalone stdio
 server. It is not part of the default runtime graph. Development installs also
 carry it so the actual wire contract can be exercised in tests.
 
-The complete checked row records 24 root, direct, and transitive distributions,
+The complete checked row records 26 root, direct, and transitive distributions,
 their exact installed versions, relationships, license expressions, target
 interpreter/platform, and the SHA-256 of the lock that selected them. Regenerate
 it only from a fresh environment installed with the checked lock:

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/search-result.schema.json",
   "title": "Bounded federated OPTIMADE search result",
-  "description": "A zero-capable, provider-grouped result with explicit partial failure, selected-field omissions, namespaced properties, pagination state, rights, citations, and response hashes.",
+  "description": "A zero-capable, provider-grouped, context-measured result with explicit partial failure, selected-field and whole-hit omissions, continuation-safe pagination, namespaced properties, rights, citation references, and response hashes.",
   "type": "object",
   "$defs": {
     "boundedValue": {
@@ -37,6 +37,7 @@
       "additionalProperties": false
     },
     "rightsRecord": {
+      "description": "Decision-complete rights metadata for bounded search. Provider inspection exposes the full attribution instruction.",
       "type": "object",
       "required": [
         "basis",
@@ -45,7 +46,6 @@
         "terms_sha256",
         "review_status",
         "redistribution",
-        "attribution",
         "reviewed_at",
         "expires_at"
       ],
@@ -67,7 +67,6 @@
         },
         "review_status": {"enum": ["reviewed", "unavailable"]},
         "redistribution": {"enum": ["permitted", "not-permitted", "unknown"]},
-        "attribution": {"type": "string", "minLength": 1, "maxLength": 2048},
         "reviewed_at": {
           "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
         },
@@ -116,10 +115,13 @@
     "query",
     "providers",
     "hits",
+    "deferred_hits",
     "total_returned",
     "more_data_available",
     "continuation",
-    "citations",
+    "citation_refs",
+    "transformation",
+    "context",
     "warnings"
   ],
   "properties": {
@@ -133,56 +135,13 @@
       "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
     },
     "query": {
+      "description": "SHA-256 of UTF-8 compact JSON for the complete query plus entry_type, using lexicographically sorted object keys, no insignificant whitespace, and unescaped Unicode.",
       "type": "object",
-      "required": [
-        "providers",
-        "filter",
-        "response_fields",
-        "sort",
-        "include",
-        "page_limit",
-        "max_pages_per_provider",
-        "max_results"
-      ],
+      "required": ["sha256"],
       "properties": {
-        "providers": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 2,
-          "uniqueItems": true,
-          "items": {"enum": ["mp", "nmd"]}
-        },
-        "filter": {"type": "string", "maxLength": 4096},
-        "response_fields": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 32,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "pattern": "^(?:[a-z][a-z0-9_]{0,127}|_[a-z0-9]+_[a-z0-9_]+)$",
-            "maxLength": 128
-          }
-        },
-        "sort": {
-          "type": "array",
-          "maxItems": 8,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "pattern": "^-?(?:[a-z][a-z0-9_]{0,127}|_[a-z0-9]+_[a-z0-9_]+)$",
-            "maxLength": 129
-          }
-        },
-        "include": {
-          "type": "array",
-          "maxItems": 4,
-          "uniqueItems": true,
-          "items": {"enum": ["structures", "references"]}
-        },
-        "page_limit": {"type": "integer", "minimum": 1, "maximum": 50},
-        "max_pages_per_provider": {"type": "integer", "minimum": 1, "maximum": 5},
-        "max_results": {"type": "integer", "minimum": 1, "maximum": 100}
+        "sha256": {
+          "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+        }
       },
       "additionalProperties": false
     },
@@ -202,10 +161,12 @@
           "records_returned",
           "data_available",
           "more_data_available",
-          "request_uris",
           "response_sha256",
+          "retrieved_at",
           "rights",
           "citation_ref",
+          "warning_records_observed",
+          "warning_records_omitted",
           "warnings"
         ],
         "properties": {
@@ -231,8 +192,10 @@
               {"type": "null"}
             ]
           },
-          "implementation_name": {"type": "string", "minLength": 1, "maxLength": 512},
-          "implementation_version": {"type": "string", "minLength": 1, "maxLength": 128},
+          "implementation_metadata_sha256": {
+            "description": "SHA-256 of the provider-controlled implementation metadata. Recompute over the UTF-8 RFC 8259 compact JSON object {name,version} using lexicographically sorted object keys, no insignificant whitespace, and unescaped Unicode. Inspect the provider for bounded inline name and version values.",
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+          },
           "outcome": {"enum": ["success", "empty", "failed"]},
           "pages_returned": {"type": "integer", "minimum": 0, "maximum": 5},
           "records_returned": {"type": "integer", "minimum": 0, "maximum": 100},
@@ -243,16 +206,6 @@
             ]
           },
           "more_data_available": {"type": "boolean"},
-          "request_uris": {
-            "type": "array",
-            "maxItems": 5,
-            "items": {
-              "type": "string",
-              "format": "uri",
-              "pattern": "^https://[^\\s]+$",
-              "maxLength": 8192
-            }
-          },
           "response_sha256": {
             "type": "array",
             "maxItems": 5,
@@ -260,14 +213,38 @@
               "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
             }
           },
+          "retrieved_at": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
+            }
+          },
+          "page_evidence_commitment": {
+            "description": "Commitment over the ordered page-evidence array. Recompute SHA-256 over UTF-8 RFC 8259 JSON for [{\"response_sha256\":HASH,\"retrieved_at\":TIME},...] using lexicographically sorted object keys, no insignificant whitespace, and unescaped Unicode. Its presence requires the two inline evidence arrays to be empty.",
+            "type": "object",
+            "required": ["count", "sha256"],
+            "properties": {
+              "count": {"type": "integer", "minimum": 1, "maximum": 5},
+              "sha256": {
+                "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+              }
+            },
+            "additionalProperties": false
+          },
           "rights": {"$ref": "#/$defs/rightsRecord"},
           "citation_ref": {
             "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
           },
-          "next_cursor": {
-            "type": "string",
-            "pattern": "^[A-Za-z0-9_-]{1,2048}$",
-            "maxLength": 2048
+          "warning_records_observed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 250000
+          },
+          "warning_records_omitted": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 250000
           },
           "warnings": {
             "type": "array",
@@ -296,8 +273,33 @@
                   "pattern": "^1\\.[0-9]+\\.[0-9]+$",
                   "maxLength": 32
                 }
-              }
+              },
+              "required": ["implementation_metadata_sha256"]
             }
+          },
+          {
+            "oneOf": [
+              {
+                "required": ["page_evidence_commitment"],
+                "properties": {
+                  "response_sha256": {"maxItems": 0},
+                  "retrieved_at": {"maxItems": 0}
+                }
+              },
+              {
+                "not": {"required": ["page_evidence_commitment"]},
+                "if": {
+                  "properties": {"pages_returned": {"minimum": 1}},
+                  "required": ["pages_returned"]
+                },
+                "then": {
+                  "properties": {
+                    "response_sha256": {"minItems": 1},
+                    "retrieved_at": {"minItems": 1}
+                  }
+                }
+              }
+            ]
           }
         ],
         "additionalProperties": false
@@ -318,13 +320,8 @@
           "returned_selected_field_count",
           "omitted_selected_field_count",
           "unrequested_field_count",
-          "source_uri",
-          "source_response_sha256",
           "page_index",
           "resource_index",
-          "retrieved_at",
-          "rights",
-          "citation_refs",
           "warnings"
         ],
         "properties": {
@@ -378,34 +375,38 @@
             "maximum": 32
           },
           "unrequested_field_count": {"type": "integer", "minimum": 0},
-          "source_uri": {
-            "type": "string",
-            "format": "uri",
-            "pattern": "^https://[^\\s]+$",
-            "maxLength": 8192
-          },
-          "source_response_sha256": {
-            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
-          },
           "page_index": {"type": "integer", "minimum": 0, "maximum": 4},
           "resource_index": {"type": "integer", "minimum": 0, "maximum": 49},
-          "retrieved_at": {
-            "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#dateTime"
-          },
-          "rights": {"$ref": "#/$defs/rightsRecord"},
-          "citation_refs": {
-            "type": "array",
-            "minItems": 1,
-            "maxItems": 8,
-            "uniqueItems": true,
-            "items": {
-              "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
-            }
-          },
           "warnings": {
             "type": "array",
             "maxItems": 16,
             "items": {"type": "string", "minLength": 1, "maxLength": 1024}
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "deferred_hits": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["composite_ref", "reason", "exact_capability_id", "exact_input"],
+        "properties": {
+          "composite_ref": {
+            "type": "string",
+            "pattern": "^urn:materials-mcp:optimade:record:[a-f0-9]{64}$",
+            "maxLength": 102
+          },
+          "reason": {"const": "record-exceeds-remaining-inline-context"},
+          "exact_capability_id": {
+            "enum": [
+              "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/structures/get",
+              "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/references/get"
+            ]
+          },
+          "exact_input": {
+            "$ref": "https://schemas.autonomouslab.io/materials-mcp/plugins/optimade/0.1.0/get-input.schema.json"
           }
         },
         "additionalProperties": false
@@ -430,13 +431,39 @@
       },
       "additionalProperties": false
     },
-    "citations": {
+    "citation_refs": {
       "type": "array",
       "minItems": 1,
-      "maxItems": 8,
+      "maxItems": 2,
+      "uniqueItems": true,
       "items": {
-        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/citation.schema.json"
+        "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#absoluteReference"
       }
+    },
+    "transformation": {"const": "selected-field-projection"},
+    "context": {
+      "type": "object",
+      "required": [
+        "tokenizer_ref",
+        "token_limit",
+        "observed_tokens",
+        "utf8_byte_limit",
+        "observed_utf8_bytes",
+        "omitted_hits",
+        "deferred_hits"
+      ],
+      "properties": {
+        "tokenizer_ref": {
+          "const": "https://github.com/openai/tiktoken/tree/0.14.0#o200k_base"
+        },
+        "token_limit": {"const": 1500},
+        "observed_tokens": {"type": "integer", "minimum": 1, "maximum": 1500},
+        "utf8_byte_limit": {"const": 8192},
+        "observed_utf8_bytes": {"type": "integer", "minimum": 1, "maximum": 8192},
+        "omitted_hits": {"type": "integer", "minimum": 0, "maximum": 100},
+        "deferred_hits": {"type": "integer", "minimum": 0, "maximum": 1}
+      },
+      "additionalProperties": false
     },
     "warnings": {
       "type": "array",

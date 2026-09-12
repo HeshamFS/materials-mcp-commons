@@ -7,6 +7,7 @@ import hashlib
 import json
 import platform
 import sys
+import sysconfig
 from collections import deque
 from collections.abc import Sequence
 from importlib.metadata import PackageNotFoundError, distribution
@@ -26,14 +27,36 @@ _CLASSIFIER_LICENSES = {
     "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)": "MPL-2.0",
     "License :: OSI Approved :: Python Software Foundation License": "PSF-2.0",
 }
+_LICENSE_FILE_HASHES = {
+    (
+        "tiktoken",
+        "258463fc3788f1f9b6a3f1820d8a87481ac24018d53167597e25d3e9031851ca",
+    ): "MIT",
+    (
+        "tiktoken",
+        "418cb499b436128d653d79941333a5437b7be2ea9213dcc2f04d15d5d2c51d86",
+    ): "MIT",
+}
 
 
 class DependencyInventoryError(RuntimeError):
     """The installed production graph cannot be inventoried exactly."""
 
 
+def _machine() -> str:
+    observed = platform.machine().strip().lower()
+    if observed:
+        return observed
+    platform_tag = sysconfig.get_platform().lower()
+    for candidate in ("x86_64", "amd64", "aarch64", "arm64"):
+        if candidate in platform_tag:
+            return candidate
+    raise DependencyInventoryError("Machine architecture is unavailable")
+
+
 def _license(name: str) -> str:
-    metadata = distribution(name).metadata
+    installed = distribution(name)
+    metadata = installed.metadata
     expressions = metadata.get_all("License-Expression", [])
     expression = expressions[0] if expressions else None
     if expression:
@@ -51,6 +74,16 @@ def _license(name: str) -> str:
     )
     if found:
         return " OR ".join(found)
+    for relative in installed.files or ():
+        if "license" not in str(relative).lower():
+            continue
+        path = cast(Path, installed.locate_file(relative))
+        if not path.is_file():
+            continue
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        mapped = _LICENSE_FILE_HASHES.get((canonicalize_name(name), digest))
+        if mapped is not None:
+            return mapped
     raise DependencyInventoryError(f"No bounded license expression found for {name}")
 
 
@@ -110,7 +143,7 @@ def build_inventory() -> dict[str, object]:
         "source": "installed distribution metadata resolved by the checked-in uv lock",
         "python": f"{sys.version_info.major}.{sys.version_info.minor}",
         "platform": sys.platform,
-        "machine": platform.machine().lower(),
+        "machine": _machine(),
         "uv_lock_sha256": hashlib.sha256(lock.read_bytes()).hexdigest(),
         "packages": packages,
     }

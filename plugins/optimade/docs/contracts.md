@@ -71,6 +71,65 @@ geometry is never used as an identity substitute.
   SHA-256; and
 - namespaced provider properties remain separate from standard OPTIMADE fields.
 
+The compact JSON form of the search query is preflighted before provider
+federation. It may not exceed 500 `o200k_base` tokens or 3,072 UTF-8 bytes. A
+larger schema-valid query is rejected explicitly at `input-context-budget`
+before any provider request. The result does not repeat provider-controlled
+query text: `query.sha256` binds the full query plus `entry_type` using compact,
+sorted-key, unescaped-Unicode UTF-8 JSON. Continuations bind the same digest.
+
+Federated search is measured before return with the identified
+`tiktoken==0.14.0` `o200k_base` tokenizer. It may not exceed 1,500 tokens or
+8,192 UTF-8 bytes. If requested hits do not fit after metadata compaction, only
+whole hits are removed;
+`context.omitted_hits`, returned counts, warnings, and per-provider continuation
+state expose the loss. Provider warning records have observed and omitted
+counts; verbose warnings are removed from inline context before scientific hits
+are removed, while their complete source pages remain hash-bound. Page-by-page
+hash/timestamp arrays may then be
+replaced by one ordered SHA-256 commitment per provider with explicit observed
+and omitted counts. No page evidence is truncated silently. Continuation
+resumes at the first omitted record, so context compaction neither duplicates
+nor skips provider data. If one hit cannot fit in the remaining result envelope,
+`deferred_hits` advances past it explicitly and provides the
+fixed-size composite reference, exact capability, and minimal valid exact-get input; the
+search cursor therefore continues to make progress while the record remains
+retrievable without truncated scientific content. If even that descriptor cannot
+fit after exact JSON token and byte measurement, only the responsible provider is
+marked failed at `record-identity-context`, its cursor is not advanced, and other
+provider outcomes remain usable.
+
+Every handler result also stays below the engine's 65,536-byte and 4,096-node
+dispatch limits. Provider listing, provider inspection, and exact
+`ResultBundle` projection remove only whole repeatable records as needed under
+a conservative internal target, declare counts or warnings, and retain the
+provider URI plus source response SHA-256. Exact projection becomes `partial`
+only when inline scientific properties are omitted; compacting verbose warning
+text alone does not change the scientific completeness status. The checksummed
+source remains the authoritative record.
+
+Provider-level response hashes and retrieval timestamps are aligned arrays while
+they remain inline. Each hit's provider identity plus `page_index` identifies
+the corresponding source page without repeating rights, citation, hash, and
+timestamp data on every hit. Before scientific hits are omitted, the arrays may
+be replaced by `page_evidence_commitment`. Its SHA-256 input is the UTF-8 RFC
+8259 JSON array `[{"response_sha256":"HASH","retrieved_at":"TIME"},...]`,
+with objects in retrieval order, object keys sorted, no insignificant whitespace,
+and Unicode emitted unescaped. Search results never inline provider-controlled
+implementation strings: `implementation_metadata_sha256` always commits to compact
+sorted-key UTF-8 JSON `{"name":"NAME","version":"VERSION"}`; provider inspection
+exposes their bounded text form. Decision-complete rights records remain in
+every provider block; the longer attribution instruction is available through
+provider inspection and exact retrieval/export. Citation URLs are returned once
+as unique references. If a failed provider's optional implementation commitment
+must be removed to admit a healthy record identity, its failure and source-page
+evidence remain explicit.
+
+Provider-list inputs accept an optional zero-based `registry_entry_offset`.
+When dispatch compaction removes tail records, increase that
+offset by the prior result's `registry.data_returned` value to retrieve the next
+bounded window.
+
 Mapped `ResultBundle` property identifiers use the stable OPTIMADE `1.2`
 contract line, while the exact provider patch version remains in source
 provenance. A provider patch upgrade therefore does not change the identity of
@@ -150,6 +209,9 @@ response models. The integration does not use `OptimadeClient`, its HTTP extra,
 its cache, or its provider-wide/default request behavior. The project-owned
 transport uses only fixed reviewed configuration and the Python standard library
 for egress. Transitive `requests` is therefore not an authorized network path.
+The exact `o200k_base` merge-rank file is fetched from one fixed upstream HTTPS
+URL through that transport, hash-verified, retained only in process memory, and
+never loaded through the package's unbounded URL/cache helper.
 
 Structural conformance, successful parsing, or a live response does not establish
 scientific validity. Positive evidence uses real provider records; generated

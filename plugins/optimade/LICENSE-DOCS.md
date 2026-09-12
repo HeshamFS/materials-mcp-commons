@@ -7,4 +7,4 @@ Copyright 2026 Hesham Salama.
 - License deed: <https://creativecommons.org/licenses/by/4.0/>
 - Legal code: <https://creativecommons.org/licenses/by/4.0/legalcode>
 
-Software source code, executable tests, and deployment code are licensed separately under the Apache License 2.0 in [`LICENSE`](LICENSE). Third-party material retains its own license and attribution requirements; see [`docs/licensing.md`](docs/licensing.md) for the current dependency and data-rights inventory.
+Software source code, executable tests, and deployment code are licensed separately under the Apache License 2.0 in [`LICENSE`](LICENSE). Third-party material retains its own license and attribution requirements; see [`docs/dependencies.md`](docs/dependencies.md) for the current dependency inventory and [`NOTICE`](NOTICE) for applicable notices.

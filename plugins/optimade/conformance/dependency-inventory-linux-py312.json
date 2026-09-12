@@ -117,6 +117,12 @@
       "version": "0.37.0"
     },
     {
+      "license": "Apache-2.0 AND CNRI-Python",
+      "name": "regex",
+      "relationship": "transitive",
+      "version": "2026.9.10"
+    },
+    {
       "license": "Apache-2.0",
       "name": "requests",
       "relationship": "transitive",
@@ -127,6 +133,12 @@
       "name": "rpds-py",
       "relationship": "transitive",
       "version": "2026.6.3"
+    },
+    {
+      "license": "MIT",
+      "name": "tiktoken",
+      "relationship": "direct",
+      "version": "0.14.0"
     },
     {
       "license": "PSF-2.0",
@@ -150,5 +162,5 @@
   "platform": "linux",
   "python": "3.12",
   "source": "installed distribution metadata resolved by the checked-in uv lock",
-  "uv_lock_sha256": "9e04a44f9d4d773b80f86aa1dae2ac3233460b1cb674a9785a02d7fc19056e18"
+  "uv_lock_sha256": "c10b6963dce3072ebb3ddf904cb20adcd03118e8bc64c117d7ccbcbf0d797104"
 }

@@ -125,7 +125,8 @@ def package_spec() -> PluginPackageSpec:
             title="Search OPTIMADE structures",
             description=(
                 "Run one validated OPTIMADE 1.2 filter across an explicit supported-provider "
-                "subset with bounded fields, pages, results, and honest partial failure."
+                "subset with bounded fields, pages, results, honest partial failure, exact "
+                "context measurement, and continuation or exact retrieval for omitted hits."
             ),
             effect=_r0(
                 "Performs bounded concurrent HTTPS reads from explicitly selected supported "
@@ -157,7 +158,8 @@ def package_spec() -> PluginPackageSpec:
             title="Search OPTIMADE references",
             description=(
                 "Run one validated OPTIMADE 1.2 filter over references across an explicit "
-                "supported-provider subset with bounded projection and partial-failure reporting."
+                "supported-provider subset with bounded projection, partial-failure reporting, "
+                "and context-safe continuation or exact retrieval for omitted hits."
             ),
             effect=_r0(
                 "Performs bounded concurrent HTTPS reads from explicitly selected supported "

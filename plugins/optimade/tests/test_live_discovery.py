@@ -49,6 +49,42 @@ def test_live_registry_request_can_exclude_unreviewed_entries() -> None:
     assert [item["provider_id"] for item in providers] == ["mp", "nmd"]
 
 
+def test_live_registry_offset_retrieves_distinct_windows() -> None:
+    client = OptimadeClient()
+    first = client.list_providers(
+        {
+            "include_registry_only": True,
+            "registry_entry_limit": 1,
+            "registry_entry_offset": 0,
+        }
+    )
+    second = client.list_providers(
+        {
+            "include_registry_only": True,
+            "registry_entry_limit": 1,
+            "registry_entry_offset": 1,
+        }
+    )
+    high_offset = client.list_providers(
+        {
+            "include_registry_only": True,
+            "registry_entry_limit": 1,
+            "registry_entry_offset": 100,
+        }
+    )
+    manifest = load_declarative_manifest(PROFILE_ROOT)
+    manifest.validate(f"{SCHEMA_BASE}provider-list-result.schema.json", first)
+    manifest.validate(f"{SCHEMA_BASE}provider-list-result.schema.json", second)
+    manifest.validate(f"{SCHEMA_BASE}provider-list-result.schema.json", high_offset)
+
+    first_provider = cast(list[dict[str, object]], first["providers"])[0]
+    second_provider = cast(list[dict[str, object]], second["providers"])[0]
+    assert first_provider["provider_id"] != second_provider["provider_id"]
+    assert cast(dict[str, object], first["registry"])["requested_offset"] == 0
+    assert cast(dict[str, object], second["registry"])["requested_offset"] == 1
+    assert cast(dict[str, object], high_offset["registry"])["requested_offset"] == 100
+
+
 @pytest.mark.parametrize("provider_id", ["mp", "nmd"])
 def test_live_provider_inspection(provider_id: str) -> None:
     result = OptimadeClient().inspect_provider(provider_id)
@@ -83,3 +119,7 @@ def test_live_provider_inspection_honors_projection_controls() -> None:
     assert entry_types[0]["entry_type"] == "structures"
     assert entry_types[0]["returned_property_count"] == 0
     assert cast(int, entry_types[0]["omitted_property_count"]) > 0
+    assert entry_types[0]["property_count"] == entry_types[0]["omitted_property_count"]
+    assert any(
+        "omitted" in warning.lower() for warning in cast(list[str], entry_types[0]["warnings"])
+    )

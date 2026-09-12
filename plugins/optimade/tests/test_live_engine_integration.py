@@ -111,6 +111,36 @@ def test_live_exact_record_dispatches_through_actual_engine_contracts(tmp_path: 
     assert len(cast(list[object], result["entities"])) == 1
 
 
+def test_live_full_provider_inspection_dispatches_through_engine_bounds(tmp_path: Path) -> None:
+    now = datetime.now(UTC)
+    lifecycle, dispatcher, registration_ref = _register(tmp_path)
+    capability_id = CAPABILITY_IDS["providers_inspect"]
+    lifecycle.activate(capability_id, current_turn=0)
+    request = _request(
+        registration_ref,
+        capability_id,
+        {
+            "provider_id": "nmd",
+            "entry_types": ["structures", "references"],
+            "include_property_definitions": True,
+            "property_limit": 128,
+        },
+        suffix="engine-provider-inspection",
+        occurred_at=now,
+    )
+
+    outcome = dispatcher.dispatch(request)
+    assert isinstance(outcome, DispatchSuccess)
+    result = cast(dict[str, object], outcome.to_result())
+    entry_types = cast(list[dict[str, object]], result["entry_types"])
+    assert {item["entry_type"] for item in entry_types} == {"structures", "references"}
+    assert all(
+        cast(int, item["returned_property_count"]) + cast(int, item["omitted_property_count"])
+        == cast(int, item["property_count"])
+        for item in entry_types
+    )
+
+
 def test_live_export_requires_engine_r1_receipt_then_provider_rights(tmp_path: Path) -> None:
     now = datetime.now(UTC)
     policy_root = tmp_path / "policy"

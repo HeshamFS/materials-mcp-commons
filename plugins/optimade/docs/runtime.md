@@ -41,6 +41,36 @@ The MCP surface remains the generic engine protocol:
 The generated [capability reference](../conformance/capabilities.md) lists all
 seven capability IDs and their exact input, result, and error contracts.
 
+Search execution preflights canonical query metadata at 500 tokenizer tokens
+and 3,072 UTF-8 bytes before federation. The result binds the full query and
+entry type through `query.sha256` instead of repeating filter text. It then
+measures the complete JSON result with the declared `o200k_base` tokenizer and
+UTF-8 encoding before it crosses the MCP boundary.
+When a larger requested page cannot fit the 1,500-token or 8,192-byte inline
+budget, it first compacts verbose provider warnings and page-by-page hash/time
+arrays. Page evidence retains retrieval order in a documented, recomputable
+per-provider SHA-256 commitment with the exact count. Only then does it remove
+whole hits, declare the count, and roll provider cursors back to the first
+omitted record. Repeating the same request with the returned continuation
+retrieves the omitted data without starvation, duplication, or a silent offset
+jump. If a single hit cannot fit the remaining envelope, the response advances
+past that hit only after emitting a `deferred_hits` descriptor for exact
+retrieval. The descriptor carries provider record identifiers only once. If its
+JSON-escaped form still cannot fit the measured envelope, that provider becomes a
+bounded `record-identity-context` partial failure without advancing its cursor;
+other providers are preserved. The
+tokenizer's exact merge-rank data is fetched from a fixed upstream HTTPS
+endpoint through the bounded project transport and verified by SHA-256. One
+successful load is retained in process memory; failed loads remain bounded and
+can be retried by a later call. The runtime does not use `requests`, proxy
+variables, or a machine tokenizer cache.
+
+All seven handlers are also constrained by the engine dispatch envelope.
+Registry listing, provider inspection, and exact retrieval compact only whole
+repeatable records under a 60 KiB/3,800-node target. They update omission
+metadata and preserve checksummed source evidence before the engine performs its
+authoritative 65,536-byte/4,096-node validation.
+
 ## Python composition
 
 Embedding applications can compose the same host explicitly:

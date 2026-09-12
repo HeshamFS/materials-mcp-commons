@@ -21,6 +21,7 @@
         "uri",
         "api_version",
         "response_sha256",
+        "requested_offset",
         "data_returned",
         "more_data_available"
       ],
@@ -35,6 +36,11 @@
         },
         "response_sha256": {
           "$ref": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/common.schema.json#sha256"
+        },
+        "requested_offset": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
         },
         "data_returned": {
           "type": "integer",
