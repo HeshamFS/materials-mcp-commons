@@ -19,6 +19,7 @@ venv/
 node_modules/
 .wrangler/
 .worker-dist/
+.schema-host-assets/
 build/
 dist/
 *.egg-info/

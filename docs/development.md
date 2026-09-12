@@ -82,11 +82,17 @@ The canonical-host deployment has an independent Node.js toolchain. From `deploy
 ```console
 npm ci
 npx wrangler types --include-runtime false
+npm run test
+npm run prepare-assets
 npm run typecheck
 npm run check
 ```
 
-These commands install the pinned deployment toolchain, regenerate binding types, type-check the Worker, and perform a Wrangler dry run. They do not deploy. See the [schema-hosting guide](schema-hosting.md) for local HTTP checks, authenticated deployment, and live acceptance.
+These commands install the pinned deployment toolchain, regenerate binding
+types, test exact route acceptance, checksum-stage only approved schema assets,
+type-check the Worker, and perform a Wrangler dry run. They do not deploy. See
+the [schema-hosting guide](schema-hosting.md) for local HTTP checks,
+authenticated deployment, and live acceptance.
 
 ## Build boundaries
 

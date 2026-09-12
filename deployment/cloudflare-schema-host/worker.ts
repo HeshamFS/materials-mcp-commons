@@ -1,6 +1,4 @@
-const CANONICAL_PREFIX = "/materials-mcp/";
-const EXACT_VERSION = /^(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)$/;
-const RESOURCE_NAME = /^(?:[a-z][a-z0-9-]*\.schema\.json|schema-index\.json)$/;
+import { canonicalResource } from "./routing.js";
 
 function plainResponse(message: string, status: number): Response {
   const headers = new Headers({
@@ -18,24 +16,6 @@ function plainResponse(message: string, status: number): Response {
     status,
     headers,
   });
-}
-
-function canonicalResource(pathname: string): string | null {
-  if (pathname.includes("%") || !pathname.startsWith(CANONICAL_PREFIX)) {
-    return null;
-  }
-
-  const parts = pathname.split("/");
-  if (
-    parts.length !== 4 ||
-    parts[0] !== "" ||
-    parts[1] !== "materials-mcp" ||
-    !EXACT_VERSION.test(parts[2]) ||
-    !RESOURCE_NAME.test(parts[3])
-  ) {
-    return null;
-  }
-  return `/${parts[2]}/${parts[3]}`;
 }
 
 export default {

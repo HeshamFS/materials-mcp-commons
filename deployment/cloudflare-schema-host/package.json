@@ -2,11 +2,17 @@
   "name": "materials-mcp-schema-host",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Cloudflare deployment boundary for immutable Materials MCP Profile schemas.",
   "author": "Hesham Salama",
   "license": "Apache-2.0",
   "scripts": {
-    "check": "wrangler deploy --dry-run --outdir ../../.worker-dist",
+    "prepare-assets": "node prepare-assets.mjs",
+    "test": "node --test test/*.test.mjs",
+    "precheck": "npm run test",
+    "check": "npm run prepare-assets",
+    "postcheck": "wrangler deploy --dry-run --outdir ../../.worker-dist",
+    "predeploy": "npm run check",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit"
   },
