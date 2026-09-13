@@ -13,21 +13,21 @@
     {
       "path": "result-bundle-0.2.0.json",
       "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/result-bundle.schema.json",
-      "size_bytes": 12136,
-      "sha256": "33e88c8890676a8d43f963f8598a8547df23f8bcafe7ba78e586ea4b2d59b35c",
+      "size_bytes": 12123,
+      "sha256": "23d3b5a361e2416d08a0e0c6d8d022470e1d448bc427851b4acd8a188c6595c5",
       "derivation": "Lossless migration of the registered 0.1.0 ResultBundle by changing only its exact contract identifier and profile version."
     },
     {
       "path": "compact-result-0.2.0.json",
       "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.2.0/compact-result.schema.json",
-      "size_bytes": 3507,
-      "sha256": "8d23d98bbb9c0053a9ea5676f79f7e427c83c27db93de0a20440a7a8ed67b985",
+      "size_bytes": 3508,
+      "sha256": "3215db838c507cb30e36d4f201d9507650992254fa6caa65cfa1f7616413ec62",
       "derivation": "Bounded source-order projection of the registered 0.2.0 ResultBundle with explicit omission counts and byte measurement."
     }
   ],
   "limitations": [
     "The selected scalar values contain no reported standard uncertainties.",
     "The source record does not include reflection observations.",
-    "The compact projection proves contract and budget behavior, not independent scientific validation."
+    "The compact projection exercises contract and budget behavior for the registered source."
   ]
 }

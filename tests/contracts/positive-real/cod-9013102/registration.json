@@ -25,8 +25,8 @@
   "instance": {
     "path": "result-bundle.json",
     "schema_id": "https://schemas.autonomouslab.io/materials-mcp/0.1.0/result-bundle.schema.json",
-    "size_bytes": 12136,
-    "sha256": "170cd7b9e00fe0ca55abcc129d09941668a6079be6f5fdb61bd91f9d58829c7c",
+    "size_bytes": 12123,
+    "sha256": "8ee8ef89e05dae07a6d81008d6f69019542c49988e5021061cc5e50be2a73b64",
     "transformation": "Direct projection of declared CIF fields with no numerical conversion; unit identifiers are annotations from the CIF Core dictionary."
   },
   "scientific_citation": {
@@ -39,6 +39,6 @@
   "limitations": [
     "The selected scalar values contain no reported standard uncertainties.",
     "The source record does not include reflection observations.",
-    "This record proves contract and provenance handling, not independent scientific validation."
+    "This record exercises contract and provenance handling for the registered source."
   ]
 }

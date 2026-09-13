@@ -31,7 +31,7 @@ Large arrays, trajectories, meshes, logs, and binary content remain artifact ref
 - Missing uncertainty is explicit, for example `not-reported` with a reason; it is not silently interpreted as zero.
 - Artifacts include stable identity, URI, media type, byte size, SHA-256, role, access scope, and provenance reference.
 - Provenance records producer, activity, inputs, parameters, environment, source rights, source checksums, transformations, and citations.
-- Quality is an explicit assessment with criteria and limitations. Schema-valid does not mean scientifically Validated.
+- Quality records the assessment status, criteria, and limitations for the reported result.
 - Structured failures include cause, stage, evidence, retryability, and a corrective next action.
 
 ## Effect policy
@@ -85,7 +85,7 @@ uv run python -m tools.run_conformance
 
 ## Evidence boundary
 
-The [positive corpus](../tests/contracts/positive-real/README.md) contains only registered, provenance-traceable real records. The [generated-negative corpus](../tests/contracts/negative-generated/README.md) exists only to prove rejection or safe failure. A fixture that passes these contracts is Conformant evidence for the tested boundary; it is not, by itself, runtime verification or independent scientific validation.
+The [positive corpus](../tests/contracts/positive-real/README.md) contains only registered, provenance-traceable real records. The [generated-negative corpus](../tests/contracts/negative-generated/README.md) exists only to prove rejection or safe failure. Passing fixtures provide Conformant evidence for their declared contract and provenance checks.
 
 ## Deliberately outside this implementation slice
 

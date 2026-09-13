@@ -17,7 +17,7 @@ This runbook governs the current local/in-process and stdio host boundary. It is
 - Alert on sustained `failure` counts by operation and stable error code, unexpected `dropped_sink_events`, or a change in expected registration/binding counts.
 - Treat `TARGET_UNAVAILABLE` as a lifecycle/registration/lease problem, `INPUT_SCHEMA_REJECTED` as caller-contract drift, `EFFECT_POLICY_REQUIRED` or `AUTHORIZATION_DENIED` as a fail-closed policy event, and `HANDLER_FAILED` as a private handler investigation.
 - Do not add payloads, results, owner references, receipts, paths, or raw exceptions to the public operational event.
-- A `ready` health snapshot proves only that the local composition can answer; it does not prove external backend availability or scientific validity.
+- A `ready` health snapshot reports that the local composition can answer. Provider availability is reported by the corresponding plugin operations.
 
 ## Graceful stop
 

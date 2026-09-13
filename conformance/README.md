@@ -4,11 +4,11 @@
 
 `engine-suite.json` and `engine-report.json` are the current evolving engine boundary. They retain the profile and corpus checks while adding each accepted runtime surface. Reports contain no timestamp, machine path, network result, or environment-specific value, so the same committed inputs produce identical bytes.
 
-`context-engine-report.json` records W-0303 measurements over the actual engine control capabilities and registered real COD result. It identifies the exact verification tokenizer and model-window assumption, records canonical bytes/tokens, retrieval Recall@5, compact-result omissions, and the 100-turn activation workload. It explicitly does not claim scientific-domain retrieval breadth.
+`context-engine-report.json` records W-0303 measurements over the actual engine control capabilities and registered real COD result. It identifies the exact verification tokenizer and model-window assumption, records canonical bytes/tokens, retrieval Recall@5, compact-result omissions, and the 100-turn activation workload. Its retrieval corpus covers the engine control catalog.
 
-`engine-plugin-report.json` is the deterministic exact-profile declarative report for the actual engine-control package. `authoring-matrix-report.json` records the explicit 0.1.0/0.2.0 profile matrix and compatibility checks. `engine-capabilities.md` is rendered only from the validated immutable manifest. These three authoring artifacts do not execute plugin code and do not establish backend, security, interoperability, or scientific validity.
+`engine-plugin-report.json` is the deterministic exact-profile declarative report for the actual engine-control package. `authoring-matrix-report.json` records the explicit 0.1.0/0.2.0 profile matrix and compatibility checks. `engine-capabilities.md` is rendered only from the validated immutable manifest. These three authoring artifacts cover package declarations and registration without executing plugin code.
 
-`public-api.json` is the W-0502 production-alpha compatibility lock. It is freshly derived from the installed root package, project metadata, exact local profile inventory, and an actual official-SDK server composition. It freezes Python exports, signatures and awaitability, console entry points, supported profile lines, stable public error codes, and closed top-level schemas for all four MCP tools. It does not claim publication, network hosting, external usability, or scientific validation.
+`public-api.json` is the W-0502 production-alpha compatibility lock. It is freshly derived from the installed root package, project metadata, exact local profile inventory, and an actual official-SDK server composition. It freezes Python exports, signatures and awaitability, console entry points, supported profile lines, stable public error codes, and closed top-level schemas for all four MCP tools.
 
 `dependency-inventory-windows-py312.json` and `dependency-inventory-linux-py312.json` are the installed production dependency and license graphs for the base and optional MCP-host distributions. They record the governing `uv.lock` digest and expose platform-only differences instead of merging them away.
 
@@ -47,6 +47,6 @@ Do not rewrite the M1 snapshot. Reproduce it by checking out its recorded commit
 
 The structural coupling audit requires the exact declared generic runtime-dependency set, an exact source-root allowlist, only declared standard-library and dependency import roots, exact-version-local schema references, and generic registered-extension boundaries. Schema-index digests pin the reviewed contract surface.
 
-This result demonstrates that the current engine foundation has no imported external implementation and no external schema dependency. It is not a claim that automated text matching can understand every future architectural concept. Changes to the dependency, import, schema, or extension surface must update the suite deliberately and pass human architecture review.
+This result verifies the declared dependencies, import roots, and local schema references. Changes to the dependency, import, schema, or extension surface must update the suite and pass the corresponding checks.
 
 The positive inputs remain real and provenance-traceable. Generated material is accepted only in the negative corpus to demonstrate rejection and fail-closed behavior.

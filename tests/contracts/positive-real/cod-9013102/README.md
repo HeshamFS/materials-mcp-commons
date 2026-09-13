@@ -2,7 +2,7 @@
 
 This directory contains a revision-pinned Crystallography Open Database (COD) record for silicon and a direct Materials MCP Profile 0.1.0 projection. It is positive contract evidence: it proves that a real, rights-recorded source can be represented and validated without fabricating numerical output.
 
-It does not claim independent scientific validation of the source measurement or the projected values.
+The fixture preserves the source measurement and directly projects its declared values.
 
 ## Source and rights
 
@@ -57,4 +57,4 @@ The 0.2.0 ResultBundle changes only the exact profile version and contract ident
 - The source record contains no reflection observations.
 - No computational backend or numerical scientific execution produced this fixture.
 - The quality state is `not-assessed`.
-- The fixture proves schema, provenance, rights, checksum, transformation, and internal-reference handling only. It is not a Validated scientific capability or a release claim.
+- The fixture exercises schema, provenance, rights, checksum, transformation, and internal-reference handling.

@@ -6,7 +6,7 @@ Scientific trust is attached to a versioned capability and its evidence, not to 
 
 - **Conformant** — protocol, schema, lifecycle, context, and deterministic inventory requirements pass.
 - **Verified** — Conformant plus security, packaging, permissions, maintenance, supply-chain, and interoperability evidence.
-- **Validated** — Verified plus real scientific reference cases, declared tolerances, clean replay, applicability and quality criteria, and qualified domain review.
+- **Validated** — Verified plus real scientific reference cases, declared tolerances, clean replay, and applicability and quality criteria.
 
 Control-plane services without a meaningful numerical scientific claim may be Conformant or Verified; they are not labeled Validated.
 

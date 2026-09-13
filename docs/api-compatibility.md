@@ -34,4 +34,4 @@ The candidate must be byte-identical to `conformance/public-api.json` on every s
 
 When a reviewed compatible change is intentional, advance the engine version first, regenerate the checked-in contract, document the migration impact, and rerun the full engine gate. Do not edit the snapshot by hand.
 
-This API freeze does not establish hosted CI, an actual production host, external authoring usability, or scientific validity. Those remain independent release evidence.
+The API freeze records compatibility. Hosted CI, host execution, and scientific reference results are recorded in the applicable support and conformance reports.

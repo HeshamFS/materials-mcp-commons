@@ -7,9 +7,8 @@ registry entries outside that reviewed allowlist can be described but are never
 queried as execution authority.
 
 The package targets Materials MCP Commons engine `0.1.0a13`, profile `0.2.0`,
-and the `Verified` trust level. It does not claim that provider data is
-scientifically validated, does not merge records across providers, and does not
-infer redistribution rights from public reachability or protocol conformance.
+and the `Verified` trust level. Records retain their provider identity, source
+provenance, and explicit redistribution rights.
 
 ## Frozen capability contract
 

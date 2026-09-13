@@ -13,25 +13,76 @@
   ],
   "lint": {
     "measurements": [
-      {"category": "control-surface", "state": "measured", "token_fraction": 0.0009609375, "tokens": 123, "utf8_bytes": 608},
-      {"category": "discovery", "state": "measured", "token_fraction": 0.0009609375, "tokens": 123, "utf8_bytes": 608},
-      {"category": "activation", "state": "measured", "token_fraction": 0.0051796875, "tokens": 663, "utf8_bytes": 2695},
-      {"category": "inline-result", "state": "measured", "token_fraction": 0.0061796875, "tokens": 791, "utf8_bytes": 2817},
-      {"category": "total-mcp", "state": "target", "token_fraction": 0.01328125, "tokens": 1700, "utf8_bytes": 6728}
+      {
+        "category": "control-surface",
+        "state": "measured",
+        "token_fraction": 0.0009609375,
+        "tokens": 123,
+        "utf8_bytes": 608
+      },
+      {
+        "category": "discovery",
+        "state": "measured",
+        "token_fraction": 0.0009609375,
+        "tokens": 123,
+        "utf8_bytes": 608
+      },
+      {
+        "category": "activation",
+        "state": "measured",
+        "token_fraction": 0.0051796875,
+        "tokens": 663,
+        "utf8_bytes": 2695
+      },
+      {
+        "category": "inline-result",
+        "state": "measured",
+        "token_fraction": 0.006171875,
+        "tokens": 790,
+        "utf8_bytes": 2818
+      },
+      {
+        "category": "total-mcp",
+        "state": "target",
+        "token_fraction": 0.0132734375,
+        "tokens": 1699,
+        "utf8_bytes": 6729
+      }
     ],
     "state": "pass",
     "violations": []
   },
   "model_window_tokens": 128000,
   "projection": {
-    "byte_omissions": {"artifacts": 0, "citations": 0, "conditions": 0, "entities": 0, "properties": 0, "truncated": false, "warnings": 0},
+    "byte_omissions": {
+      "artifacts": 0,
+      "citations": 0,
+      "conditions": 0,
+      "entities": 0,
+      "properties": 0,
+      "truncated": false,
+      "warnings": 0
+    },
     "source_result_ref": "urn:materials-mcp:fixture:cod-9013102-r291877:result",
-    "token_omissions": {"artifacts": 0, "citations": 0, "conditions": 0, "entities": 0, "properties": 1, "truncated": true, "warnings": 0},
-    "tokens": 1385,
-    "utf8_bytes": 5365
+    "token_omissions": {
+      "artifacts": 0,
+      "citations": 0,
+      "conditions": 0,
+      "entities": 0,
+      "properties": 1,
+      "truncated": true,
+      "warnings": 0
+    },
+    "tokens": 1384,
+    "utf8_bytes": 5352
   },
   "report_version": 1,
-  "retrieval": {"failed_case_ids": [], "passed_cases": 4, "recall_at_k": 1.0, "total_cases": 4},
+  "retrieval": {
+    "failed_case_ids": [],
+    "passed_cases": 4,
+    "recall_at_k": 1.0,
+    "total_cases": 4
+  },
   "scope": "actual-engine-control-plane",
   "tokenizer_ref": "https://github.com/openai/tiktoken/tree/0.14.0#o200k_base"
 }

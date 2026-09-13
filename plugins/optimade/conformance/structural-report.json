@@ -131,7 +131,7 @@
   ],
   "limitations": [
     "No plugin implementation code or backend was loaded or executed.",
-    "This report does not establish security, interoperability, or scientific validity."
+    "This report covers package declarations, schema integrity, and registration identity."
   ],
   "plugin": {
     "description": "Bounded, rights-aware OPTIMADE 1.2 federation over reviewed live materials databases with explicit provenance, partial failure, and local export effects.",

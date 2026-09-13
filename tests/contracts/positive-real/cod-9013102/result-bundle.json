@@ -177,12 +177,12 @@
   ],
   "quality": {
     "status": "not-assessed",
-    "reason": "This fixture tests contract and provenance handling; it is not a scientific validation claim.",
+    "reason": "This fixture tests contract and provenance handling for the source-reported crystal structure.",
     "criteria": [],
     "limitations": [
       "The selected scalar values contain no reported standard uncertainties.",
       "The source record does not include reflection observations.",
-      "No numerical backend execution or independent scientific validation is claimed."
+      "The values are projected directly from the registered CIF fields."
     ]
   },
   "provenance": {

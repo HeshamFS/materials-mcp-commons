@@ -5,7 +5,7 @@ Contract evidence is split by purpose so generated rejection inputs cannot be mi
 - `positive-real/` accepts only registered, provenance-traceable real records with rights and integrity metadata.
 - `negative-generated/` accepts deliberately invalid or adversarial inputs only when the asserted outcome is rejection, containment, or safe failure.
 
-The positive corpus contains one checksummed source record, its direct 0.1.0 ResultBundle, a lossless 0.2.0 migration, and a bounded compact projection. The negative corpus contains generated rejection cases only. Neither corpus is a substitute for later runtime, interoperability, or independent scientific-validation evidence.
+The positive corpus contains one checksummed source record, its direct 0.1.0 ResultBundle, a lossless 0.2.0 migration, and a bounded compact projection. The negative corpus contains generated rejection cases only. These corpora exercise schema validation, provenance, and rejection behavior.
 
 ## What the executable checks cover
 

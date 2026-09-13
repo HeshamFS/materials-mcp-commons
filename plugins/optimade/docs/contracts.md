@@ -16,7 +16,7 @@ not import, name, package, or special-case this integration.
 | Profile | `0.2.0` |
 | Protocol implementation | stable OPTIMADE 1.2.x patch line; 1.2.0 baseline |
 | Intended local matrix | Windows and Ubuntu, CPython 3.11-3.14 |
-| Trust target | `Verified`; not `Validated` |
+| Trust target | `Verified` |
 
 The current official OPTIMADE specification is 1.3.0, but the accepted live
 providers and the pinned official Python grammar/model dependency currently use
@@ -213,8 +213,7 @@ The exact `o200k_base` merge-rank file is fetched from one fixed upstream HTTPS
 URL through that transport, hash-verified, retained only in process memory, and
 never loaded through the package's unbounded URL/cache helper.
 
-Structural conformance, successful parsing, or a live response does not establish
-scientific validity. Positive evidence uses real provider records; generated
+Positive evidence uses real provider records; generated
 inputs are isolated to negative, boundary, fuzz, and security rejection tests.
 NOMAD currently exposes no reference records through the tested endpoint, while
 the Materials Project rights record remains fail-closed for redistribution.

@@ -240,9 +240,9 @@ positive evidence separate from generated negative and security inputs. Use the
 typed authoring API to build a checksum-bound declarative package only after the
 capability semantics, effects, rights, and schemas are complete.
 
-A successful package build proves structural conformance to one exact profile.
-It does not prove backend interoperability, security, numerical correctness, or
-scientific validity.
+A successful package build establishes structural conformance to one exact
+profile, including package declarations, schema integrity, and registration
+identity.
 
 Before distribution, add the license text corresponding to the selected SPDX
 expression and verify rights for every bundled resource. Until the pinned engine

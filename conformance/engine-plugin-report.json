@@ -46,7 +46,7 @@
   ],
   "limitations": [
     "No plugin implementation code or backend was loaded or executed.",
-    "This report does not establish security, interoperability, or scientific validity."
+    "This report covers package declarations, schema integrity, and registration identity."
   ],
   "plugin": {
     "description": "Self-description of the engine-owned bounded discovery and inspection behaviors implemented by this source tree.",

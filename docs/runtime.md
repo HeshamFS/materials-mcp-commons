@@ -102,7 +102,7 @@ The linter measures control tools, discovery cards, active schemas, an optional 
 
 Rich-to-compact projection validates the authoritative ResultBundle first, copies only source values and references in source order, records every omission, and measures the complete contract-valid projection. If the candidate exceeds its byte or identified-token budget, whole optional entries are removed from the end; serialized JSON and scientific scalars are never byte-truncated. An irreducible envelope that cannot fit fails explicitly.
 
-The runtime also provides deterministic retrieval and 100-turn lifecycle evaluators. The checked-in positive corpus covers only actual engine-owned discovery and inspection behavior, including no-tool cases. It does not claim scientific-domain retrieval breadth; that evidence belongs to later real plugins.
+The runtime also provides deterministic retrieval and 100-turn lifecycle evaluators. The checked-in positive corpus covers only actual engine-owned discovery and inspection behavior, including no-tool cases. Scientific plugin retrieval is measured against each plugin's own query corpus.
 
 ## Author without inventing a plugin
 
@@ -110,7 +110,7 @@ The authoring SDK creates an empty installable scientist workspace and builds a 
 
 The SDK does not generate a sample capability, handler, backend, scientific result, or trust claim and does not execute plugin code. See the [Scientist Kit guide](authoring.md).
 
-`PluginConformanceRunner` produces a path-free, timestamp-free report from the validated package snapshot and repeats registration to prove stable identity. `build_versioned_matrix` evaluates only explicit local exact-version profiles and packages, while `assess_plugin_migration` compares two separately valid caller-supplied packages without mutating either one. Capability-reference Markdown is generated solely from the validated manifest. All of these checks are declarative and code-execution-free; none establish backend, security, interoperability, or scientific validity.
+`PluginConformanceRunner` produces a path-free, timestamp-free report from the validated package snapshot and repeats registration to prove stable identity. `build_versioned_matrix` evaluates only explicit local exact-version profiles and packages, while `assess_plugin_migration` compares two separately valid caller-supplied packages without mutating either one. Capability-reference Markdown is generated solely from the validated manifest. These checks cover package declarations, exact schema references, and registration without executing plugin code.
 
 ## Durable runs and artifacts
 
@@ -120,4 +120,4 @@ Artifact registration uses a contained relative path beneath a separate explicit
 
 ## Evidence boundary
 
-The checked-in positive runtime record describes only discovery, inspection, and dispatch behavior actually implemented by this engine. It is not a scientific backend, concrete integration, or numerical validation case. Generated runtime material exists only under the negative-test namespace and passes only when rejected or safely contained.
+The checked-in positive runtime record describes only discovery, inspection, and dispatch behavior actually implemented by this engine. Its scope is the engine control plane. Generated runtime material exists only under the negative-test namespace and passes only when rejected or safely contained.

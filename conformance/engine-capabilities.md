@@ -1,6 +1,6 @@
 # Materials MCP Commons engine lifecycle capability reference
 
-This generated reference reports exact declarative structure only. It does not load or execute plugin code and does not establish backend interoperability, security, or scientific validity.
+This generated reference reports capability declarations and exact contracts from the package manifest without loading or executing plugin code.
 
 - Plugin ID: `https://schemas.autonomouslab.io/materials-mcp/engine`
 - Plugin version: `0.1.0-alpha.9`

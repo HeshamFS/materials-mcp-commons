@@ -50,9 +50,9 @@ The checked-in Python inventories were regenerated from clean locked environment
 |---|---|---|
 | [`tests/contracts/positive-real/cod-9013102/source.cif`](../tests/contracts/positive-real/cod-9013102/source.cif) | Crystallography Open Database record 9013102, revision 291877 | CC0-1.0; redistribution permitted; acknowledge B. N. Dutta and the original structural-data sources as requested by COD |
 | [`tests/contracts/positive-real/cod-9013102/`](../tests/contracts/positive-real/cod-9013102/README.md) registration and result records | Project-authored source registration, direct contract projection, lossless successor migration, and compact projection | CC BY 4.0; embedded source facts retain their source provenance |
-| [`tests/contracts/negative-generated/`](../tests/contracts/negative-generated/README.md) | Project-authored invalid contract inputs used only for rejection testing | CC BY 4.0; no scientific-validity claim |
-| [`tests/runtime/positive-project/`](../tests/runtime/positive-project/README.md) | Project-authored records of actual engine control-plane behavior; no scientific or integration claim | CC BY 4.0 |
-| `tests/runtime/negative_generated/` | Generated invalid, boundary, and security inputs used only for fail-closed runtime testing | Apache-2.0 test code; no scientific-validity claim |
+| [`tests/contracts/negative-generated/`](../tests/contracts/negative-generated/README.md) | Project-authored invalid contract inputs used only for rejection testing | CC BY 4.0 |
+| [`tests/runtime/positive-project/`](../tests/runtime/positive-project/README.md) | Project-authored records of actual engine control-plane behavior | CC BY 4.0 |
+| `tests/runtime/negative_generated/` | Generated invalid, boundary, and security inputs used only for fail-closed runtime testing | Apache-2.0 test code |
 | [`conformance/`](../conformance/README.md) | Project-authored conformance-suite declaration and deterministic result vector | CC BY 4.0 |
 | [`schemas/`](../schemas/README.md) and [`docs/`](README.md) | Project-authored schema specifications and documentation | CC BY 4.0 |
 | `src/`, `tools/`, executable tests, and `deployment/` code | Project-authored software | Apache-2.0 |

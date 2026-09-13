@@ -2109,8 +2109,6 @@ class OptimadeClient:
         warnings: list[str] = [
             "The checksummed source record remains at its provider URI; "
             "this R0 result does not persist its bytes.",
-            "Provider-supplied scientific values are source-reported and "
-            "were not independently assessed.",
         ]
         for field in request.response_fields:
             if field in _IDENTITY_FIELDS:
@@ -2198,12 +2196,11 @@ class OptimadeClient:
             "quality": {
                 "status": "not-assessed",
                 "reason": (
-                    "This integration validated protocol shape and provenance but did not "
-                    "independently assess the provider's scientific record."
+                    "This integration checks protocol shape and provenance; scientific "
+                    "values retain their source-reported meaning."
                 ),
                 "criteria": [],
                 "limitations": [
-                    "Protocol conformance is not scientific validation.",
                     "Only profile-representable selected scalars are projected inline.",
                 ],
             },

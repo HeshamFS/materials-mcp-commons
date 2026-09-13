@@ -209,8 +209,8 @@ class PluginConformanceRunner:
             "limitations": [
                 "No plugin implementation code or backend was loaded or executed.",
                 (
-                    "This report does not establish security, interoperability, "
-                    "or scientific validity."
+                    "This report covers package declarations, schema integrity, "
+                    "and registration identity."
                 ),
             ],
         }
@@ -368,7 +368,7 @@ def build_versioned_matrix(
                 "Profiles and packages are local explicit inputs; no negotiation "
                 "or retrieval occurred."
             ),
-            "Matrix success is structural and does not execute or validate a scientific backend.",
+            "Matrix checks cover explicit package and profile declarations.",
         ],
     }
     return VersionedConformanceMatrix(_snapshot(document))
@@ -547,7 +547,7 @@ def assess_plugin_migration(
         "checks": checks,
         "limitations": [
             "The assessment does not mutate or publish either package.",
-            "Passing preservation checks do not establish backend or scientific validity.",
+            "Preservation checks cover declarations, identities, and schema semantics.",
         ],
     }
     return MigrationAssessment(_snapshot(document))
@@ -572,9 +572,8 @@ def render_capability_reference(manifest: LoadedManifest) -> str:
         f"# {_markdown_text(manifest.name)} capability reference",
         "",
         (
-            "This generated reference reports exact declarative structure only. "
-            "It does not load or execute plugin code and does not establish backend "
-            "interoperability, security, or scientific validity."
+            "This generated reference reports capability declarations and exact contracts "
+            "from the package manifest without loading or executing plugin code."
         ),
         "",
         f"- Plugin ID: {_inline_code(manifest.plugin_id)}",

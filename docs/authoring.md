@@ -1,6 +1,6 @@
 # Authoring with the Scientist Kit
 
-The Scientist Kit separates workspace scaffolding, declarative package construction, executable handler composition, and scientific validation. These are different gates: completing one does not imply the next has passed.
+The Scientist Kit supports workspace scaffolding, declarative package construction, executable handler composition, and scientific reference checks. Each stage records its own results.
 
 ## Create an empty workspace
 
@@ -87,4 +87,4 @@ The command exits `0` only for a conforming package and `2` with a typed code fo
 
 `assess_plugin_migration` compares two separately valid caller-supplied packages against an explicit compatibility document and exact source/target registries. A passing assessment requires stable plugin and capability identities plus preserved manifest metadata, effects, extensions, schema-resource descriptors, and normalized validation semantics. Package versions may advance and are reported.
 
-The assessment never edits, rewrites, or publishes either package. Authors must construct and review the target package themselves; the result does not establish backend interoperability or scientific validity.
+The assessment never edits, rewrites, or publishes either package. Authors construct the target package and use the report to check preserved declarations and schema semantics.

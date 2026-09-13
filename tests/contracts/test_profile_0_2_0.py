@@ -333,11 +333,9 @@ def test_generated_cross_field_budget_case_fails_closed(
 
 def test_mutating_successor_case_does_not_change_registered_real_records() -> None:
     original = load_json(POSITIVE_ROOT / "compact-result-0.2.0.json")
+    before_mutation = copy.deepcopy(original)
     mutated = apply_add_mutation(original, "/projection/budget/observed", 8193)
-    assert (
-        cast(dict[str, Any], cast(dict[str, Any], original["projection"])["budget"])["observed"]
-        == 3507
-    )
+    assert original == before_mutation
     assert (
         cast(dict[str, Any], cast(dict[str, Any], mutated["projection"])["budget"])["observed"]
         == 8193

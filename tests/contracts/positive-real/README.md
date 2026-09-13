@@ -15,4 +15,4 @@ Every directory in this corpus must contain an authoritative real record and:
 |---|---|---|---|
 | [`cod-9013102/`](cod-9013102/README.md) | Revision-pinned experimental silicon crystal-structure record | `result-bundle.schema.json` | Contract and provenance handling only; quality is explicitly not assessed |
 
-Toy data, fabricated values, mocked scientific outputs, and generated positive examples are prohibited. A record's presence here does not make it scientifically Validated.
+Toy data, fabricated values, mocked scientific outputs, and generated positive examples are prohibited.

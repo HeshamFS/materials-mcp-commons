@@ -178,7 +178,7 @@
       "The hosted push matrix and manual live-provider job both pass on the same immutable runtime commit.",
       "The canonical plugin schemas and their core profile 0.2.0 dependencies are live and byte-identical to deployment commit 082980ae75a1d559cf294167182dc7b3b8af6944.",
       "No package registry publication or release tag is claimed.",
-      "The trust ceiling is Verified; no human review or Validated claim is required or made."
+      "The integration's declared trust level is Verified."
     ]
   }
 }

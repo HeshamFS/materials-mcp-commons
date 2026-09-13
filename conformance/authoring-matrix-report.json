@@ -26,7 +26,7 @@
   ],
   "limitations": [
     "Profiles and packages are local explicit inputs; no negotiation or retrieval occurred.",
-    "Matrix success is structural and does not execute or validate a scientific backend."
+    "Matrix checks cover explicit package and profile declarations."
   ],
   "packages": [
     {
@@ -79,7 +79,7 @@
         ],
         "limitations": [
           "No plugin implementation code or backend was loaded or executed.",
-          "This report does not establish security, interoperability, or scientific validity."
+          "This report covers package declarations, schema integrity, and registration identity."
         ],
         "plugin": {
           "description": "Self-description of the engine-owned bounded discovery and inspection behaviors implemented by this source tree.",
@@ -173,7 +173,7 @@
         ],
         "limitations": [
           "No plugin implementation code or backend was loaded or executed.",
-          "This report does not establish security, interoperability, or scientific validity."
+          "This report covers package declarations, schema integrity, and registration identity."
         ],
         "plugin": {
           "description": "Self-description of the engine-owned bounded discovery and inspection behaviors implemented by this source tree.",

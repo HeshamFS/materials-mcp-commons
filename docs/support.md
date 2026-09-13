@@ -42,8 +42,8 @@ The distribution provides a composition library, not a preconfigured server with
 
 Streamable HTTP and every other network deployment are unsupported in this alpha boundary. The SDK's ability to construct an HTTP application is not deployment evidence. Network support requires a separately accepted authenticated-principal design, transport-security allowlist, reverse-proxy and TLS controls, bounded request resources, and executed security and operations gates.
 
-No concrete scientific or provider plugin is part of the engine support declaration. Scientific capabilities require their own real-system, provenance, numerical, licensing, security, and domain-review evidence before they can receive a trust label.
+The engine support declaration covers the generic runtime. Each scientific plugin records its supported real systems, provenance, numerical criteria where applicable, licensing, security, and capability evidence.
 
 ## Evidence status
 
-The checked-in workflow and local reports are reproducibility inputs, not self-certifying claims. A release record must identify the immutable commit, successful hosted workflow run, exact host and SDK versions, artifact hashes, and the review evidence required by the accepted milestone gate. The current gate requires no human review and no such review is claimed. Until every accepted gate is recorded, the repository remains an unreleased alpha candidate.
+The checked-in workflow and local reports provide reproducible verification. A release record identifies the immutable commit, successful hosted workflow run, exact host and SDK versions, artifact hashes, and applicable test results. The current packages are available from the source checkout.

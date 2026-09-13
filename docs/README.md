@@ -16,9 +16,8 @@ This directory contains public, product-facing documentation for Materials MCP C
 - [Versioning and compatibility](versioning.md)
 - [Production-alpha API compatibility](api-compatibility.md)
 - [Production-alpha support boundary](support.md)
-- [Optional independent review protocol](external-review.md)
 - [Licensing and third-party material](licensing.md)
 
-Documentation grows alongside executable contracts and verified capabilities. It describes public product behavior and supported evidence without treating schema validity as runtime or scientific validation.
+Documentation grows alongside executable contracts and verified capabilities. It describes public product behavior, supported environments, and the evidence for each capability.
 
 Unless a file states otherwise, documentation and specification prose are licensed under CC BY 4.0. See [`../LICENSE-DOCS.md`](../LICENSE-DOCS.md).

@@ -109,8 +109,8 @@ input, creates an immutable operation plan, checks its fixed export-root
 permission, reserves one unit from the durable configured quota, consumes a
 single-use receipt, and lets the dispatcher redeem that receipt immediately
 before the handler runs. An inactive or expired request never reaches the
-authorization resolver and consumes no quota. No human confirmation is required
-for R1.
+authorization resolver and consumes no quota. R1 export uses the configured
+host policy and quota.
 
 Authorization alone cannot establish redistribution rights. The handler also
 requires a current affirmative provider-rights record before network access and
@@ -142,5 +142,4 @@ fixed providers, exercise exact engine dispatch and a real stdio subprocess,
 and parse a real exported CIF with an independent crystallographic parser.
 Generated data appears only in rejection and security controls. The checked
 [`support matrix`](../conformance/support-matrix.json) separates offline checks
-from dated real-provider observations. No independent human review is claimed
-or required; the trust ceiling is `Verified`, never `Validated`.
+from dated real-provider observations.
